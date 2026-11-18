@@ -1,0 +1,2 @@
+# Keep the committed Marketplace entry point identical to the release asset.
+/dist/gleam-card.js -text linguist-generated=true
