@@ -1,0 +1,38 @@
+name: Interactive demo
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [index.html, dev/demo.js, dist/gleam-card.js, .github/workflows/demo.yml]
+permissions: {}
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Stage the public demo
+        run: |
+          mkdir -p site/dev site/dist
+          cp index.html site/
+          cp dist/gleam-card.js site/dist/
+          cp dev/demo.js site/dev/
+          printf '%s\n' 'import "../dist/gleam-card.js";' 'import "./demo.js";' > site/dev/preview.js
+      - uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: site
+  deploy:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.site.outputs.page_url }}
+    steps:
+      - id: site
+        uses: actions/deploy-pages@v5.0.1

@@ -1,20 +1,20 @@
 # Gleam Cards
 
-See **when you used energy and what electricity cost at the time** on one interactive Home Assistant dashboard. Start with a cumulative energy meter; add price, power, and voltage sensors when you have them.
+**Your energy use and electricity prices on one timeline.** Rotate the graph to explore a day in depth, or switch to Front view to see which hours used the most energy.
 
 The Energy Graph and Thermostat are the first two cards in a planned Gleam series. The long-term goal is to cover most everyday Home Assistant dashboard needs with cards that look and feel consistent.
 
-[Install](#install) · [Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md)
+[**Try the live demo ↗**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install) · [Release notes](https://github.com/magnusoverli/gleam-card/releases/latest)
 
 ![Gleam Energy Graph showing hourly consumption bars beside a stepped price forecast and power history](docs/images/energy-graph.png)
 
 ### Energy Graph · Stable
 
-Compare hourly consumption with recorded prices and, when your price sensor supplies them, upcoming rates. Drag to rotate, right-drag to pan, or choose **Front** to compare the series on a timeline. The visual editor lets you pick sensors, colours, readouts, and a starting view.
+Start with a single cumulative meter. Add price, power, or voltage when you’re ready; if your price sensor publishes tomorrow’s rates, the graph shows those too. [Configure the graph →](docs/energy-graph.md)
 
 ### Thermostat · Experimental
 
-Adjust a climate entity’s target temperature with a dial, or use the buttons and keyboard. Available modes and controls follow the device’s capabilities. The thermostat ships in the same package as the graph and carries an **Experimental** badge because real-device testing is limited.
+Set a target temperature by turning the dial or using the keyboard. Fan, preset, and swing controls follow the capabilities of your climate entity. Real-device testing is limited; you can [try the demo dial](https://magnusoverli.github.io/gleam-card/#thermostat) without controlling any equipment. [Thermostat settings →](docs/thermostat.md)
 
 <details>
 <summary>See the thermostat</summary>

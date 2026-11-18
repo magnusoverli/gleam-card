@@ -68,3 +68,52 @@ larger card if scaling makes controls difficult to use.
 
 The visual editor preserves unrecognized configuration and layout keys when
 resetting display/control options.
+
+## YAML examples
+
+**Start with one entity.** Replace the climate ID with a device in your installation.
+
+```yaml
+type: custom:gleam-thermostat
+entity: climate.heat_pump
+```
+
+**Compact, scrollable thermostat.** This example includes every card option.
+It leaves the dial and buttons interactive, hides the slider, and keeps
+advanced controls collapsed until needed. A selector appears only when the
+device supports it. Quote hex colours so YAML reads them as strings.
+
+```yaml
+type: custom:gleam-thermostat
+entity: climate.heat_pump
+name: Living room
+card_height: 360
+card_max_width: 400
+content_overflow: scroll
+show_name: true
+show_mode: true
+show_caption: true
+show_room_temperature: true
+dial_height: 220
+dial_padding: 8
+temperature_font_size: 48
+card_padding: 16
+corner_radius: 18
+interactive_dial: true
+show_temperature_buttons: true
+show_temperature_slider: false
+show_hvac_modes: true
+show_fan: true
+show_presets: true
+show_swing: true
+advanced_open: false
+confirmation_timeout: 15
+heat_color: "#ffab70"
+cool_color: "#65f0ff"
+off_color: "#8fa9c2"
+background_color: "#080e24"
+show_dial_ticks: true
+glass_opacity: 0.7
+ring_thickness: 0.08
+glow_intensity: 0.45
+```

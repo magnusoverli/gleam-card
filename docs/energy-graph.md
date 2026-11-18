@@ -30,7 +30,7 @@ until corrected. You can switch between YAML and the visual editor.
 | `use_server_time` | `false` | Axis and tooltip times use the viewing device’s time zone. Enable **Graph settings → Use Home Assistant server time** to use the installation’s zone instead. |
 | `point_light_intensity` | `48` | Brightness of the camera-following point light, from 0 (off) to 200. It stays centred in the view as you orbit or pan. Set under **Graph settings**. |
 
-All entity options must be sensor IDs. Defaults are placeholders, not entity
+Use a `sensor.*` ID for each configured source, or `""` to disable an optional source. Defaults are placeholders, not entity
 discovery. Power and voltage lanes start hidden and load history on demand.
 
 Set **Graph settings → Dataset spacing** in the visual editor, or add
@@ -56,6 +56,15 @@ and `<series>_opacity`, with `energy`, `price`, `power`, or `voltage` as the ser
 Current-hour and completed bars share the energy style. Energy defaults to 65%
 opacity; the other series default to 100%. Price fills and forecast shading stay
 lighter than the price line. Opacity affects plotted data, not axes or controls.
+Colours use six hexadecimal digits; quote the `#` colour in YAML. These are the defaults:
+
+| Series | Base colour | Opacity |
+| --- | --- | --- |
+| Energy | `#22e4ef` | 65% |
+| Price | `#ff883f` | 100% |
+| Power | `#64f9a5` | 100% |
+| Voltage | `#b48aff` | 100% |
+
 Price, power, and voltage also have independent **Line width (%)** settings.
 Use `price_line_width`, `power_line_width`, or `voltage_line_width` in YAML.
 Values range from 25 to 300; 100 keeps the original stroke and join thickness.
@@ -111,3 +120,73 @@ Drag to orbit, right-drag to pan, and pinch or scroll to zoom. Select Isometric,
 Series toggles are keyboard accessible; plotted tooltips use pointer input.
 Rendering is demand-driven and refreshes pause off-screen. Removing the card
 disposes its observers, timers, controls, textures, geometries and WebGL renderer.
+
+## YAML examples
+
+**Energy only.** Show the past 24 hours with no forecast window. Replace the
+meter ID with your own. Empty IDs disable the optional power and voltage lanes.
+
+```yaml
+type: custom:gleam-energy-graph
+energy_entity: sensor.house_total_energy
+power_entity: ""
+voltage_entity: ""
+hours_to_show: 24
+future_hours: 0
+```
+
+**Four-series dashboard.** This complete example shows every card option. It
+opens in Front view with energy, price, and power visible; voltage can be
+toggled on. Remove any optional settings you want to leave at their defaults.
+
+```yaml
+type: custom:gleam-energy-graph
+title: Household energy
+energy_entity: sensor.house_total_energy
+current_hour_entity: sensor.house_energy_this_hour
+price_entity: sensor.electricity_price
+power_entity: sensor.house_power
+voltage_entity: sensor.supply_voltage
+hours_to_show: 36
+future_hours: 12
+refresh_interval: 30
+use_server_time: true
+dataset_spacing: 5
+point_light_intensity: 40
+now_marker_color: "#ff647c"
+
+energy_color: "#22e4ef"
+price_color: "#ff883f"
+power_color: "#64f9a5"
+voltage_color: "#b48aff"
+energy_opacity: 75
+price_opacity: 95
+power_opacity: 85
+voltage_opacity: 80
+price_line_width: 125
+power_line_width: 100
+voltage_line_width: 75
+energy_shift_minutes: 30
+price_shift_minutes: 0
+power_shift_minutes: -5
+voltage_shift_minutes: 0
+
+show_current_hour_readout: true
+show_price_readout: true
+current_hour_label: Usage this hour
+price_label: Tariff
+show_current_hour_label: true
+show_price_label: false       # Unit only; the price value remains visible.
+separate_readout_sizes: true
+readout_value_size: 100       # Used when separate_readout_sizes is false.
+current_hour_value_size: 125
+price_value_size: 90
+start_energy: true
+start_price: true
+start_power: true
+start_voltage: false
+show_dataset_buttons: true
+show_camera_buttons: true
+starting_view: front
+lock_navigation: false
+```
