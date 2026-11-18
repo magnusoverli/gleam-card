@@ -1,129 +1,56 @@
 # Gleam Cards
 
-Interactive glass/neon Home Assistant dashboard cards by
-Magnus Øverli (<magnus@overli.dev>).
+See **when you used energy and what electricity cost at the time** on one interactive Home Assistant dashboard. Start with a cumulative energy meter; add price, power, and voltage sensors when you have them.
 
-| Card | Status | Lovelace type | Configuration |
-| --- | --- | --- | --- |
-| Gleam Energy Graph | Stable | `custom:gleam-energy-graph` | YAML and visual editor |
-| Gleam Thermostat | Experimental | `custom:gleam-thermostat` | YAML and visual editor |
+[Install](#install) · [Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md)
 
-Gleam Cards is one Home Assistant Marketplace dashboard package. Both cards
-share a release version; the thermostat's Experimental badge describes its
-limited real-device testing, not a separate update channel.
+![Gleam Energy Graph showing hourly consumption bars beside a stepped price forecast and power history](docs/images/energy-graph.png)
 
-For a Marketplace release, run `npm ci`, test and build, then attach
-`dist/gleam-card.js` to the GitHub Release as `gleam-card.js`. The root
-`hacs.json` identifies that asset. Use a regular release for the stable package;
-mark a release as a pre-release only to offer a beta of the **whole package**.
+### Energy Graph · Stable
 
-![Energy Graph with hourly bars, price intervals and power history](docs/images/energy-graph.png)
+Compare hourly consumption with recorded prices and, when your price sensor supplies them, upcoming rates. Drag to rotate, right-drag to pan, or choose **Front** to compare the series on a timeline. The visual editor lets you pick sensors, colours, readouts, and a starting view.
 
-![Experimental Thermostat showing the target temperature and mode controls](docs/images/thermostat.png)
+### Thermostat · Experimental
 
-## Home Assistant Marketplace
+Adjust a climate entity’s target temperature with a dial, or use the buttons and keyboard. Available modes and controls follow the device’s capabilities. The thermostat ships in the same package as the graph and carries an **Experimental** badge because real-device testing is limited.
+
+<details>
+<summary>See the thermostat</summary>
+
+![Gleam Thermostat showing the temperature dial, heating mode and experimental badge](docs/images/thermostat.png)
+
+</details>
+
+## Install
 
 [![Open Gleam Cards in your Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&repository=gleam-card&category=plugin)
 
-Use the button above to install the [published package](https://github.com/magnusoverli/gleam-card/releases).
-Before catalog inclusion, this link offers to add the custom Dashboard repository.
-After installation, reload the dashboard and select a card in **Add card**.
-If migrating from the local installation below, remove its old resource registration.
+1. Open the link above. If Gleam Cards isn’t in your catalog, confirm **Add custom repository** when prompted, then install the Dashboard package.
+2. Reload the dashboard. Choose **Edit dashboard → Add card → Gleam Energy Graph**.
+3. Under **Main energy → Sensor**, select a cumulative meter that reports kWh and has hourly Recorder statistics. Save the card. Price and current-hour readings are optional.
 
-Both cards and Three.js are bundled into one local JavaScript module. No CDN,
-backend integration, or separate vendor directory is required.
-
-## Build and preview
-
-Use the latest stable Node.js and npm (currently Node 26.13.1 and npm 12.2.3).
-The lockfile pins dependencies for reproducible installs.
-
-```sh
-npm ci
-npm run build
-npm run dev
-```
-
-Open the local URL printed by Vite. The preview uses synthetic data and mock
-climate actions; it does not connect to Home Assistant. Source changes reload
-the page automatically. Browser regression tests exercise the production bundle.
-
-## Install locally
-
-### Development deployment (no manual version increments)
-
-Mount or share your Home Assistant configuration directory, then run:
-
-```sh
-npm run deploy -- --config "<path to Home Assistant config>"
-```
-
-Register `/local/gleam-card/loader.js` once as a **JavaScript module** in
-**Settings → Dashboards → Resources**. Replace the previous Gleam resource
-registration rather than adding a duplicate.
-
-After each deployment, reload the dashboard. The stable loader fetches a fresh
-manifest and imports the content-hashed bundle. No `?v=` changes or Home
-Assistant restart are needed. The command writes only `www/gleam-card/`;
-it does not edit Home Assistant settings or require an API token.
-
-Older hashed bundles are retained for open clients. They can be removed when
-no longer needed; keep the file named in `manifest.json`. Deployment requires
-filesystem access; it does not automatically upload to a remote server.
-
-### Manual single-file installation
-
-Copy `dist/gleam-card.js` to `<Home Assistant config>/www/gleam-card.js`.
-In **Settings → Dashboards → Resources**, register:
-
-- URL: `/local/gleam-card.js?v=1`
-- Type: **JavaScript module**
-
-Reload the browser. Advanced Mode may be needed to see Resources.
-Increment the existing resource URL's version when updating; avoid duplicate
-registrations. No Home Assistant restart is needed.
-
-Both cards appear in the card picker. Replace the example entity IDs with your
-own entities. The thermostat controls operate the configured real device.
-
-For the graph, open your dashboard → **Edit dashboard → Add card**, search for
-**Gleam Energy Graph**, then choose your sensors and time window in the visual
-editor and **Save**. Existing graph cards also support **Edit → Show visual editor**.
+Prefer YAML? Replace the example entity with your meter:
 
 ```yaml
 type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
-current_hour_entity: sensor.current_hour_energy
-price_entity: sensor.electricity_price
-power_entity: sensor.power
-voltage_entity: sensor.voltage
-hours_to_show: 33
-future_hours: 16.8
-refresh_interval: 10
-grid_options:
-  columns: full
-  rows: auto
 ```
 
-```yaml
-type: custom:gleam-thermostat
-entity: climate.heat_pump
-name: Heat pump
-```
+For climate controls, choose **Gleam Thermostat (Experimental)** in the card picker or use `type: custom:gleam-thermostat` with `entity: climate.heat_pump`. Installing the package doesn’t add either card to a dashboard automatically.
 
-## Documentation
+<details>
+<summary>Manual installation</summary>
 
-- [Energy graph configuration and data contract](docs/energy-graph.md)
-- [Thermostat configuration and controls](docs/thermostat.md)
-- [Development and verification](docs/development.md)
-- [Release and catalog submission](docs/publishing.md)
+Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/gleam-card.js`. In **Settings → Dashboards → Resources**, register `/local/gleam-card.js?v=1` as a **JavaScript module** and reload the browser. Advanced Mode may be needed to see Resources. When updating manually, change the version in the existing URL. If switching to the Marketplace, remove the manual resource to avoid loading both copies.
 
-WebGL 2 is required for 3D rendering. The thermostat retains its enabled HTML
-controls if graphics initialization fails. The energy chart reports the error;
-it does not yet provide an accessible table or HTML chart fallback.
+</details>
 
-## License
+## Requirements and support
 
-Original Gleam Card code uses the [Unlicense](LICENSE). Three.js retains its MIT
-license, reproduced in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and embedded
-in the built bundle. Development tools retain their respective licenses.
+The cards bundle Three.js and run locally, without a CDN or a separate backend integration. The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial.
+
+[Graph configuration and sensor requirements](docs/energy-graph.md) · [Thermostat configuration](docs/thermostat.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
+
+For local previews, builds, and tests, see [Development](docs/development.md). Release instructions are in [Publishing](docs/publishing.md).
+
+Gleam Cards by Magnus Øverli · [Unlicense](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md)
