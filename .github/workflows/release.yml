@@ -1,0 +1,35 @@
+name: Publish release
+on: workflow_dispatch
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Publish the validated package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          file() {
+            gh api -H 'Accept: application/vnd.github.raw+json' \
+              "repos/$GH_REPO/contents/$1?ref=$GITHUB_SHA"
+          }
+          version=$(file package.json | jq -er '.version')
+          [[ "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          test "$(file package-lock.json | jq -r '.packages[""].version')" = "$version"
+          test "$(gh run list --workflow marketplace.yml --commit "$GITHUB_SHA" --branch main \
+            --status success --limit 1 --json databaseId --jq length)" = 1 || {
+            echo "::error::Marketplace validation must pass on this commit before release."; exit 1;
+          }
+          file dist/gleam-card.js > gleam-card.js
+          test -s gleam-card.js
+          gh release create "v$version" gleam-card.js --target "$GITHUB_SHA" \
+            --title "Gleam Cards $version" --generate-notes \
+            --notes "Gleam Energy Graph (stable) and Gleam Thermostat (experimental)."

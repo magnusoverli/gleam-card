@@ -1,12 +1,14 @@
 {
   "name": "gleam-card",
-  "version": "0.0.0",
+  "version": "0.0.5",
   "private": true,
   "type": "module",
   "license": "Unlicense",
   "author": "Magnus Øverli <magnus@overli.dev>",
   "packageManager": "npm@12.2.3",
-  "engines": { "node": ">=26.13.1" },
+  "engines": {
+    "node": ">=26.13.1"
+  },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "dev:test": "npm run build && vite --host 127.0.0.1 --mode test",
@@ -16,7 +18,9 @@
     "test:browser": "playwright test",
     "benchmark": "playwright test performance.spec.js --project=desktop --workers=1"
   },
-  "dependencies": { "three": "0.187.0" },
+  "dependencies": {
+    "three": "0.187.0"
+  },
   "devDependencies": {
     "@playwright/test": "1.65.1",
     "@types/node": "26.6.6",

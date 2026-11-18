@@ -2,6 +2,8 @@
 
 See **when you used energy and what electricity cost at the time** on one interactive Home Assistant dashboard. Start with a cumulative energy meter; add price, power, and voltage sensors when you have them.
 
+The Energy Graph and Thermostat are the first two cards in a planned Gleam series. The long-term goal is to cover most everyday Home Assistant dashboard needs with cards that look and feel consistent.
+
 [Install](#install) · [Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md)
 
 ![Gleam Energy Graph showing hourly consumption bars beside a stepped price forecast and power history](docs/images/energy-graph.png)
