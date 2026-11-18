@@ -1,5 +1,7 @@
 # Gleam Cards
 
+[![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
+
 **Your energy use and electricity prices on one timeline.** Rotate the graph to explore a day in depth, or switch to Front view to see which hours used the most energy.
 
 The Energy Graph and Thermostat are the first two cards in a planned Gleam series. The long-term goal is to cover most everyday Home Assistant dashboard needs with cards that look and feel consistent.
