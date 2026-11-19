@@ -29,6 +29,13 @@ Garage doors are the first supported cover type. See whether the garage is close
 
 Gleam Cover is included from **v0.0.6** onward.
 
+<details>
+<summary>See the cover</summary>
+
+![Gleam Cover in Double layout: the left garage door is closed and the right door is open, with amber light spilling onto the driveway.](docs/images/cover.png)
+
+</details>
+
 ## Install
 
 [![Open Gleam Cards in your Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&repository=gleam-card&category=plugin)
