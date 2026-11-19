@@ -18,13 +18,22 @@ Gleam Cover debuted in v0.0.6. Now the illustrated garage can match your roof, f
 - **One-press controls.** A closed door offers **Open**; an open door offers **Close**. The button shows progress during travel and operates only its own bay.
 - **Roof and bay labels.** Choose a pitched or flat roof. Names like *Workshop* and *Driveway* sit above their openings without shifting the building or controls.
 - **Paired settings.** Left and right doors sit side by side in the editor on wider screens. Movement, appearance, and lighting each have their own section.
+- **More room for the garage.** The Experimental badge now sits in the upper-right corner instead of taking up a row above the illustration.
 
 #### ▶️ Try it before updating
 
 - **[Open the Cover demo](https://magnusoverli.github.io/gleam-card/cover/)**, choose **Double**, and close the open bay. Switch to **Compact** to preview a half-width card.
-- **[Explore the gallery](https://magnusoverli.github.io/gleam-card/)** for a dedicated demo of each card. Energy Graph remains **Stable**; Cover and Thermostat keep their **Experimental** badges in the upper-right corner.
+- **[Cover settings and YAML examples](https://github.com/magnusoverli/gleam-card/blob/v0.0.7/docs/cover.md)** show how to configure a single door or a two-bay garage.
 
-[Cover settings and YAML examples](https://github.com/magnusoverli/gleam-card/blob/v0.0.7/docs/cover.md) · [Compare v0.0.6 → v0.0.7](https://github.com/magnusoverli/gleam-card/compare/v0.0.6...v0.0.7)
+### 🌡️ Gleam Thermostat
+
+- **A slimmer header.** The Experimental badge moves to the upper-right corner, leaving more room for the dial and readouts.
+
+### 📦 General
+
+- **[Interactive demo gallery](https://magnusoverli.github.io/gleam-card/).** Each card now has its own demo page. The README screenshots and “Try” links take you directly to the card you want to explore.
+
+[Compare v0.0.6 → v0.0.7](https://github.com/magnusoverli/gleam-card/compare/v0.0.6...v0.0.7)
 
 ## [0.0.6](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.6) · 2026-11-19
 
@@ -40,10 +49,16 @@ Gleam Cover debuted in v0.0.6. Now the illustrated garage can match your roof, f
 
 #### 🛠️ Set up your first garage
 
-- After updating, choose **Gleam Cover (Experimental)** in the card picker and select your `cover.*` entity. It ships alongside Energy Graph and Thermostat in the same bundle.
+- After updating, choose **Gleam Cover (Experimental)** in the card picker and select your `cover.*` entity.
 - Set the travel time to match your opener. The status comes from Home Assistant; the animation finishing never declares the door closed.
 - In **v0.0.6**, tap the illustrated door to reveal its **Open** or **Close** button. Garage doors are the first supported cover type.
 
-[Getting started with v0.0.6](https://github.com/magnusoverli/gleam-card/blob/v0.0.6/docs/cover.md) · [Compare v0.0.5 → v0.0.6](https://github.com/magnusoverli/gleam-card/compare/v0.0.5...v0.0.6)
+[Cover setup and YAML examples for v0.0.6](https://github.com/magnusoverli/gleam-card/blob/v0.0.6/docs/cover.md)
+
+### 📦 General
+
+- **One Marketplace update installs all three cards.** The existing `gleam-card.js` bundle now includes Energy Graph (Stable), Thermostat (Experimental), and Cover (Experimental). No second dashboard resource is needed.
+
+[Compare v0.0.5 → v0.0.6](https://github.com/magnusoverli/gleam-card/compare/v0.0.5...v0.0.6)
 
 [Earlier releases](https://github.com/magnusoverli/gleam-card/releases)

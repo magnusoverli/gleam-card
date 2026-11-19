@@ -5,7 +5,11 @@ names `gleam-card.js`. The stable Energy Graph and experimental Thermostat and C
 the same bundle and release; there is no integration manifest or hassfest job.
 
 1. **Prepare the candidate.** Track changes under **Unreleased** in the
-   [changelog](../CHANGELOG.md). When preparing a release, move those entries
+   [changelog](../CHANGELOG.md). Group highlights under an emoji heading for
+   each affected card, with short bullets about what changed for its users.
+   Put collection-wide changes (packaging, installation, or the demo gallery)
+   under **📦 General**. Omit sections with no changes.
+   When preparing a release, move those entries
    under its dated version heading. Set the package and lockfile version together with
    `npm version patch --no-git-tag-version` (or specify the desired version).
    Run `npm ci`, `npm test`, and `npm run test:browser`
