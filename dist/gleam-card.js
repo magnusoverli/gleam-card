@@ -45,7 +45,7 @@ var e = {
 	PAN: 1,
 	DOLLY_PAN: 2,
 	DOLLY_ROTATE: 3
-}, n = 1e3, r = 1001, i = 1002, a = 1003, o = 1004, s = 1005, c = 1006, l = 1007, u = 1008, d = 1009, f = 1010, p = 1011, m = 1012, h = 1013, g = 1014, _ = 1015, v = 1016, y = 1017, b = 1018, x = 1020, S = 35902, C = 35899, w = 1021, T = 1022, E = 1023, D = 1026, O = 1027, k = 1028, A = 1029, j = 1030, ee = 1031, te = 1033, M = 33776, N = 33777, P = 33778, F = 33779, I = 35840, ne = 35841, re = 35842, ie = 35843, ae = 36196, oe = 37492, L = 37496, R = 37488, se = 37489, ce = 37490, le = 37491, ue = 37808, de = 37809, fe = 37810, pe = 37811, me = 37812, he = 37813, ge = 37814, _e = 37815, ve = 37816, ye = 37817, be = 37818, xe = 37819, Se = 37820, Ce = 37821, we = 36492, Te = 36494, Ee = 36495, De = 36283, Oe = 36284, ke = 36285, Ae = 36286, z = 2300, je = 2301, Me = 2302, Ne = 2303, B = 2400, Pe = 2401, V = 2402, H = 3200, Fe = "srgb", Ie = "srgb-linear", Le = "linear", Re = "srgb", ze = 7680, Be = 35044, Ve = 2e3;
+}, n = 1e3, r = 1001, i = 1002, a = 1003, o = 1004, s = 1005, c = 1006, l = 1007, u = 1008, d = 1009, f = 1010, p = 1011, m = 1012, h = 1013, g = 1014, _ = 1015, v = 1016, y = 1017, b = 1018, x = 1020, S = 35902, C = 35899, w = 1021, T = 1022, E = 1023, D = 1026, O = 1027, k = 1028, A = 1029, j = 1030, M = 1031, ee = 1033, N = 33776, te = 33777, P = 33778, F = 33779, I = 35840, ne = 35841, re = 35842, ie = 35843, ae = 36196, oe = 37492, L = 37496, R = 37488, se = 37489, ce = 37490, le = 37491, ue = 37808, de = 37809, fe = 37810, pe = 37811, me = 37812, he = 37813, ge = 37814, _e = 37815, ve = 37816, ye = 37817, be = 37818, xe = 37819, Se = 37820, Ce = 37821, we = 36492, Te = 36494, Ee = 36495, De = 36283, Oe = 36284, ke = 36285, Ae = 36286, z = 2300, je = 2301, Me = 2302, Ne = 2303, B = 2400, Pe = 2401, V = 2402, H = 3200, Fe = "srgb", Ie = "srgb-linear", Le = "linear", Re = "srgb", ze = 7680, Be = 35044, Ve = 2e3;
 function He(e) {
 	for (let t = e.length - 1; t >= 0; --t) if (e[t] >= 65535) return !0;
 	return !1;
@@ -1708,8 +1708,8 @@ var Ut = class {
 		return this.multiplyMatrices(e, this);
 	}
 	multiplyMatrices(e, t) {
-		let n = e.elements, r = t.elements, i = this.elements, a = n[0], o = n[4], s = n[8], c = n[12], l = n[1], u = n[5], d = n[9], f = n[13], p = n[2], m = n[6], h = n[10], g = n[14], _ = n[3], v = n[7], y = n[11], b = n[15], x = r[0], S = r[4], C = r[8], w = r[12], T = r[1], E = r[5], D = r[9], O = r[13], k = r[2], A = r[6], j = r[10], ee = r[14], te = r[3], M = r[7], N = r[11], P = r[15];
-		return i[0] = a * x + o * T + s * k + c * te, i[4] = a * S + o * E + s * A + c * M, i[8] = a * C + o * D + s * j + c * N, i[12] = a * w + o * O + s * ee + c * P, i[1] = l * x + u * T + d * k + f * te, i[5] = l * S + u * E + d * A + f * M, i[9] = l * C + u * D + d * j + f * N, i[13] = l * w + u * O + d * ee + f * P, i[2] = p * x + m * T + h * k + g * te, i[6] = p * S + m * E + h * A + g * M, i[10] = p * C + m * D + h * j + g * N, i[14] = p * w + m * O + h * ee + g * P, i[3] = _ * x + v * T + y * k + b * te, i[7] = _ * S + v * E + y * A + b * M, i[11] = _ * C + v * D + y * j + b * N, i[15] = _ * w + v * O + y * ee + b * P, this;
+		let n = e.elements, r = t.elements, i = this.elements, a = n[0], o = n[4], s = n[8], c = n[12], l = n[1], u = n[5], d = n[9], f = n[13], p = n[2], m = n[6], h = n[10], g = n[14], _ = n[3], v = n[7], y = n[11], b = n[15], x = r[0], S = r[4], C = r[8], w = r[12], T = r[1], E = r[5], D = r[9], O = r[13], k = r[2], A = r[6], j = r[10], M = r[14], ee = r[3], N = r[7], te = r[11], P = r[15];
+		return i[0] = a * x + o * T + s * k + c * ee, i[4] = a * S + o * E + s * A + c * N, i[8] = a * C + o * D + s * j + c * te, i[12] = a * w + o * O + s * M + c * P, i[1] = l * x + u * T + d * k + f * ee, i[5] = l * S + u * E + d * A + f * N, i[9] = l * C + u * D + d * j + f * te, i[13] = l * w + u * O + d * M + f * P, i[2] = p * x + m * T + h * k + g * ee, i[6] = p * S + m * E + h * A + g * N, i[10] = p * C + m * D + h * j + g * te, i[14] = p * w + m * O + h * M + g * P, i[3] = _ * x + v * T + y * k + b * ee, i[7] = _ * S + v * E + y * A + b * N, i[11] = _ * C + v * D + y * j + b * te, i[15] = _ * w + v * O + y * M + b * P, this;
 	}
 	multiplyScalar(e) {
 		let t = this.elements;
@@ -3887,15 +3887,15 @@ var Qr = /*@__PURE__*/ new q(), $r = /*@__PURE__*/ new q(), ei = /*@__PURE__*/ n
 		return this.intersectBox(e, Qr) !== null;
 	}
 	intersectTriangle(e, t, n, r, i) {
-		let a = this.origin, o = this.direction, s = o.x, c = o.y, l = o.z, u = e.x - a.x, d = e.y - a.y, f = e.z - a.z, p = t.x - a.x, m = t.y - a.y, h = t.z - a.z, g = n.x - a.x, _ = n.y - a.y, v = n.z - a.z, y = Math.abs(s), b = Math.abs(c), x = Math.abs(l), S, C, w, T, E, D, O, k, A, j, ee, te;
-		if (y >= b && y >= x ? (w = s, D = u, A = p, te = g, s >= 0 ? (S = c, C = l, T = d, E = f, O = m, k = h, j = _, ee = v) : (S = l, C = c, T = f, E = d, O = h, k = m, j = v, ee = _)) : b >= x ? (w = c, D = d, A = m, te = _, c >= 0 ? (S = l, C = s, T = f, E = u, O = h, k = p, j = v, ee = g) : (S = s, C = l, T = u, E = f, O = p, k = h, j = g, ee = v)) : (w = l, D = f, A = h, te = v, l >= 0 ? (S = s, C = c, T = u, E = d, O = p, k = m, j = g, ee = _) : (S = c, C = s, T = d, E = u, O = m, k = p, j = _, ee = g)), w === 0) return null;
-		let M = S / w, N = C / w, P = 1 / w, F = T - M * D, I = E - N * D, ne = O - M * A, re = k - N * A, ie = j - M * te, ae = ee - N * te, oe = ie * re - ae * ne, L = F * ae - I * ie, R = ne * I - re * F;
+		let a = this.origin, o = this.direction, s = o.x, c = o.y, l = o.z, u = e.x - a.x, d = e.y - a.y, f = e.z - a.z, p = t.x - a.x, m = t.y - a.y, h = t.z - a.z, g = n.x - a.x, _ = n.y - a.y, v = n.z - a.z, y = Math.abs(s), b = Math.abs(c), x = Math.abs(l), S, C, w, T, E, D, O, k, A, j, M, ee;
+		if (y >= b && y >= x ? (w = s, D = u, A = p, ee = g, s >= 0 ? (S = c, C = l, T = d, E = f, O = m, k = h, j = _, M = v) : (S = l, C = c, T = f, E = d, O = h, k = m, j = v, M = _)) : b >= x ? (w = c, D = d, A = m, ee = _, c >= 0 ? (S = l, C = s, T = f, E = u, O = h, k = p, j = v, M = g) : (S = s, C = l, T = u, E = f, O = p, k = h, j = g, M = v)) : (w = l, D = f, A = h, ee = v, l >= 0 ? (S = s, C = c, T = u, E = d, O = p, k = m, j = g, M = _) : (S = c, C = s, T = d, E = u, O = m, k = p, j = _, M = g)), w === 0) return null;
+		let N = S / w, te = C / w, P = 1 / w, F = T - N * D, I = E - te * D, ne = O - N * A, re = k - te * A, ie = j - N * ee, ae = M - te * ee, oe = ie * re - ae * ne, L = F * ae - I * ie, R = ne * I - re * F;
 		if (r) {
 			if (oe < 0 || L < 0 || R < 0) return null;
 		} else if ((oe < 0 || L < 0 || R < 0) && (oe > 0 || L > 0 || R > 0)) return null;
 		let se = oe + L + R;
 		if (se === 0) return null;
-		let ce = P * (oe * D + L * A + R * te);
+		let ce = P * (oe * D + L * A + R * ee);
 		return (se > 0 ? ce < 0 : ce > 0) ? null : this.at(ce / se, i);
 	}
 	applyMatrix4(e) {
@@ -5825,12 +5825,12 @@ function jo(e, t, n, r) {
 		case k: return e * t / i.components * i.byteLength;
 		case A: return e * t / i.components * i.byteLength;
 		case j: return e * t * 2 / i.components * i.byteLength;
-		case ee: return e * t * 2 / i.components * i.byteLength;
+		case M: return e * t * 2 / i.components * i.byteLength;
 		case T: return e * t * 3 / i.components * i.byteLength;
 		case E: return e * t * 4 / i.components * i.byteLength;
-		case te: return e * t * 4 / i.components * i.byteLength;
-		case M:
-		case N: return Math.floor((e + 3) / 4) * Math.floor((t + 3) / 4) * 8;
+		case ee: return e * t * 4 / i.components * i.byteLength;
+		case N:
+		case te: return Math.floor((e + 3) / 4) * Math.floor((t + 3) / 4) * 8;
 		case P:
 		case F: return Math.floor((e + 3) / 4) * Math.floor((t + 3) / 4) * 16;
 		case ne:
@@ -8569,7 +8569,7 @@ function sl(e, t, n, r, i, a) {
 			let e = s.getVertexShaderStage(i), t = s.getFragmentShaderStage(i);
 			s.update(i, e, t), O = e.id, k = t.id;
 		}
-		let A = e.getRenderTarget(), j = e.state.buffers.depth.getReversed(), ee = m.isInstancedMesh === !0, te = m.isBatchedMesh === !0, M = !!i.map, N = !!i.matcap, P = !!b, F = P && b.isPMREMTexture === !0, I = !!i.aoMap, ne = !!i.lightMap, re = !!i.bumpMap && i.wireframe === !1, ie = !!i.normalMap, ae = !!i.displacementMap, oe = !!i.emissiveMap, L = !!i.metalnessMap, R = !!i.roughnessMap, se = i.anisotropy > 0, ce = i.clearcoat > 0, le = i.diffuseRoughness > 0, ue = i.dispersion > 0, de = i.retroreflectivity > 0, fe = i.iridescence > 0, pe = i.sheen > 0, me = i.transmission > 0, he = se && !!i.anisotropyMap, ge = ce && !!i.clearcoatMap, _e = ce && !!i.clearcoatNormalMap, ve = ce && !!i.clearcoatRoughnessMap, ye = le && !!i.diffuseRoughnessMap, be = fe && !!i.iridescenceMap, xe = fe && !!i.iridescenceThicknessMap, Se = pe && !!i.sheenColorMap, Ce = pe && !!i.sheenRoughnessMap, we = !!i.specularMap, Te = !!i.specularColorMap, Ee = !!i.specularIntensityMap, De = me && !!i.transmissionMap, Oe = me && !!i.thicknessMap, ke = !!i.gradientMap, Ae = !!i.alphaMap, z = i.alphaTest > 0, je = !!i.alphaHash, Me = !!i.extensions, Ne = 0;
+		let A = e.getRenderTarget(), j = e.state.buffers.depth.getReversed(), M = m.isInstancedMesh === !0, ee = m.isBatchedMesh === !0, N = !!i.map, te = !!i.matcap, P = !!b, F = P && b.isPMREMTexture === !0, I = !!i.aoMap, ne = !!i.lightMap, re = !!i.bumpMap && i.wireframe === !1, ie = !!i.normalMap, ae = !!i.displacementMap, oe = !!i.emissiveMap, L = !!i.metalnessMap, R = !!i.roughnessMap, se = i.anisotropy > 0, ce = i.clearcoat > 0, le = i.diffuseRoughness > 0, ue = i.dispersion > 0, de = i.retroreflectivity > 0, fe = i.iridescence > 0, pe = i.sheen > 0, me = i.transmission > 0, he = se && !!i.anisotropyMap, ge = ce && !!i.clearcoatMap, _e = ce && !!i.clearcoatNormalMap, ve = ce && !!i.clearcoatRoughnessMap, ye = le && !!i.diffuseRoughnessMap, be = fe && !!i.iridescenceMap, xe = fe && !!i.iridescenceThicknessMap, Se = pe && !!i.sheenColorMap, Ce = pe && !!i.sheenRoughnessMap, we = !!i.specularMap, Te = !!i.specularColorMap, Ee = !!i.specularIntensityMap, De = me && !!i.transmissionMap, Oe = me && !!i.thicknessMap, ke = !!i.gradientMap, Ae = !!i.alphaMap, z = i.alphaTest > 0, je = !!i.alphaHash, Me = !!i.extensions, Ne = 0;
 		i.toneMapped && (A === null || A.isXRRenderTarget === !0) && (Ne = e.toneMapping);
 		let B = F ? b.isCompressedCubeTexture ? b.image[0].mipmaps : b.mipmaps : null, Pe = {
 			shaderID: x,
@@ -8583,15 +8583,15 @@ function sl(e, t, n, r, i, a) {
 			isRawShaderMaterial: i.isRawShaderMaterial === !0,
 			glslVersion: i.glslVersion,
 			precision: S,
-			batching: te,
-			batchingColor: te && m._colorsTexture !== null,
-			instancing: ee,
-			instancingColor: ee && m.instanceColor !== null,
-			instancingMorph: ee && m.morphTexture !== null,
+			batching: ee,
+			batchingColor: ee && m._colorsTexture !== null,
+			instancing: M,
+			instancingColor: M && m.instanceColor !== null,
+			instancingMorph: M && m.morphTexture !== null,
 			outputColorSpace: A === null ? e.outputColorSpace : A.isXRRenderTarget === !0 ? A.texture.colorSpace : Y.workingColorSpace,
 			alphaToCoverage: !!i.alphaToCoverage,
-			map: M,
-			matcap: N,
+			map: N,
+			matcap: te,
 			envMap: P,
 			envMapMode: P && b.mapping,
 			envMapPMREM: F,
@@ -8636,7 +8636,7 @@ function sl(e, t, n, r, i, a) {
 			alphaTest: z,
 			alphaHash: je,
 			combine: i.combine,
-			mapUv: M && p(i.map.channel),
+			mapUv: N && p(i.map.channel),
 			aoMapUv: I && p(i.aoMap.channel),
 			lightMapUv: ne && p(i.lightMap.channel),
 			bumpMapUv: re && p(i.bumpMap.channel),
@@ -8664,7 +8664,7 @@ function sl(e, t, n, r, i, a) {
 			vertexNormals: !!_.attributes.normal,
 			vertexColors: i.vertexColors,
 			vertexAlphas: i.vertexColors === !0 && !!_.attributes.color && _.attributes.color.itemSize === 4,
-			pointsUvs: m.isPoints === !0 && !!_.attributes.uv && (M || Ae),
+			pointsUvs: m.isPoints === !0 && !!_.attributes.uv && (N || Ae),
 			fog: !!g,
 			useFog: i.fog === !0,
 			fogExp2: !!g && g.isFogExp2,
@@ -8699,7 +8699,7 @@ function sl(e, t, n, r, i, a) {
 			shadowMapEnabled: e.shadowMap.enabled && l.length > 0,
 			shadowMapType: e.shadowMap.type,
 			toneMapping: Ne,
-			decodeVideoTexture: M && i.map.isVideoTexture === !0 && Y.getTransfer(i.map.colorSpace) === "srgb",
+			decodeVideoTexture: N && i.map.isVideoTexture === !0 && Y.getTransfer(i.map.colorSpace) === "srgb",
 			decodeVideoTextureEmissive: oe && i.emissiveMap.isVideoTexture === !0 && Y.getTransfer(i.emissiveMap.colorSpace) === "srgb",
 			premultipliedAlpha: i.premultipliedAlpha,
 			doubleSided: i.side === 2,
@@ -8708,7 +8708,7 @@ function sl(e, t, n, r, i, a) {
 			depthPacking: i.depthPacking || 0,
 			index0AttributeName: i.index0AttributeName,
 			extensionClipCullDistance: Me && i.extensions.clipCullDistance === !0 && n.has("WEBGL_clip_cull_distance"),
-			extensionMultiDraw: (Me && i.extensions.multiDraw === !0 || te) && n.has("WEBGL_multi_draw"),
+			extensionMultiDraw: (Me && i.extensions.multiDraw === !0 || ee) && n.has("WEBGL_multi_draw"),
 			rendererExtensionParallelShaderCompile: n.has("KHR_parallel_shader_compile"),
 			customProgramCacheKey: i.customProgramCacheKey()
 		};
@@ -9399,8 +9399,8 @@ function Ol(e, t) {
 			}
 		};
 	}
-	let a = new n(), o = new r(), s = new i(), c = {}, l = /* @__PURE__ */ new WeakMap(), u = {}, d = {}, f = {}, p = /* @__PURE__ */ new WeakMap(), m = [], h = null, g = !1, _ = null, v = null, y = null, b = null, x = null, S = null, C = null, w = new X(0, 0, 0), T = 0, E = !1, D = null, O = null, k = null, A = null, j = null, ee = e.getParameter(e.MAX_COMBINED_TEXTURE_IMAGE_UNITS), te = !1, M = 0, N = e.getParameter(e.VERSION);
-	N.indexOf("WebGL") === -1 ? N.indexOf("OpenGL ES") !== -1 && (M = parseFloat(/^OpenGL ES (\d)/.exec(N)[1]), te = M >= 2) : (M = parseFloat(/^WebGL (\d)/.exec(N)[1]), te = M >= 1);
+	let a = new n(), o = new r(), s = new i(), c = {}, l = /* @__PURE__ */ new WeakMap(), u = {}, d = {}, f = {}, p = /* @__PURE__ */ new WeakMap(), m = [], h = null, g = !1, _ = null, v = null, y = null, b = null, x = null, S = null, C = null, w = new X(0, 0, 0), T = 0, E = !1, D = null, O = null, k = null, A = null, j = null, M = e.getParameter(e.MAX_COMBINED_TEXTURE_IMAGE_UNITS), ee = !1, N = 0, te = e.getParameter(e.VERSION);
+	te.indexOf("WebGL") === -1 ? te.indexOf("OpenGL ES") !== -1 && (N = parseFloat(/^OpenGL ES (\d)/.exec(te)[1]), ee = N >= 2) : (N = parseFloat(/^WebGL (\d)/.exec(te)[1]), ee = N >= 1);
 	let P = null, F = {}, I = e.getParameter(e.SCISSOR_BOX), ne = e.getParameter(e.VIEWPORT), re = new Ut().fromArray(I), ie = new Ut().fromArray(ne);
 	function ae(t, n, r, i) {
 		let a = /* @__PURE__ */ new Uint8Array(4), o = e.createTexture();
@@ -9509,7 +9509,7 @@ function Ol(e, t) {
 		t === 0 ? R(e.CULL_FACE) : (L(e.CULL_FACE), t !== O && (t === 1 ? e.cullFace(e.BACK) : t === 2 ? e.cullFace(e.FRONT) : e.cullFace(e.FRONT_AND_BACK))), O = t;
 	}
 	function ge(t) {
-		t !== k && (te && e.lineWidth(t), k = t);
+		t !== k && (ee && e.lineWidth(t), k = t);
 	}
 	function _e(t, n, r) {
 		t ? (L(e.POLYGON_OFFSET_FILL), (A !== n || j !== r) && (A = n, j = r, o.getReversed() && (n = -n, r = -r), e.polygonOffset(n, r))) : R(e.POLYGON_OFFSET_FILL);
@@ -9518,10 +9518,10 @@ function Ol(e, t) {
 		t ? L(e.SCISSOR_TEST) : R(e.SCISSOR_TEST);
 	}
 	function ye(t) {
-		t === void 0 && (t = e.TEXTURE0 + ee - 1), P !== t && (e.activeTexture(t), P = t);
+		t === void 0 && (t = e.TEXTURE0 + M - 1), P !== t && (e.activeTexture(t), P = t);
 	}
 	function be(t, n, r) {
-		r === void 0 && (r = P === null ? e.TEXTURE0 + ee - 1 : P);
+		r === void 0 && (r = P === null ? e.TEXTURE0 + M - 1 : P);
 		let i = F[r];
 		i === void 0 && (i = {
 			type: void 0,
@@ -9697,7 +9697,7 @@ function kl(e, t, d, f, p, m, h) {
 	function j(t) {
 		return t.isWebGLCubeRenderTarget ? e.TEXTURE_CUBE_MAP : t.isWebGL3DRenderTarget ? e.TEXTURE_3D : t.isWebGLArrayRenderTarget || t.isCompressedArrayTexture ? e.TEXTURE_2D_ARRAY : e.TEXTURE_2D;
 	}
-	function ee(n, r, i, a, o, s = !1) {
+	function M(n, r, i, a, o, s = !1) {
 		if (n !== null) {
 			if (e[n] !== void 0) return e[n];
 			U("WebGLRenderer: Attempt to use non-existing WebGL internal format '" + n + "'");
@@ -9711,14 +9711,14 @@ function kl(e, t, d, f, p, m, h) {
 		}
 		return (l === e.R16F || l === e.R32F || l === e.RG16F || l === e.RG32F || l === e.RGBA16F || l === e.RGBA32F) && t.get("EXT_color_buffer_float"), l;
 	}
-	function te(t, n) {
+	function ee(t, n) {
 		let r;
 		return t ? n === null || n === 1014 || n === 1020 ? r = e.DEPTH24_STENCIL8 : n === 1015 ? r = e.DEPTH32F_STENCIL8 : n === 1012 && (r = e.DEPTH24_STENCIL8, U("DepthTexture: 16 bit depth attachment is not supported with stencil. Using 24-bit attachment.")) : n === null || n === 1014 || n === 1020 ? r = e.DEPTH_COMPONENT24 : n === 1015 ? r = e.DEPTH_COMPONENT32F : n === 1012 && (r = e.DEPTH_COMPONENT16), r;
 	}
-	function M(e, t) {
+	function N(e, t) {
 		return k(e) === !0 || e.isFramebufferTexture && e.minFilter !== 1003 && e.minFilter !== 1006 ? Math.log2(Math.max(t.width, t.height)) + 1 : e.mipmaps.length > 0 ? e.mipmaps.length : e.isCompressedTexture && Array.isArray(e.image) ? t.mipmaps.length : 1;
 	}
-	function N(e) {
+	function te(e) {
 		let t = new WeakRef(e);
 		f.get(e).__ref = t, C.add(t), w.register(e, t, t);
 	}
@@ -9858,7 +9858,7 @@ function kl(e, t, d, f, p, m, h) {
 	}
 	function be(t, n) {
 		let r = !1;
-		t.__webglInit === void 0 && (t.__webglInit = !0, n.addEventListener("dispose", F), N(n));
+		t.__webglInit === void 0 && (t.__webglInit = !0, n.addEventListener("dispose", F), te(n));
 		let i = n.source, a = S.get(i);
 		a === void 0 && (a = {}, S.set(i, a));
 		let o = de(n);
@@ -9909,10 +9909,10 @@ function kl(e, t, d, f, p, m, h) {
 			d.pixelStorei(e.UNPACK_ALIGNMENT, n.unpackAlignment);
 			let t = D(n.image, !1, p.maxTextureSize);
 			t = V(n, t);
-			let c = m.convert(n.format, n.colorSpace), l = m.convert(n.type), u = ee(n.internalFormat, c, l, n.normalized, n.colorSpace, n.isVideoTexture);
+			let c = m.convert(n.format, n.colorSpace), l = m.convert(n.type), u = M(n.internalFormat, c, l, n.normalized, n.colorSpace, n.isVideoTexture);
 			ye(i, n);
-			let f, h = n.mipmaps, g = n.isVideoTexture !== !0, _ = s.__version === void 0 || a === !0, v = o.dataReady, y = M(n, t);
-			if (n.isDepthTexture) u = te(n.format === O, n.type), _ && (g ? d.texStorage2D(e.TEXTURE_2D, 1, u, t.width, t.height) : d.texImage2D(e.TEXTURE_2D, 0, u, t.width, t.height, 0, c, l, null));
+			let f, h = n.mipmaps, g = n.isVideoTexture !== !0, _ = s.__version === void 0 || a === !0, v = o.dataReady, y = N(n, t);
+			if (n.isDepthTexture) u = ee(n.format === O, n.type), _ && (g ? d.texStorage2D(e.TEXTURE_2D, 1, u, t.width, t.height) : d.texImage2D(e.TEXTURE_2D, 0, u, t.width, t.height, 0, c, l, null));
 			else if (n.isDataTexture) {
 				if (h.length > 0) {
 					g && _ && d.texStorage2D(e.TEXTURE_2D, y, u, h[0].width, h[0].height);
@@ -10010,11 +10010,11 @@ function kl(e, t, d, f, p, m, h) {
 			d.pixelStorei(e.UNPACK_FLIP_Y_WEBGL, n.flipY), d.pixelStorei(e.UNPACK_PREMULTIPLY_ALPHA_WEBGL, n.premultiplyAlpha), d.pixelStorei(e.UNPACK_ALIGNMENT, n.unpackAlignment), d.pixelStorei(e.UNPACK_COLORSPACE_CONVERSION_WEBGL, c);
 			let l = n.isCompressedTexture || n.image[0].isCompressedTexture, u = n.image[0] && n.image[0].isDataTexture, f = [];
 			for (let e = 0; e < 6; e++) !l && !u ? f[e] = D(n.image[e], !0, p.maxCubemapSize) : f[e] = u ? n.image[e].image : n.image[e], f[e] = V(n, f[e]);
-			let h = f[0], g = m.convert(n.format, n.colorSpace), _ = m.convert(n.type), v = ee(n.internalFormat, g, _, n.normalized, n.colorSpace), y = n.isVideoTexture !== !0, b = o.__version === void 0 || i === !0, x = a.dataReady, S = M(n, h);
+			let h = f[0], g = m.convert(n.format, n.colorSpace), _ = m.convert(n.type), v = M(n.internalFormat, g, _, n.normalized, n.colorSpace), y = n.isVideoTexture !== !0, b = o.__version === void 0 || i === !0, x = a.dataReady, S = N(n, h);
 			ye(e.TEXTURE_CUBE_MAP, n);
 			let C;
 			if (n.isDepthTexture) {
-				if (v = te(n.format === O, n.type), b) {
+				if (v = ee(n.format === O, n.type), b) {
 					if (y) d.texStorage2D(e.TEXTURE_CUBE_MAP, 1, v, h.width, h.height);
 					else for (let t = 0; t < 6; t++) d.texImage2D(e.TEXTURE_CUBE_MAP_POSITIVE_X + t, 0, v, h.width, h.height, 0, g, _, null);
 				}
@@ -10052,7 +10052,7 @@ function kl(e, t, d, f, p, m, h) {
 		t.__version = n.version;
 	}
 	function Te(t, n, r, i, a, o) {
-		let s = m.convert(r.format, r.colorSpace), c = m.convert(r.type), l = ee(r.internalFormat, s, c, r.normalized, r.colorSpace), u = f.get(n), p = f.get(r);
+		let s = m.convert(r.format, r.colorSpace), c = m.convert(r.type), l = M(r.internalFormat, s, c, r.normalized, r.colorSpace), u = f.get(n), p = f.get(r);
 		if (p.__renderTarget = n, !u.__hasExternalTextures) {
 			let t = Math.max(1, n.width >> o), r = Math.max(1, n.height >> o);
 			a === e.TEXTURE_3D || a === e.TEXTURE_2D_ARRAY ? d.texImage3D(a, o, l, t, r, n.depth, 0, s, c, null) : d.texImage2D(a, o, l, t, r, 0, s, c, null);
@@ -10061,12 +10061,12 @@ function kl(e, t, d, f, p, m, h) {
 	}
 	function Ee(t, n, r) {
 		if (e.bindRenderbuffer(e.RENDERBUFFER, t), n.depthBuffer) {
-			let i = n.depthTexture, a = i && i.isDepthTexture ? i.type : null, o = te(n.stencilBuffer, a), s = n.stencilBuffer ? e.DEPTH_STENCIL_ATTACHMENT : e.DEPTH_ATTACHMENT;
+			let i = n.depthTexture, a = i && i.isDepthTexture ? i.type : null, o = ee(n.stencilBuffer, a), s = n.stencilBuffer ? e.DEPTH_STENCIL_ATTACHMENT : e.DEPTH_ATTACHMENT;
 			B(n) ? g.renderbufferStorageMultisampleEXT(e.RENDERBUFFER, Ne(n), o, n.width, n.height) : r ? e.renderbufferStorageMultisample(e.RENDERBUFFER, Ne(n), o, n.width, n.height) : e.renderbufferStorage(e.RENDERBUFFER, o, n.width, n.height), e.framebufferRenderbuffer(e.FRAMEBUFFER, s, e.RENDERBUFFER, t);
 		} else {
 			let t = n.textures;
 			for (let i = 0; i < t.length; i++) {
-				let a = t[i], o = m.convert(a.format, a.colorSpace), s = m.convert(a.type), c = ee(a.internalFormat, o, s, a.normalized, a.colorSpace);
+				let a = t[i], o = m.convert(a.format, a.colorSpace), s = m.convert(a.type), c = M(a.internalFormat, o, s, a.normalized, a.colorSpace);
 				B(n) ? g.renderbufferStorageMultisampleEXT(e.RENDERBUFFER, Ne(n), c, n.width, n.height) : r ? e.renderbufferStorageMultisample(e.RENDERBUFFER, Ne(n), c, n.width, n.height) : e.renderbufferStorage(e.RENDERBUFFER, c, n.width, n.height);
 			}
 		}
@@ -10119,7 +10119,7 @@ function kl(e, t, d, f, p, m, h) {
 	}
 	function Ae(t) {
 		let n = t.texture, r = f.get(t), i = f.get(n);
-		t.addEventListener("dispose", I), N(t);
+		t.addEventListener("dispose", I), te(t);
 		let a = t.textures, o = t.isWebGLCubeRenderTarget === !0, s = a.length > 1;
 		if (s || (i.__webglTexture === void 0 && (i.__webglTexture = e.createTexture()), i.__version = n.version, h.memory.textures++), o) {
 			r.__webglFramebuffer = [];
@@ -10141,7 +10141,7 @@ function kl(e, t, d, f, p, m, h) {
 				for (let n = 0; n < a.length; n++) {
 					let i = a[n];
 					r.__webglColorRenderbuffer[n] = e.createRenderbuffer(), e.bindRenderbuffer(e.RENDERBUFFER, r.__webglColorRenderbuffer[n]);
-					let o = m.convert(i.format, i.colorSpace), s = m.convert(i.type), c = ee(i.internalFormat, o, s, i.normalized, i.colorSpace, t.isXRRenderTarget === !0), l = Ne(t);
+					let o = m.convert(i.format, i.colorSpace), s = m.convert(i.type), c = M(i.internalFormat, o, s, i.normalized, i.colorSpace, t.isXRRenderTarget === !0), l = Ne(t);
 					e.renderbufferStorageMultisample(e.RENDERBUFFER, l, c, t.width, t.height), e.framebufferRenderbuffer(e.FRAMEBUFFER, e.COLOR_ATTACHMENT0 + n, e.RENDERBUFFER, r.__webglColorRenderbuffer[n]);
 				}
 				e.bindRenderbuffer(e.RENDERBUFFER, null), t.depthBuffer && (r.__webglDepthRenderbuffer = e.createRenderbuffer(), Ee(r.__webglDepthRenderbuffer, t, !0)), d.bindFramebuffer(e.FRAMEBUFFER, null);
@@ -10354,9 +10354,9 @@ var jl = "\nvoid main() {\n\n	gl_Position = vec4( position, 1.0 );\n\n}", Ml = "
 		super();
 		let n = this, r = null, i = 1, a = null, o = "local-floor", s = 1, c = null, l = null, u = null, f = null, p = null, m = null, h = typeof XRWebGLBinding < "u", _ = new Nl(), v = {}, y = t.getContextAttributes(), b = null, S = null, C = [], w = [], T = new K(), k = null, A = null, j = new no();
 		j.viewport = new Ut();
-		let ee = new no();
-		ee.viewport = new Ut();
-		let te = [j, ee], M = new fo(), N = null, P = null;
+		let M = new no();
+		M.viewport = new Ut();
+		let ee = [j, M], N = new fo(), te = null, P = null;
 		this.cameraAutoUpdate = !0, this.enabled = !1, this.isPresenting = !1, this.getController = function(e) {
 			let t = C[e];
 			return t === void 0 && (t = new Tn(), C[e] = t), t.getTargetRaySpace();
@@ -10382,7 +10382,7 @@ var jl = "\nvoid main() {\n\n	gl_Position = vec4( position, 1.0 );\n\n}", Ml = "
 				let t = w[e];
 				t !== null && (w[e] = null, C[e].disconnect(t));
 			}
-			N = null, P = null, _.reset();
+			te = null, P = null, _.reset();
 			for (let e in v) delete v[e];
 			if (e.setRenderTarget(b), p = null, f = null, u = null, r = null, S = null, L.stop(), n.isPresenting = !1, e.setPixelRatio(k), e.setSize(T.width, T.height, !1), A !== null) {
 				let e = A.camera;
@@ -10481,24 +10481,24 @@ var jl = "\nvoid main() {\n\n	gl_Position = vec4( position, 1.0 );\n\n}", Ml = "
 		this.updateCamera = function(e) {
 			if (r === null) return;
 			let t = e.near, n = e.far;
-			_.texture !== null && (_.depthNear > 0 && (t = _.depthNear), _.depthFar > 0 && (n = _.depthFar)), M.near = ee.near = j.near = t, M.far = ee.far = j.far = n, (N !== M.near || P !== M.far) && (r.updateRenderState({
-				depthNear: M.near,
-				depthFar: M.far
-			}), N = M.near, P = M.far), M.layers.mask = e.layers.mask | 6, j.layers.mask = M.layers.mask & -5, ee.layers.mask = M.layers.mask & -3;
-			let i = e.parent, a = M.cameras;
-			re(M, i);
+			_.texture !== null && (_.depthNear > 0 && (t = _.depthNear), _.depthFar > 0 && (n = _.depthFar)), N.near = M.near = j.near = t, N.far = M.far = j.far = n, (te !== N.near || P !== N.far) && (r.updateRenderState({
+				depthNear: N.near,
+				depthFar: N.far
+			}), te = N.near, P = N.far), N.layers.mask = e.layers.mask | 6, j.layers.mask = N.layers.mask & -5, M.layers.mask = N.layers.mask & -3;
+			let i = e.parent, a = N.cameras;
+			re(N, i);
 			for (let e = 0; e < a.length; e++) re(a[e], i);
-			M.projectionMatrix.copy(j.projectionMatrix), M.projectionMatrixInverse.copy(j.projectionMatrixInverse), A === null && e.isPerspectiveCamera && (A = {
+			N.projectionMatrix.copy(j.projectionMatrix), N.projectionMatrixInverse.copy(j.projectionMatrixInverse), A === null && e.isPerspectiveCamera && (A = {
 				camera: e,
 				fov: e.fov,
 				zoom: e.zoom
-			}), ie(e, M, i);
+			}), ie(e, N, i);
 		};
 		function ie(e, t, n) {
 			n === null ? e.matrix.copy(t.matrixWorld) : (e.matrix.copy(n.matrixWorld), e.matrix.invert(), e.matrix.multiply(t.matrixWorld)), e.matrix.decompose(e.position, e.quaternion, e.scale), e.updateMatrixWorld(!0), e.projectionMatrix.copy(t.projectionMatrix), e.projectionMatrixInverse.copy(t.projectionMatrixInverse), e.isPerspectiveCamera && (e.fov = nt * 2 * Math.atan(1 / e.projectionMatrix.elements[5]), e.zoom = 1);
 		}
 		this.getCamera = function() {
-			return M;
+			return N;
 		}, this.getFoveation = function() {
 			if (f !== null || p !== null) return s;
 		}, this.setFoveation = function(e) {
@@ -10506,7 +10506,7 @@ var jl = "\nvoid main() {\n\n	gl_Position = vec4( position, 1.0 );\n\n}", Ml = "
 		}, this.hasDepthSensing = function() {
 			return _.texture !== null;
 		}, this.getDepthSensingMesh = function() {
-			return _.getMesh(M);
+			return _.getMesh(N);
 		}, this.getCameraTexture = function(e) {
 			return v[e];
 		};
@@ -10516,7 +10516,7 @@ var jl = "\nvoid main() {\n\n	gl_Position = vec4( position, 1.0 );\n\n}", Ml = "
 				let t = l.views;
 				p !== null && (e.setRenderTargetFramebuffer(S, p.framebuffer), e.setRenderTarget(S));
 				let i = !1;
-				t.length !== M.cameras.length && (M.cameras.length = 0, i = !0);
+				t.length !== N.cameras.length && (N.cameras.length = 0, i = !0);
 				for (let n = 0; n < t.length; n++) {
 					let r = t[n], a = null;
 					if (p !== null) a = p.getViewport(r);
@@ -10524,8 +10524,8 @@ var jl = "\nvoid main() {\n\n	gl_Position = vec4( position, 1.0 );\n\n}", Ml = "
 						let t = u.getViewSubImage(f, r);
 						a = t.viewport, n === 0 && (e.setRenderTargetTextures(S, t.colorTexture, t.depthStencilTexture), e.setRenderTarget(S));
 					}
-					let o = te[n];
-					o === void 0 && (o = new no(), o.layers.enable(n), o.viewport = new Ut(), te[n] = o), o.matrix.fromArray(r.transform.matrix), o.matrix.decompose(o.position, o.quaternion, o.scale), o.projectionMatrix.fromArray(r.projectionMatrix), o.projectionMatrixInverse.copy(o.projectionMatrix).invert(), o.viewport.set(a.x, a.y, a.width, a.height), n === 0 && (M.matrix.copy(o.matrix), M.matrix.decompose(M.position, M.quaternion, M.scale)), i === !0 && M.cameras.push(o);
+					let o = ee[n];
+					o === void 0 && (o = new no(), o.layers.enable(n), o.viewport = new Ut(), ee[n] = o), o.matrix.fromArray(r.transform.matrix), o.matrix.decompose(o.position, o.quaternion, o.scale), o.projectionMatrix.fromArray(r.projectionMatrix), o.projectionMatrixInverse.copy(o.projectionMatrix).invert(), o.viewport.set(a.x, a.y, a.width, a.height), n === 0 && (N.matrix.copy(o.matrix), N.matrix.decompose(N.position, N.quaternion, N.scale)), i === !0 && N.cameras.push(o);
 				}
 				let a = r.enabledFeatures;
 				if (a && a.includes("depth-sensing") && r.depthUsage == "gpu-optimized" && h) {
@@ -11242,8 +11242,8 @@ var Hl = class {
 			_ = n.getContextAttributes().alpha;
 		} else _ = a;
 		let S = h, C = /* @__PURE__ */ new Set([
-			te,
 			ee,
+			M,
 			A
 		]), w = /* @__PURE__ */ new Set([
 			d,
@@ -11257,7 +11257,7 @@ var Hl = class {
 			min: [],
 			max: [],
 			resolution: []
-		}, O = null, k = null, j = [], M = [], N = null;
+		}, O = null, k = null, j = [], N = [], te = null;
 		this.domElement = t, this.debug = {
 			checkShaderErrors: !0,
 			diagnostics: { keywords: !1 },
@@ -11302,7 +11302,7 @@ var Hl = class {
 		function rt() {
 			Me = new cs(z), Me.init(), et = new Al(z, Me), Ne = new Ho(z, Me, e, et), B = new Ol(z, Me), Ne.reversedDepthBuffer && p && B.buffers.depth.setReversed(!0), ne = z.createFramebuffer(), re = z.createFramebuffer(), ie = z.createFramebuffer(), Pe = new ds(z), V = new cl(), H = new kl(z, Me, B, V, Ne, et, Pe), Ie = new ss(P), Le = new Po(z), tt = new Bo(z, Le), Re = new ls(z, Le, Pe, tt), ze = new ps(z, Re, Le, tt, Pe), Ze = new fs(z, Ne, H), Ke = new Uo(V), Be = new sl(P, Ie, Me, Ne, tt, Ke), He = new Ll(P, V), Ue = new fl(), We = new yl(Me), Ye = new zo(P, Ie, B, ze, _, s), Je = new Dl(P, ze, Ne), nt = new Rl(z, Pe, Ne, B), Qe = new Vo(z, Me, Pe), $e = new us(z, Me, Pe), Pe.programs = Be.programs, P.capabilities = Ne, P.extensions = Me, P.properties = V, P.renderLists = Ue, P.shadowMap = Je, P.state = B, P.info = Pe;
 		}
-		S !== 1009 && (N = new hs(S, t.width, t.height, o, r, i));
+		S !== 1009 && (te = new hs(S, t.width, t.height, o, r, i));
 		let G = new Pl(P, z);
 		this.xr = G, this.getContext = function() {
 			return z;
@@ -11321,7 +11321,7 @@ var Hl = class {
 		}, this.getSize = function(e) {
 			return e.set(pe, me);
 		}, this.setSize = function(e, n, r = !0) {
-			G.isPresenting ? U("WebGLRenderer: Can't change size while VR device is presenting.") : (pe = e, me = n, t.width = Math.floor(e * he), t.height = Math.floor(n * he), r === !0 && (t.style.width = e + "px", t.style.height = n + "px"), N !== null && N.setSize(t.width, t.height), this.setViewport(0, 0, e, n));
+			G.isPresenting ? U("WebGLRenderer: Can't change size while VR device is presenting.") : (pe = e, me = n, t.width = Math.floor(e * he), t.height = Math.floor(n * he), r === !0 && (t.style.width = e + "px", t.style.height = n + "px"), te !== null && te.setSize(t.width, t.height), this.setViewport(0, 0, e, n));
 		}, this.getDrawingBufferSize = function(e) {
 			return e.set(pe * he, me * he).floor();
 		}, this.setDrawingBufferSize = function(e, n, r) {
@@ -11335,7 +11335,7 @@ var Hl = class {
 						break;
 					}
 				}
-				N.setEffects(e || []);
+				te.setEffects(e || []);
 			}
 		}, this.getCurrentViewport = function(e) {
 			return e.copy(ce);
@@ -11448,7 +11448,7 @@ var Hl = class {
 			I !== null && e.isNodeMaterial && I.setObject(r, e), Ce === !0 && Ke.setState(e, n, !1), e.transparent === !0 && e.side === 2 && e.forceSinglePass === !1 ? (e.side = 1, e.needsUpdate = !0, St(e, t, r), e.side = 0, e.needsUpdate = !0, St(e, t, r), e.side = 2) : St(e, t, r);
 		}
 		this.compile = function(e, t, n = null) {
-			n === null && (n = e), I !== null && I.renderStart(e, t, n), k = We.get(n), k.init(t), M.push(k), n.traverseVisible(function(e) {
+			n === null && (n = e), I !== null && I.renderStart(e, t, n), k = We.get(n), k.init(t), N.push(k), n.traverseVisible(function(e) {
 				e.isLight && e.layers.test(t.layers) && (k.pushLight(e), e.castShadow && k.pushShadow(e));
 			}), e !== n && e.traverseVisible(function(e) {
 				e.isLight && e.layers.test(t.layers) && (k.pushLight(e), e.castShadow && k.pushShadow(e));
@@ -11464,7 +11464,7 @@ var Hl = class {
 					}
 					else ut(i, n, t, e), r.add(i);
 				}
-			}), k = M.pop(), I !== null && I.renderEnd(), r;
+			}), k = N.pop(), I !== null && I.renderEnd(), r;
 		}, this.compileAsync = function(e, t, n = null) {
 			let r = this.compile(e, t, n);
 			return new Promise((t) => {
@@ -11497,14 +11497,14 @@ var Hl = class {
 			}
 			if (F === !0) return;
 			I !== null && I.renderStart(e, t);
-			let n = G.enabled === !0 && G.isPresenting === !0, r = N !== null && (L === null || n) && N.begin(P, L);
-			if (e.matrixWorldAutoUpdate === !0 && e.updateMatrixWorld(), t.parent === null && t.matrixWorldAutoUpdate === !0 && t.updateMatrixWorld(), G.enabled === !0 && G.isPresenting === !0 && (N === null || N.isCompositing() === !1) && (G.cameraAutoUpdate === !0 && G.updateCamera(t), t = G.getCamera()), e.isScene === !0 && e.onBeforeRender(P, e, t, L), k = We.get(e, M.length), k.init(t), k.state.textureUnits = H.getTextureUnits(), M.push(k), Te.multiplyMatrices(t.projectionMatrix, t.matrixWorldInverse), t.isArrayCamera ? Se.setFromArrayCamera(t) : xe.setFromProjectionMatrix(Te, Ve, t.reversedDepth), we = this.localClippingEnabled, Ce = Ke.init(this.clippingPlanes, we), O = Ue.get(e, j.length), O.init(), j.push(O), this.info.render.frame++, G.enabled === !0 && G.isPresenting === !0) {
+			let n = G.enabled === !0 && G.isPresenting === !0, r = te !== null && (L === null || n) && te.begin(P, L);
+			if (e.matrixWorldAutoUpdate === !0 && e.updateMatrixWorld(), t.parent === null && t.matrixWorldAutoUpdate === !0 && t.updateMatrixWorld(), G.enabled === !0 && G.isPresenting === !0 && (te === null || te.isCompositing() === !1) && (G.cameraAutoUpdate === !0 && G.updateCamera(t), t = G.getCamera()), e.isScene === !0 && e.onBeforeRender(P, e, t, L), k = We.get(e, N.length), k.init(t), k.state.textureUnits = H.getTextureUnits(), N.push(k), Te.multiplyMatrices(t.projectionMatrix, t.matrixWorldInverse), t.isArrayCamera ? Se.setFromArrayCamera(t) : xe.setFromProjectionMatrix(Te, Ve, t.reversedDepth), we = this.localClippingEnabled, Ce = Ke.init(this.clippingPlanes, we), O = Ue.get(e, j.length), O.init(), j.push(O), this.info.render.frame++, G.enabled === !0 && G.isPresenting === !0) {
 				let e = P.xr.getDepthSensingMesh();
 				e !== null && gt(e, t, -Infinity, P.sortObjects);
 			}
 			gt(e, t, 0, P.sortObjects), O.finish(), I !== null && I.updateLights(k.state.lightsArray), P.sortObjects === !0 && O.sort(ge, _e), ke = G.enabled === !1 || G.isPresenting === !1 || G.hasDepthSensing() === !1, ke && Ye.addToRenderList(O, e), this.info.autoReset === !0 && this.info.reset(), Ce === !0 && Ke.beginShadows();
 			let i = k.state.shadowsArray;
-			if (Je.render(i, e, t), Ce === !0 && Ke.endShadows(), (r && N.hasRenderPass()) === !1) {
+			if (Je.render(i, e, t), Ce === !0 && Ke.endShadows(), (r && te.hasRenderPass()) === !1) {
 				let n = O.opaque, r = O.transmissive;
 				if (k.setupLights(), t.isArrayCamera) {
 					let i = t.cameras;
@@ -11519,7 +11519,7 @@ var Hl = class {
 					}
 				} else r.length > 0 && vt(n, r, e, t), ke && Ye.render(e), _t(O, e, t);
 			}
-			L !== null && oe === 0 && (H.updateMultisampleRenderTarget(L), H.updateRenderTargetMipmap(L)), r && N.end(P), e.isScene === !0 && e.onAfterRender(P, e, t), tt.resetDefaultState(), R = -1, se = null, M.pop(), M.length > 0 ? (k = M[M.length - 1], H.setTextureUnits(k.state.textureUnits), Ce === !0 && Ke.setGlobalState(P.clippingPlanes, k.state.camera)) : k = null, j.pop(), O = j.length > 0 ? j[j.length - 1] : null, I !== null && I.renderEnd();
+			L !== null && oe === 0 && (H.updateMultisampleRenderTarget(L), H.updateRenderTargetMipmap(L)), r && te.end(P), e.isScene === !0 && e.onAfterRender(P, e, t), tt.resetDefaultState(), R = -1, se = null, N.pop(), N.length > 0 ? (k = N[N.length - 1], H.setTextureUnits(k.state.textureUnits), Ce === !0 && Ke.setGlobalState(P.clippingPlanes, k.state.camera)) : k = null, j.pop(), O = j.length > 0 ? j[j.length - 1] : null, I !== null && I.renderEnd();
 		};
 		function gt(e, t, n, r) {
 			if (e.visible === !1) return;
@@ -14500,22 +14500,53 @@ function Rd(e) {
 	};
 }
 // src/cards/cover/shade.ts
-var zd = () => "<svg viewBox=\"0 0 320 174\" aria-hidden=\"true\">\n  <defs><linearGradient id=\"sky\" x2=\".7\" y2=\"1\"><stop stop-color=\"#285779\"/><stop offset=\"1\" stop-color=\"#9ac8df\"/></linearGradient></defs>\n  <rect x=\"56\" y=\"16\" width=\"208\" height=\"140\" rx=\"3\" fill=\"#14293a\" stroke=\"#79afbb\"/>\n  <rect x=\"63\" y=\"23\" width=\"194\" height=\"125\" fill=\"url(#sky)\"/>\n  <foreignObject x=\"63\" y=\"23\" width=\"194\" height=\"125\" overflow=\"hidden\">\n    <div xmlns=\"http://www.w3.org/1999/xhtml\" style=\"width:100%;height:100%;overflow:hidden\">\n      <img class=\"window-view\" alt=\"\" hidden style=\"width:100%;height:100%;object-fit:cover;object-position:var(--photo-x,50%) var(--photo-y,50%);transform-origin:var(--photo-x,50%) var(--photo-y,50%);transform:scale(var(--photo-scale,1))\">\n    </div>\n  </foreignObject>\n  <path class=\"glazing-bars\" d=\"M160 23v125M63 88h194\" stroke=\"var(--glazing-color,#30566a)\" stroke-width=\"var(--glazing-width,3)\"/>\n  <path d=\"M51 157h218l-5 4H48Z\" fill=\"#253e50\" stroke=\"#628697\"/>\n</svg>\n<div class=\"shade-layer\"><svg viewBox=\"0 0 320 174\" aria-hidden=\"true\">\n  <defs><linearGradient id=\"fabric\" x2=\"0\" y2=\"1\"><stop stop-color=\"#607978\"/><stop offset=\".12\" stop-color=\"#b2c3b6\"/><stop offset=\"1\" stop-color=\"#839d94\"/></linearGradient>\n  <linearGradient id=\"bottom-rail\" x2=\"0\" y2=\"1\"><stop stop-color=\"#637679\"/><stop offset=\".3\" stop-color=\"#dbe4df\"/><stop offset=\".62\" stop-color=\"#a5b7b4\"/><stop offset=\"1\" stop-color=\"#53666a\"/></linearGradient></defs>\n  <g class=\"shade-cloth\" opacity=\"var(--shade-opacity,1)\"><rect x=\"62\" y=\"22\" width=\"196\" height=\"126\" fill=\"url(#fabric)\"/></g>\n  <rect class=\"shade-rail\" x=\"61\" y=\"146\" width=\"198\" height=\"5\" rx=\"2.5\" fill=\"url(#bottom-rail)\" stroke=\"#43585d\" stroke-width=\".7\"/>\n  <rect x=\"54\" y=\"13\" width=\"212\" height=\"13\" rx=\"5\" fill=\"#274656\" stroke=\"#a8d8df\"/>\n</svg></div>";
-function Bd(e) {
+var zd = (e) => `<svg viewBox="0 0 320 174" aria-hidden="true">
+  <defs><linearGradient id="sky" x2=".7" y2="1"><stop stop-color="#285779"/><stop offset="1" stop-color="#9ac8df"/></linearGradient></defs>
+  <rect x="56" y="16" width="208" height="140" rx="3" fill="#14293a" stroke="#79afbb"/>
+  <rect x="63" y="23" width="194" height="125" fill="url(#sky)"/>
+  <foreignObject x="63" y="23" width="194" height="125" overflow="hidden">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;overflow:hidden">
+      <img class="window-view" alt="" hidden style="width:100%;height:100%;object-fit:cover;object-position:var(--photo-x,50%) var(--photo-y,50%);transform-origin:var(--photo-x,50%) var(--photo-y,50%);transform:scale(var(--photo-scale,1))">
+    </div>
+  </foreignObject>
+  <path class="glazing-bars" d="M160 23v125M63 88h194" stroke="var(--glazing-color,#30566a)" stroke-width="var(--glazing-width,3)"/>
+  <path d="M51 157h218l-5 4H48Z" fill="#253e50" stroke="#628697"/>
+</svg>
+<div class="shade-layer"><svg viewBox="0 0 320 174" aria-hidden="true">
+  <defs><linearGradient id="fabric" x2="0" y2="1"><stop stop-color="#607978"/><stop offset=".12" stop-color="#b2c3b6"/><stop offset="1" stop-color="#839d94"/></linearGradient>
+  <linearGradient id="bottom-rail" x2="0" y2="1"><stop stop-color="#637679"/><stop offset=".3" stop-color="#dbe4df"/><stop offset=".62" stop-color="#a5b7b4"/><stop offset="1" stop-color="#53666a"/></linearGradient></defs>
+  ${e}
+  <rect class="shade-rail" x="61" y="146" width="198" height="5" rx="2.5" fill="url(#bottom-rail)" stroke="#43585d" stroke-width=".7"/>
+  <rect x="54" y="13" width="212" height="13" rx="5" fill="#274656" stroke="#a8d8df"/>
+</svg></div>`, Bd = () => zd("<g class=\"shade-cloth\" opacity=\"var(--shade-opacity,1)\"><rect x=\"62\" y=\"22\" width=\"196\" height=\"126\" fill=\"url(#fabric)\"/></g>");
+function Vd(e) {
 	let t = e.parentElement.querySelector(".shade-layer svg"), n = t.querySelector(".shade-cloth"), r = t.querySelector(".shade-rail"), i = -1;
 	return (e) => {
 		e !== i && (i = e, n.setAttribute("transform", `translate(0 22) scale(1 ${1 - e}) translate(0 -22)`), r.setAttribute("transform", `translate(0 ${-126 * e})`));
 	};
 }
+// src/cards/cover/blind.ts
+var Hd = 14, Ud = 126 / Hd, Wd = () => zd(`<g class="slats">${Array.from({ length: Hd }, (e, t) => `<rect x="62" y="${22 + t * Ud}" width="196" height="${Ud}" rx="1" fill="url(#fabric)" stroke="#687f80" stroke-width=".5"/>`).join("")}</g>`);
+function Gd(e) {
+	let t = e.parentElement, n = [...t.querySelectorAll(".slats rect")], r = t.querySelector(".shade-rail"), i = -1, a = -1;
+	return (e, t = .35) => {
+		if (e === i && t === a) return;
+		let o = 126 - e * 112, s = (e) => Math.min(e * Ud, o - (Hd - e)), c = 1 + 8 * Math.cos(t * Math.PI / 2);
+		n.forEach((t, n) => {
+			let r = s(n);
+			e !== i && t.setAttribute("y", String(22 + r)), t.setAttribute("height", String(Math.min(c, s(n + 1) - r)));
+		}), e !== i && r.setAttribute("transform", `translate(0 ${o - 126})`), i = e, a = t;
+	};
+}
 // src/cards/cover/garage-settings.ts
-var Vd = 2e3, Hd = 6500;
-function Ud(e) {
+var Kd = 2e3, qd = 6500;
+function Jd(e) {
 	return e.light_temperature_kelvin ?? (e.variant === "double" ? e.right_light_temperature_kelvin : void 0);
 }
-function Wd(e) {
+function Yd(e) {
 	if (e.roof_type !== void 0 && e.roof_type !== "pitched" && e.roof_type !== "flat") throw Error("Roof type must be pitched or flat.");
-	let t = Ud(e);
-	if (t !== void 0 && (!Number.isInteger(t) || t < 2e3 || t > 6500)) throw Error(`Light temperature must be a whole number from ${Vd} to ${Hd} K.`);
+	let t = Jd(e);
+	if (t !== void 0 && (!Number.isInteger(t) || t < 2e3 || t > 6500)) throw Error(`Light temperature must be a whole number from ${Kd} to ${qd} K.`);
 	let n = e.variant === "double";
 	for (let t of [e.light_entity, n ? e.right_light_entity : void 0]) if (t !== void 0 && !/^light\.[a-z0-9_]+$/.test(t)) throw Error("Select a light entity or leave it blank.");
 	if (!n) return;
@@ -14524,7 +14555,7 @@ function Wd(e) {
 	if (!Number.isFinite(r) || r < 1 || r > 300) throw Error("Right travel time must be 1–300 seconds.");
 }
 // src/cards/cover/kinds.ts
-var Gd = {
+var Xd = {
 	garage: {
 		label: "Garage",
 		deviceClass: "garage",
@@ -14535,77 +14566,168 @@ var Gd = {
 		],
 		markup: Ld,
 		mount: Rd,
-		validate: Wd
+		validate: Yd
 	},
 	shade: {
 		label: "Roller shade",
 		deviceClass: "shade",
 		layouts: ["normal", "compact"],
-		markup: zd,
-		mount: Bd,
-		validate({ shade_opacity: e, window_image: t, window_image_zoom: n, window_image_x: r, window_image_y: i, glazing_bar_width: a, glazing_bar_color: o }) {
-			if (a !== void 0 && (!Number.isInteger(a) || a < 0 || a > 10)) throw Error("Glazing bar width must be a whole number from 0 to 10.");
-			if (o !== void 0 && (typeof o != "string" || !/^#[a-f\d]{6}$/i.test(o))) throw Error("Glazing bar color must be a six-digit hex color.");
-			for (let [e, t, a] of [
-				[
-					n,
-					100,
-					300
-				],
-				[
-					r,
-					0,
-					100
-				],
-				[
-					i,
-					0,
-					100
-				]
-			]) if (e !== void 0 && (!Number.isInteger(e) || e < t || e > a)) throw Error(`Photo framing must use whole percentages from ${t} to ${a}.`);
-			if (t !== void 0 && typeof t != "string") throw Error("Window image must be an image URL or path.");
-			if (e !== void 0 && (!Number.isInteger(e) || e < 0 || e > 100)) throw Error("Shade opacity must be a whole percentage from 0 to 100.");
+		markup: Bd,
+		mount: Vd,
+		validate: Qd
+	},
+	blind: {
+		label: "Slatted blind",
+		deviceClass: "blind",
+		layouts: ["normal", "compact"],
+		markup: Wd,
+		mount: Gd,
+		validate(e) {
+			Qd(e);
+			let t = e.tilt_seconds;
+			if (t !== void 0 && (!Number.isFinite(t) || t < 0 || t > 300)) throw Error("Tilt time must be between 0 and 300 seconds.");
 		}
 	}
-};
-function Kd(e) {
-	return Object.keys(Gd).find((t) => Gd[t].deviceClass === e);
+}, Zd = (e) => e === "shade" || e === "blind";
+function Qd({ shade_opacity: e, window_image: t, window_image_zoom: n, window_image_x: r, window_image_y: i, glazing_bar_width: a, glazing_bar_color: o }) {
+	if (a !== void 0 && (!Number.isInteger(a) || a < 0 || a > 10)) throw Error("Glazing bar width must be a whole number from 0 to 10.");
+	if (o !== void 0 && (typeof o != "string" || !/^#[a-f\d]{6}$/i.test(o))) throw Error("Glazing bar color must be a six-digit hex color.");
+	for (let [e, t, a] of [
+		[
+			n,
+			100,
+			300
+		],
+		[
+			r,
+			0,
+			100
+		],
+		[
+			i,
+			0,
+			100
+		]
+	]) if (e !== void 0 && (!Number.isInteger(e) || e < t || e > a)) throw Error(`Photo framing must use whole percentages from ${t} to ${a}.`);
+	if (t !== void 0 && typeof t != "string") throw Error("Window image must be an image URL or path.");
+	if (e !== void 0 && (!Number.isInteger(e) || e < 0 || e > 100)) throw Error("Shade opacity must be a whole percentage from 0 to 100.");
+}
+function $d(e) {
+	return Object.keys(Xd).find((t) => Xd[t].deviceClass === e);
 }
 // src/cards/cover/model.ts
-function qd(e) {
+function ef(e) {
 	if (!/^cover\.[a-z0-9_]+$/.test(e?.entity)) throw Error("Select a cover entity.");
 	let t = e.travel_seconds ?? 10;
 	if (!Number.isFinite(t) || t < 1 || t > 300) throw Error("Travel time must be 1–300 seconds.");
 	let n = e.cover_type ?? "garage";
-	if (!Object.hasOwn(Gd, n)) throw Error("Unknown cover type.");
-	if (!Gd[n].layouts.includes(e.variant ?? "normal")) throw Error(`Unsupported layout for ${Gd[n].label}.`);
-	return Gd[n].validate?.(e), {
+	if (!Object.hasOwn(Xd, n)) throw Error("Unknown cover type.");
+	if (!Xd[n].layouts.includes(e.variant ?? "normal")) throw Error(`Unsupported layout for ${Xd[n].label}.`);
+	return Xd[n].validate?.(e), {
 		...e,
 		travel_seconds: t
 	};
 }
-function Jd(e) {
+function tf(e) {
 	let t = e?.attributes.current_position;
 	return typeof t == "number" && Number.isFinite(t) && t >= 0 && t <= 100 ? t / 100 : void 0;
 }
-function Yd(e) {
+function nf(e) {
+	return !!e && [
+		"closed",
+		"open",
+		"opening",
+		"closing"
+	].includes(e.state) && !!(Number(e.attributes.supported_features) & 4);
+}
+function rf(e, t, n) {
+	return e.callService("cover", "set_cover_position", {
+		entity_id: t,
+		position: n
+	});
+}
+function af(e) {
 	let t = Number(e?.attributes.supported_features);
 	if (e?.state === "closed" && t & 1) return "open";
 	if (e?.state === "open" && t & 2) return "close";
 }
-function Xd(e, t, n) {
+function of(e, t, n) {
 	return e.callService("cover", `${n}_cover`, { entity_id: t });
 }
-function Zd(e, t) {
+function sf(e, t) {
 	let n = Math.min(1, Math.max(0, (t - e.start) / e.duration));
 	return n === 1 ? e.to : e.from + (e.to - e.from) * n;
 }
-function Qd(e) {
+function cf(e) {
 	let t = Math.floor((Date.now() - Date.parse(e ?? "")) / 6e4);
 	return !Number.isFinite(t) || t < 0 ? "" : t < 1 ? "Under 1 min" : t < 60 ? `${t} min` : `${Math.floor(t / 60)} h ${t % 60} min`;
 }
+// src/cards/cover/tilt.ts
+var lf = [
+	[
+		"open_cover_tilt",
+		16,
+		"Open slats"
+	],
+	[
+		"close_cover_tilt",
+		32,
+		"Close slats"
+	],
+	[
+		"stop_cover_tilt",
+		64,
+		"Stop tilt"
+	]
+], uf = 128;
+function df(e) {
+	let t = e?.attributes.current_tilt_position;
+	return typeof t == "number" && Number.isFinite(t) && t >= 0 && t <= 100 ? t / 100 : void 0;
+}
+var ff = `<div class="tilt" hidden><label hidden>Slat tilt · <span></span>
+  <input type="range" min="0" max="100" step="1"></label>${lf.map(([e, , t]) => `<button type="button" data-tilt="${e}" hidden>${t}</button>`).join("")}<small role="status"></small></div>`;
+function pf(e) {
+	let t = e.querySelector("input"), n = e.querySelector("label"), r = [...e.querySelectorAll("button")], i = e.querySelector("small"), a, o = "", s = 0, c = 0, l = !1, u;
+	async function d(t, n, r = {}) {
+		if (!a || !o || l || !(s & n) || !e.isConnected) return;
+		let u = ++c;
+		l = !0, i.textContent = "", p();
+		try {
+			await a.callService("cover", t, {
+				entity_id: o,
+				...r
+			});
+		} catch {
+			u === c && (i.textContent = "Tilt command failed.");
+		} finally {
+			u === c && (l = !1, p());
+		}
+	}
+	let f = n.querySelector("span");
+	t.oninput = () => {
+		f.textContent = `Target ${t.value}%`;
+	}, t.onchange = () => void d("set_cover_tilt_position", uf, { tilt_position: t.valueAsNumber }), r.forEach((e, t) => {
+		let [n, r] = lf[t];
+		e.onclick = () => void d(n, r);
+	});
+	function p() {
+		e.hidden = !(s & 240), n.hidden = !(s & uf), t.disabled = l, t.value = String(u === void 0 ? 50 : Math.round(u * 100)), f.textContent = u === void 0 ? "Not reported" : `${t.value}%`, r.forEach((e, t) => {
+			e.hidden = !(s & lf[t][1]), e.disabled = l;
+		});
+	}
+	return (e, t, n) => {
+		a = e;
+		let r = n && [
+			"open",
+			"closed",
+			"opening",
+			"closing"
+		].includes(n.state) ? Number(n.attributes.supported_features) | 0 : 0, d = df(n);
+		(o !== t || s !== r || u !== d) && (o !== t && (c++, l = !1, i.textContent = ""), o = t, s = r, u = d, p());
+	};
+}
 // src/cards/cover/cover.ts
-var $d = (e, t) => `<style>${du}
+var mf = (e, t) => `<style>${du}
 :host{container-type:inline-size;min-width:0}ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
 h2{margin:0;font-size:18px;font-weight:550;overflow-wrap:anywhere}
 .scene{border:0;background:none;border-radius:12px;padding:0;width:100%;display:block}
@@ -14615,7 +14737,8 @@ svg{display:block;width:100%;height:clamp(100px,40cqi,180px)}
 .detail{min-width:0}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;min-height:40px}
 .state{font-size:16px;color:#86ecf2}.age,.hint{color:var(--gleam-muted,#8ba8c6);font-size:12px}
 ha-card[data-state=open] .state{color:#ffc27c}
-ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.shade-rail){visibility:hidden}
+ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.slats,.shade-rail){visibility:hidden}
+.tilt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tilt label,.tilt input,.lift-slider,.lift-slider input{display:block;width:100%}
 .action:disabled{cursor:default}.hint{margin:0}.hint:empty{display:none}
 @container(min-width:590px){ha-card{grid-template-columns:1.15fr 1fr;column-gap:20px}.scene{grid-column:1;grid-row:1/3}header{align-self:end}.detail{align-self:start}}
 :host([compact]) ha-card{display:block;padding:8px}.row{flex-wrap:wrap}
@@ -14635,9 +14758,10 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
   :host([shade]) .row>div{min-height:3lh}
   :host([shade]) .age{display:block}
 }
-</style><ha-card>${t ? "" : "<span class=\"experimental\">Experimental</span><header class=\"badge-clearance\"><h2></h2></header>"}<div class="scene">${Gd[e].markup(t)}</div>
+</style><ha-card>${t ? "" : "<span class=\"experimental\">Experimental</span><header class=\"badge-clearance\"><h2></h2></header>"}<div class="scene">${Xd[e].markup(t)}</div>
 <div class="detail"><div class="row"><div><strong class="state" role="status"></strong><span class="age"></span></div>
-<button id="action" class="action" hidden></button></div><p class="hint"></p></div></ha-card>`, ef = class extends HTMLElement {
+<button id="action" class="action" hidden></button></div><label class="lift-slider" hidden>Lift position · <span></span>
+<input type="range" aria-label="${t ? `${t} door lift position` : "Lift position"}" min="0" max="100" step="1"></label>${e === "blind" ? ff : ""}<p class="hint"></p></div></ha-card>`, hf = class extends HTMLElement {
 	root = this.attachShadow({ mode: "open" });
 	variant;
 	kind;
@@ -14647,10 +14771,10 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		return document.createElement("gleam-cover-editor");
 	}
 	static getStubConfig(e) {
-		let t = Object.keys(e?.states ?? {}).filter((e) => e.startsWith("cover.")), n = t.find((t) => Kd(e?.states[t].attributes.device_class)) ?? t[0] ?? "cover.garage_door";
+		let t = Object.keys(e?.states ?? {}).filter((e) => e.startsWith("cover.")), n = t.find((t) => $d(e?.states[t].attributes.device_class)) ?? t[0] ?? "cover.garage_door";
 		return {
 			entity: n,
-			cover_type: Kd(e?.states[n]?.attributes.device_class) ?? "garage"
+			cover_type: $d(e?.states[n]?.attributes.device_class) ?? "garage"
 		};
 	}
 	getCardSize() {
@@ -14664,7 +14788,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		};
 	}
 	setConfig(e) {
-		let t = qd(e), n = t.variant ?? "normal", r = t.cover_type ?? "garage";
+		let t = ef(e), n = t.variant ?? "normal", r = t.cover_type ?? "garage";
 		if (n !== this.variant || r !== this.kind) {
 			if (this.kind = r, this.variant = n, n === "double") {
 				this.root.innerHTML = `<style>${du}:host{min-width:0}ha-card{padding:12px}
@@ -14673,7 +14797,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
           .labels.flat{top:5cqi}
           .labels h3{position:relative;transform:translateX(-50%);width:62%;text-align:center;font-size:14px;line-height:1.15;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
           </style>
-          <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`, this.bays = [new tf(r, "left"), new tf(r, "right")], this.bays.forEach((e) => e.toggleAttribute("bay", !0));
+          <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`, this.bays = [new gf(r, "left"), new gf(r, "right")], this.bays.forEach((e) => e.toggleAttribute("bay", !0));
 				let e = document.createElement("div");
 				e.className = "labels";
 				for (let t of ["left", "right"]) {
@@ -14682,8 +14806,8 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 				}
 				this.root.querySelector(".bays").append(e, ...this.bays);
 			} else {
-				let e = new tf(r);
-				e.toggleAttribute("shade", r === "shade"), e.toggleAttribute("compact", n === "compact");
+				let e = new gf(r);
+				e.toggleAttribute("shade", Zd(r)), e.toggleAttribute("compact", n === "compact");
 				let t = document.createElement("style");
 				t.textContent = ":host{display:block;min-width:0}", this.bays = [e], this.root.replaceChildren(t, e);
 			}
@@ -14698,13 +14822,13 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 				name: t.left_label?.trim(),
 				travel_seconds: t.travel_seconds,
 				light_entity: t.light_entity,
-				light_temperature_kelvin: Ud(t)
+				light_temperature_kelvin: Jd(t)
 			}), this.bays[1].setConfig({
 				entity: t.right_entity,
 				name: t.right_label?.trim(),
 				travel_seconds: t.right_travel_seconds ?? t.travel_seconds,
 				light_entity: t.right_light_entity,
-				light_temperature_kelvin: Ud(t)
+				light_temperature_kelvin: Jd(t)
 			});
 		} else this.bays[0].setConfig(t);
 		for (let e of this.bays) e.toggleAttribute("flat-roof", t.roof_type === "flat");
@@ -14713,7 +14837,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	set hass(e) {
 		this.client = e, this.bays.forEach((t) => t.hass = e);
 	}
-}, tf = class extends HTMLElement {
+}, gf = class extends HTMLElement {
 	kind;
 	side;
 	root = this.attachShadow({ mode: "open" });
@@ -14721,7 +14845,14 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	client;
 	entity;
 	renderDoor;
+	updateTilt;
+	lastTilt;
+	tiltTarget;
+	tiltTravel;
 	button;
+	slider;
+	positionTarget;
+	draft;
 	observer;
 	visible = !1;
 	frame = 0;
@@ -14739,7 +14870,9 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	error = "";
 	generation = 0;
 	constructor(e = "garage", t) {
-		super(), this.kind = e, this.side = t, this.root.innerHTML = $d(e, t), this.button = this.root.querySelector(".action"), this.renderDoor = Gd[e].mount(this.root.querySelector("svg")), this.button.onclick = () => void this.act();
+		super(), this.kind = e, this.side = t, this.root.innerHTML = mf(e, t), this.button = this.root.querySelector(".action"), this.slider = this.root.querySelector(".lift-slider input"), this.slider.oninput = () => {
+			this.draft = this.slider.valueAsNumber, this.refresh();
+		}, this.slider.onchange = () => void this.setPosition(), this.renderDoor = Xd[e].mount(this.root.querySelector("svg")), e === "blind" && (this.updateTilt = pf(this.root.querySelector(".tilt"))), this.button.onclick = () => void this.act();
 	}
 	connectedCallback() {
 		this.observer = new IntersectionObserver(([e]) => {
@@ -14750,15 +14883,15 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		this.observer?.disconnect(), this.visible = !1, document.removeEventListener("visibilitychange", this.refresh), this.reset(), this.entity = void 0;
 	}
 	reset() {
-		cancelAnimationFrame(this.frame), clearTimeout(this.timer), this.frame = this.timer = 0, this.generation++, this.travel = void 0, this.target = void 0, this.confirmed = !1, this.command = !1, this.error = "";
+		cancelAnimationFrame(this.frame), clearTimeout(this.timer), this.frame = this.timer = 0, this.generation++, this.travel = void 0, this.target = void 0, this.confirmed = !1, this.command = !1, this.positionTarget = this.draft = void 0, this.tiltTarget = void 0, this.tiltTravel = void 0, this.error = "";
 	}
 	setConfig(e) {
-		let t = qd(e);
-		if (this.kind === "shade" && t.shade_opacity !== this.config?.shade_opacity && this.style.setProperty("--shade-opacity", String((t.shade_opacity ?? 100) / 100)), this.kind === "shade" && t.window_image !== this.config?.window_image) {
+		let t = ef(e);
+		if (this.kind === "shade" && t.shade_opacity !== this.config?.shade_opacity && this.style.setProperty("--shade-opacity", String((t.shade_opacity ?? 100) / 100)), Zd(this.kind) && t.window_image !== this.config?.window_image) {
 			let e = this.root.querySelector(".window-view");
 			e.hidden = !t.window_image?.trim(), e.hidden ? e.removeAttribute("src") : e.src = t.window_image.trim();
 		}
-		if (this.kind === "shade" && (t.glazing_bar_width !== this.config?.glazing_bar_width && this.style.setProperty("--glazing-width", String(t.glazing_bar_width ?? 3)), t.glazing_bar_color !== this.config?.glazing_bar_color && this.style.setProperty("--glazing-color", t.glazing_bar_color ?? "#30566a"), t.window_image_zoom !== this.config?.window_image_zoom && this.style.setProperty("--photo-scale", String((t.window_image_zoom ?? 100) / 100)), t.window_image_x !== this.config?.window_image_x && this.style.setProperty("--photo-x", `${t.window_image_x ?? 50}%`), t.window_image_y !== this.config?.window_image_y && this.style.setProperty("--photo-y", `${t.window_image_y ?? 50}%`)), t.entity !== this.config?.entity && (this.reset(), this.entity = void 0), t.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
+		if (Zd(this.kind) && (t.glazing_bar_width !== this.config?.glazing_bar_width && this.style.setProperty("--glazing-width", String(t.glazing_bar_width ?? 3)), t.glazing_bar_color !== this.config?.glazing_bar_color && this.style.setProperty("--glazing-color", t.glazing_bar_color ?? "#30566a"), t.window_image_zoom !== this.config?.window_image_zoom && this.style.setProperty("--photo-scale", String((t.window_image_zoom ?? 100) / 100)), t.window_image_x !== this.config?.window_image_x && this.style.setProperty("--photo-x", `${t.window_image_x ?? 50}%`), t.window_image_y !== this.config?.window_image_y && this.style.setProperty("--photo-y", `${t.window_image_y ?? 50}%`)), t.entity !== this.config?.entity && (this.reset(), this.entity = void 0), t.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
 			let e = t.light_temperature_kelvin;
 			if (this.toggleAttribute("tinted", e !== void 0), e === void 0) this.style.removeProperty("--lamp-color");
 			else {
@@ -14773,7 +14906,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	}
 	begin(e) {
 		let t = performance.now();
-		this.travel && (this.p = Zd(this.travel, t));
+		this.travel && (this.p = sf(this.travel, t));
 		let n = +(e === "open");
 		this.travel = {
 			from: this.p,
@@ -14786,50 +14919,96 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		if (!this.config || !this.isConnected) return;
 		let t = this.kind === "garage" && this.config.light_entity, n = t ? this.client?.states[t] : void 0;
 		this.toggleAttribute("lamp-off", !!t && n?.state !== "on");
-		let r = this.client?.states[this.config.entity], i = this.entity, a = r?.state, o = Jd(r);
-		if (!e && r === i && a === this.reportedState && o === this.reportedPosition) return;
+		let r = this.client?.states[this.config.entity], i = this.entity;
+		this.updateTilt?.(this.client, this.config.entity, r);
+		let a = r?.state, o = tf(r), s = this.updateTilt ? df(r) : void 0, c = s !== this.tiltTarget;
+		if (!e && r === i && a === this.reportedState && o === this.reportedPosition && !c) return;
+		if (c) {
+			let e = performance.now(), t = this.tiltTravel ? sf(this.tiltTravel, e) : this.tiltTarget, n = (this.config.tilt_seconds ?? 1) * 1e3;
+			this.tiltTravel = s !== void 0 && t !== void 0 && t !== s && n > 0 ? {
+				from: t,
+				to: s,
+				start: e,
+				duration: n
+			} : void 0, this.tiltTarget = s;
+		}
 		a !== this.reportedState && (this.error = "");
-		let s = this.reportedState, c = this.reportedPosition;
-		this.reportedState = a, this.reportedPosition = o, this.entity = r, this.command && (a === this.target || a === (this.target === "open" ? "opening" : "closing")) && (this.acknowledged = !0);
-		let l = o !== void 0 && o > 0 && o < 1 && (this.kind !== "shade" || o !== c || a === this.target);
+		let l = this.reportedState, u = this.reportedPosition;
+		if (this.reportedState = a, this.reportedPosition = o, this.entity = r, this.positionTarget !== void 0) {
+			if (!nf(r)) this.positionTarget = void 0, this.travel = void 0;
+			else {
+				o !== void 0 && o !== this.positionTarget && o !== u && (this.p = o, this.startPositionTravel(this.positionTarget)), this.refresh();
+				return;
+			}
+		}
+		this.command && (a === this.target || a === (this.target === "open" ? "opening" : "closing")) && (this.acknowledged = !0);
+		let d = o !== void 0 && o > 0 && o < 1 && (!Zd(this.kind) || o !== u || a === this.target);
 		if (a === "opening" || a === "closing") {
 			let e = a === "opening" ? "open" : "closed";
-			if (!i && o === void 0 && (this.p = e === "open" ? 0 : 1), this.command || this.target === e || i && a === s || this.begin(e), o !== void 0 && (!this.travel || l)) {
+			if (!i && o === void 0 && (this.p = e === "open" ? 0 : 1), this.command || this.target === e || i && a === l || this.begin(e), o !== void 0 && (!this.travel || d)) {
 				this.p = o;
 				let t = +(e === "open");
-				this.travel = this.kind === "shade" && this.target === e && o !== t ? {
+				this.travel = Zd(this.kind) && this.target === e && o !== t ? {
 					from: o,
 					to: t,
 					start: performance.now(),
 					duration: Math.max(1, Math.abs(t - o) * this.config.travel_seconds * 1e3)
 				} : void 0;
 			}
-		} else a === "open" || a === "closed" ? (o !== void 0 && (!this.travel || l) && (this.travel = void 0, this.p = o), a === this.target ? (this.confirmed = !0, !this.travel && this.kind === "shade" && o === void 0 && (this.p = +(a === "open"))) : this.command || this.target && s === a || (this.travel = void 0, this.target = void 0, this.p = o ?? (a === "closed" ? 0 : 1))) : this.command || (this.reset(), this.p = 0);
+		} else a === "open" || a === "closed" ? (o !== void 0 && (!this.travel || d) && (this.travel = void 0, this.p = o), a === this.target ? (this.confirmed = !0, !this.travel && Zd(this.kind) && o === void 0 && (this.p = +(a === "open"))) : this.command || this.target && l === a || (this.travel = void 0, this.target = void 0, this.p = o ?? (a === "closed" ? 0 : 1))) : this.command || (this.reset(), this.p = 0);
 		this.refresh();
 	}
 	async act() {
-		let e = Yd(this.entity);
-		if (!this.client || !this.config || !e || this.target) return;
+		let e = af(this.entity);
+		if (!this.client || !this.config || !e || this.target || this.positionTarget !== void 0) return;
 		let t = ++this.generation;
 		this.begin(e === "open" ? "open" : "closed"), this.command = !0, this.acknowledged = !1, this.confirmBy = performance.now() + this.config.travel_seconds * 1e3 + 5e3, this.refresh();
 		try {
-			await Xd(this.client, this.config.entity, e);
+			await of(this.client, this.config.entity, e);
 		} catch {
 			if (t !== this.generation || !this.command || this.acknowledged) return;
 			this.command = !1, this.target = void 0, this.travel = void 0, this.error = "Command failed. Check the door and try again.", this.sync(!0);
 		}
 	}
+	startPositionTravel(e) {
+		this.travel = {
+			from: this.p,
+			to: e,
+			start: performance.now(),
+			duration: Math.max(1, Math.abs(e - this.p) * this.config.travel_seconds * 1e3)
+		};
+	}
+	async setPosition() {
+		let e = this.slider.valueAsNumber;
+		if (this.draft = void 0, !this.client || !this.config || !nf(this.entity) || this.target || this.positionTarget !== void 0 || !Number.isInteger(e) || e < 0 || e > 100) {
+			this.refresh();
+			return;
+		}
+		let t = ++this.generation;
+		this.positionTarget = e / 100, this.error = "", this.startPositionTravel(this.positionTarget), this.confirmBy = performance.now() + this.config.travel_seconds * 1e3 + 5e3, this.refresh();
+		try {
+			await rf(this.client, this.config.entity, e);
+		} catch {
+			if (t !== this.generation || this.positionTarget === void 0) return;
+			this.positionTarget = void 0, this.travel = void 0, this.error = "Position command failed.", this.sync(!0);
+		}
+	}
 	paint = () => {
-		this.frame = 0, this.travel && (this.p = Zd(this.travel, performance.now()), this.p === this.travel.to && (this.travel = void 0)), this.renderDoor(this.p), this.lastPainted = this.p, this.travel ? this.frame = requestAnimationFrame(this.paint) : this.refresh();
+		this.frame = 0, this.travel && (this.p = sf(this.travel, performance.now()), this.p === this.travel.to && (this.travel = void 0)), this.lastTilt = this.tiltTravel ? sf(this.tiltTravel, performance.now()) : this.tiltTarget, this.lastTilt === this.tiltTarget && (this.tiltTravel = void 0), this.renderDoor(this.p, this.lastTilt), this.lastPainted = this.p, this.travel || this.tiltTravel ? this.frame = requestAnimationFrame(this.paint) : this.refresh();
 	};
 	refresh = () => {
 		clearTimeout(this.timer), this.timer = 0;
 		let e = this.isConnected && this.visible && !document.hidden;
 		e || (cancelAnimationFrame(this.frame), this.frame = 0), this.travel && performance.now() >= this.travel.start + this.travel.duration && (this.p = this.travel.to, this.travel = void 0);
-		let t = performance.now(), n = this.entity?.state ?? "unavailable", r = this.confirmBy - 5e3;
+		let t = performance.now(), n = this.entity?.state ?? "unavailable";
+		if (this.positionTarget !== void 0) {
+			let e = tf(this.entity) ?? (n === "closed" ? 0 : void 0);
+			!this.travel && e === this.positionTarget && (n === "open" || n === "closed") ? this.positionTarget = void 0 : t >= this.confirmBy && (this.travel = void 0, this.positionTarget = void 0, this.p = e ?? +(n === "open"), this.error = "Target position not confirmed.");
+		}
+		let r = this.confirmBy - 5e3;
 		this.command && (this.confirmed = n === this.target), !this.travel && this.confirmed && (!this.command || t >= r) && (this.command = !1, this.target = void 0, this.confirmed = !1);
 		let i = this.target && (this.command ? t >= r : !this.travel && (n === "open" || n === "closed"));
-		i && performance.now() >= this.confirmBy && (this.command = !1, this.target = void 0, this.travel = void 0, this.p = Jd(this.entity) ?? (n === "open" ? 1 : n === "closed" ? 0 : this.p), this.error = `Movement not confirmed. Home Assistant still reports ${n}.`);
+		i && performance.now() >= this.confirmBy && (this.command = !1, this.target = void 0, this.travel = void 0, this.p = tf(this.entity) ?? (n === "open" ? 1 : n === "closed" ? 0 : this.p), this.error = `Movement not confirmed. Home Assistant still reports ${n}.`);
 		let a = [
 			"closed",
 			"open",
@@ -14839,25 +15018,29 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 			let n = this.root.querySelector(e);
 			n.textContent !== t && (n.textContent = t);
 		};
-		this.side || c("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? Gd[this.kind].label));
-		let l = this.kind === "shade" && a ? Jd(this.entity) : void 0;
+		this.side || c("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? Xd[this.kind].label));
+		let l = Zd(this.kind) && a ? tf(this.entity) : void 0;
 		c(".state", o[0].toUpperCase() + o.slice(1) + (l === void 0 ? "" : ` · ${Math.round(l * 100)}% open`));
-		let u = n === "closed" || n === "open" ? Qd(this.entity?.last_changed) : "";
+		let u = n === "closed" || n === "open" ? cf(this.entity?.last_changed) : "";
 		c(".age", u ? ` · ${u}` : "");
 		let d = this.root.querySelector("ha-card");
 		d.setAttribute("data-state", n), d.toggleAttribute("data-unknown", !a);
-		let f = Yd(this.entity);
-		this.button.hidden = !s && !f, this.button.disabled = !!s || !f;
-		let p = s || (f === "open" ? "Open" : "Close");
-		if (c(".action", p), this.button.setAttribute("aria-label", this.side ? `${p} ${this.config?.name || `${this.side} door`}` : p), c(".hint", this.error), !e) return;
-		(this.travel || this.p !== this.lastPainted) && !this.frame && (this.frame = requestAnimationFrame(this.paint));
-		let m = u ? 6e4 - (Date.now() - Date.parse(this.entity.last_changed)) % 6e4 : Infinity, h = this.command && t < r ? r : i && this.target ? this.confirmBy : Infinity, g = Math.min(m, Math.max(1, h - t));
-		Number.isFinite(g) && (this.timer = window.setTimeout(this.refresh, g));
+		let f = af(this.entity);
+		this.button.hidden = !s && !f, this.button.disabled = !!s || !f || this.positionTarget !== void 0, this.slider.parentElement.hidden = !nf(this.entity), this.slider.disabled = !nf(this.entity) || !!this.target || this.positionTarget !== void 0;
+		let p = tf(this.entity), m = this.draft ?? (this.positionTarget === void 0 ? void 0 : Math.round(this.positionTarget * 100)), h = m ?? (p === void 0 ? n === "closed" ? 0 : 50 : Math.round(p * 100));
+		this.slider.value = String(h);
+		let g = m === void 0 ? p === void 0 ? "Not reported" : `${h}% open` : `Target ${m}%`;
+		c(".lift-slider span", g), this.slider.setAttribute("aria-valuetext", g);
+		let _ = s || (f === "open" ? "Open" : "Close");
+		if (c(".action", _), this.button.setAttribute("aria-label", this.side ? `${_} ${this.config?.name || `${this.side} door`}` : _), c(".hint", this.error), !e) return;
+		(this.travel || this.tiltTravel || this.p !== this.lastPainted || this.lastTilt !== this.tiltTarget) && !this.frame && (this.frame = requestAnimationFrame(this.paint));
+		let v = u ? 6e4 - (Date.now() - Date.parse(this.entity.last_changed)) % 6e4 : Infinity, y = this.positionTarget === void 0 ? this.command && t < r ? r : i && this.target ? this.confirmBy : Infinity : this.confirmBy, b = Math.min(v, Math.max(1, y - t));
+		Number.isFinite(b) && (this.timer = window.setTimeout(this.refresh, b));
 	};
 };
-customElements.get("gleam-cover-bay") || customElements.define("gleam-cover-bay", tf);
+customElements.get("gleam-cover-bay") || customElements.define("gleam-cover-bay", gf);
 // src/cards/cover/window-photo.ts
-async function nf(e, t) {
+async function _f(e, t) {
 	if (!e?.fetchWithAuth) throw Error("Photo upload is unavailable here. Enter an image URL instead.");
 	let n = new FormData();
 	n.append("file", t);
@@ -14872,7 +15055,7 @@ async function nf(e, t) {
 	return `/api/image/serve/${i.id}/original`;
 }
 // src/cards/cover/editor.ts
-var rf = [
+var vf = [
 	[
 		"window_image_zoom",
 		"Photo zoom",
@@ -14894,7 +15077,7 @@ var rf = [
 		100,
 		50
 	]
-], af = class extends HTMLElement {
+], yf = class extends HTMLElement {
 	uploadGeneration = 0;
 	root = this.attachShadow({ mode: "open" });
 	config;
@@ -14910,7 +15093,7 @@ var rf = [
        @container(min-width:440px){.pair:has([data-double]:not([hidden])),.pair[data-double]{grid-template-columns:repeat(2,minmax(0,1fr))}}
       p{margin:0;color:var(--error-color,#c62828)}p:empty{display:none}</style>
       <form><fieldset><legend>Cover setup</legend><div class="fields">
-      <label>Cover type<select id="kind">${Object.entries(Gd).map(([e, t]) => `<option value="${e}">${t.label}</option>`).join("")}</select></label>
+      <label>Cover type<select id="kind">${Object.entries(Xd).map(([e, t]) => `<option value="${e}">${t.label}</option>`).join("")}</select></label>
       <label>Layout<select id="layout"><option value="normal">Normal</option><option value="compact">Compact</option><option value="double">Double</option></select></label>
       <datalist id="covers"></datalist><div class="fields pair"><label><span id="entity-label"></span><input id="entity" list="covers" required pattern="cover\\.[a-z0-9_]+"></label>
       <label data-double>Right door entity<input id="right-entity" list="covers" required aria-describedby="duplicate" pattern="cover\\.[a-z0-9_]+"></label></div>
@@ -14918,21 +15101,23 @@ var rf = [
       <details><summary>Cover movement<small id="travel-summary"></small></summary><div class="fields">
       <small>Set the time the cover takes to travel in either direction (1–300 seconds).</small>
       <div class="fields pair"><label><span id="time-label"></span><input id="seconds" required type="number" min="1" max="300" step="any"></label>
-      <label data-double>Right door travel time (seconds)<input id="right-seconds" type="number" min="1" max="300" step="any"></label></div></div></details>
+      <label data-double>Right door travel time (seconds)<input id="right-seconds" type="number" min="1" max="300" step="any"></label></div>
+      <label data-blind>Tilt transition (seconds)<input id="tilt-seconds" required type="number" min="0" max="300" step="any">
+        <small>Time to animate a new reported slat angle. Default 1 second; 0 is immediate.</small></label></div></details>
       <details><summary>Card appearance<small>Display name<span data-garage>, roof style and door labels</span></small></summary><div class="fields">
       <label>Display name<input id="name" placeholder="Entity name"></label>
-      <fieldset data-shade><legend>Glazing bars</legend><div class="fields">
+      <fieldset data-window><legend>Glazing bars</legend><div class="fields">
         <label>Width · <span id="bar-reading"></span><input id="bar-width" type="range" min="0" max="10" step="1"></label>
         <label>Bar color<input id="bar-color" type="color"></label></div></fieldset>
-      <div data-shade class="fields"><label>Add window photo
+      <div data-window class="fields"><label>Add window photo
         <input id="window-photo" type="file" accept="image/*">
         <small>Choose a picture from this device to upload to Home Assistant.</small></label>
         <small id="photo-status" role="status"></small></div>
-      <label data-shade>Window view image · optional
+      <label data-window>Window view image · optional
         <input id="window-image" placeholder="/local/garden.jpg" spellcheck="false">
         <small>Enter an image URL or a /local/ path. Leave blank for the default sky.</small></label>
-      <fieldset data-shade><legend>Photo framing</legend><div class="fields">
-      ${rf.map(([e, t, n, r]) => `<label>${t} · <span id="${e}-value"></span><input id="${e}" type="range" min="${n}" max="${r}" step="1"></label>`).join("")}
+      <fieldset data-window><legend>Photo framing</legend><div class="fields">
+      ${vf.map(([e, t, n, r]) => `<label>${t} · <span id="${e}-value"></span><input id="${e}" type="range" min="${n}" max="${r}" step="1"></label>`).join("")}
       <small>At 100% the photo fills the window. Zoom in to pan farther.</small></div></fieldset>
       <label data-shade>Fabric opacity · <span id="opacity-reading"></span>
         <input id="shade-opacity" type="range" min="0" max="100" step="1">
@@ -14947,10 +15132,10 @@ var rf = [
       <label data-double>Right door light · optional<input id="right-light" list="lights" pattern="light\\.[a-z0-9_]+"></label></div>
       <label class="toggle"><input id="custom" type="checkbox"> Customize garage light temperature</label>
       <label for="kelvin">Garage light temperature · <span id="reading"></span></label>
-      <input id="kelvin" type="range" min="${Vd}" max="${Hd}" step="1"></div></details>
+      <input id="kelvin" type="range" min="${Kd}" max="${qd}" step="1"></div></details>
       <p id="invalid" role="status"></p></form>`, this.root.querySelector("form").addEventListener("submit", (e) => e.preventDefault()), this.root.addEventListener("input", (e) => {
 			e.target === this.input("window-image") && this.cancelPhoto(), e.target instanceof HTMLInputElement && ["entity", "right-entity"].includes(e.target.id) && this.layout(), e.target === this.input("kelvin") && this.showTemperature(), e.target === this.input("shade-opacity") && this.showOpacity(), e.target === this.input("bar-width") && this.showBarWidth();
-			for (let [t] of rf) e.target === this.input(t) && this.showFraming(t);
+			for (let [t] of vf) e.target === this.input(t) && this.showFraming(t);
 		}), this.root.addEventListener("change", (e) => {
 			if (e.target === this.input("window-photo")) {
 				this.choosePhoto();
@@ -14970,16 +15155,16 @@ var rf = [
 				entity: this.input("entity").value.trim(),
 				travel_seconds: this.input("seconds").valueAsNumber
 			};
-			(e.target === this.root.querySelector("#kind") || this.kind !== "garage" || r.cover_type) && (r.cover_type = this.kind), this.input("name").value.trim() ? r.name = this.input("name").value.trim() : delete r.name, t === "normal" ? delete r.variant : r.variant = t;
+			(e.target === this.root.querySelector("#kind") || this.kind !== "garage" || r.cover_type) && (r.cover_type = this.kind), this.input("name").value.trim() ? r.name = this.input("name").value.trim() : delete r.name, t === "normal" ? delete r.variant : r.variant = t, this.kind === "blind" && this.input("tilt-seconds").valueAsNumber !== 1 ? r.tilt_seconds = this.input("tilt-seconds").valueAsNumber : delete r.tilt_seconds;
 			let i = this.input("shade-opacity").valueAsNumber;
 			this.kind === "shade" && i !== 100 ? r.shade_opacity = i : delete r.shade_opacity;
 			let a = this.input("bar-width").valueAsNumber, o = this.input("bar-color").value;
-			this.kind === "shade" && a !== 3 ? r.glazing_bar_width = a : delete r.glazing_bar_width, this.kind === "shade" && o !== "#30566a" ? r.glazing_bar_color = o : delete r.glazing_bar_color;
+			Zd(this.kind) && a !== 3 ? r.glazing_bar_width = a : delete r.glazing_bar_width, Zd(this.kind) && o !== "#30566a" ? r.glazing_bar_color = o : delete r.glazing_bar_color;
 			let s = this.input("window-image").value.trim();
-			this.kind === "shade" && s ? r.window_image = s : delete r.window_image;
-			for (let [e, , , , t] of rf) {
+			Zd(this.kind) && s ? r.window_image = s : delete r.window_image;
+			for (let [e, , , , t] of vf) {
 				let n = this.input(e).valueAsNumber;
-				this.kind === "shade" && n !== t ? r[e] = n : delete r[e];
+				Zd(this.kind) && n !== t ? r[e] = n : delete r[e];
 			}
 			this.kind === "garage" && this.root.querySelector("#roof").value === "flat" ? r.roof_type = "flat" : delete r.roof_type, t === "double" ? (r.right_entity = this.input("right-entity").value, this.input("right-seconds").value ? r.right_travel_seconds = this.input("right-seconds").valueAsNumber : delete r.right_travel_seconds) : (delete r.right_entity, delete r.right_travel_seconds);
 			for (let e of ["left", "right"]) {
@@ -14990,7 +15175,7 @@ var rf = [
 				let n = e ? "right-" : "", i = this.kind === "garage" && (!e || t === "double"), a = e ? "right_light_entity" : "light_entity";
 				i && this.input(n + "light").value ? r[a] = this.input(n + "light").value : delete r[a];
 			}
-			delete r.right_light_temperature_kelvin, this.kind === "garage" && this.input("custom").checked ? r.light_temperature_kelvin = this.input("kelvin").valueAsNumber : delete r.light_temperature_kelvin, this.config = qd(r), this.dispatchEvent(new CustomEvent("config-changed", {
+			delete r.right_light_temperature_kelvin, this.kind === "garage" && this.input("custom").checked ? r.light_temperature_kelvin = this.input("kelvin").valueAsNumber : delete r.light_temperature_kelvin, this.config = ef(r), this.dispatchEvent(new CustomEvent("config-changed", {
 				detail: { config: r },
 				bubbles: !0,
 				composed: !0
@@ -15008,12 +15193,12 @@ var rf = [
 	}
 	async choosePhoto() {
 		let e = this.input("window-photo"), t = e.files?.[0];
-		if (!t || this.kind !== "shade") return;
+		if (!t || !Zd(this.kind)) return;
 		e.value = "";
 		let n = ++this.uploadGeneration, r = this.root.querySelector("#photo-status");
 		r.textContent = "Uploading photo…";
 		try {
-			let e = await nf(this.assistant, t);
+			let e = await _f(this.assistant, t);
 			if (n !== this.uploadGeneration) return;
 			let i = this.input("window-image");
 			i.value = e, i.dispatchEvent(new Event("change", { bubbles: !0 })), r.textContent = "Photo uploaded to Home Assistant.";
@@ -15047,12 +15232,14 @@ var rf = [
 	}
 	layout() {
 		this.updateSuggestion();
-		let e = this.root.querySelector("#layout"), t = Gd[this.kind].layouts;
+		let e = this.root.querySelector("#layout"), t = Xd[this.kind].layouts;
 		for (let n of e.options) n.disabled = n.hidden = !t.some((e) => e === n.value);
 		e.selectedOptions[0]?.disabled && (e.value = "normal");
 		let n = e.value, r = this.kind === "garage";
+		this.root.querySelector("[data-blind]").hidden = this.input("tilt-seconds").disabled = this.kind !== "blind";
 		for (let e of this.root.querySelectorAll("[data-shade]")) e.hidden = this.kind !== "shade";
-		this.input("window-image").disabled = this.input("shade-opacity").disabled = this.kind !== "shade";
+		for (let e of this.root.querySelectorAll("[data-window]")) e.hidden = !Zd(this.kind);
+		this.input("window-image").disabled = !Zd(this.kind), this.input("shade-opacity").disabled = this.kind !== "shade";
 		for (let e of this.root.querySelectorAll("[data-garage]")) e.hidden = !r;
 		this.input("light").disabled = this.input("custom").disabled = !r;
 		let i = n === "double";
@@ -15061,17 +15248,17 @@ var rf = [
 		let a = this.input("right-entity"), o = this.input("entity").value.trim(), s = i && o && a.value.trim() === o ? "Both doors use the same cover entity. Choose a different entity for one door." : "";
 		a.setCustomValidity(s), a.setAttribute("aria-invalid", String(!!s));
 		let c = this.root.querySelector("#duplicate");
-		c.textContent !== s && (c.textContent = s), this.root.querySelector("#entity-label").textContent = i ? "Left door entity" : `${Gd[this.kind].label} entity`, this.root.querySelector("#light-label").textContent = i ? "Left door light · optional" : "Garage light · optional", this.root.querySelector("#time-label").textContent = i ? "Left door travel time (seconds)" : "Travel time (seconds)";
+		c.textContent !== s && (c.textContent = s), this.root.querySelector("#entity-label").textContent = i ? "Left door entity" : `${Xd[this.kind].label} entity`, this.root.querySelector("#light-label").textContent = i ? "Left door light · optional" : "Garage light · optional", this.root.querySelector("#time-label").textContent = i ? "Left door travel time (seconds)" : "Travel time (seconds)";
 		let l = this.input("seconds").value || "—";
 		this.root.querySelector("#travel-summary").textContent = i ? `Left: ${l} s · Right: ${this.input("right-seconds").value || l} s` : `${l} seconds to open or close`;
 		let u = this.invalidField();
 		return this.root.querySelector("#invalid").textContent = u?.closest("details") ? `${u.labels?.[0]?.textContent?.trim()}: ${u.validationMessage}` : "", n;
 	}
 	setConfig(e) {
-		(this.config?.entity !== e.entity || this.config?.cover_type !== e.cover_type || this.config?.window_image !== e.window_image) && this.cancelPhoto(), this.config = e, this.root.querySelector("#kind").value = e.cover_type ?? "garage", this.input("entity").value = e.entity ?? "", this.input("name").value = e.name ?? "", this.input("seconds").value = String(e.travel_seconds ?? 10), this.input("shade-opacity").value = String(e.shade_opacity ?? 100), this.input("window-image").value = e.window_image ?? "", this.input("bar-width").value = String(e.glazing_bar_width ?? 3), this.input("bar-color").value = e.glazing_bar_color ?? "#30566a", this.showBarWidth();
-		for (let [t, , , , n] of rf) this.input(t).value = String(e[t] ?? n), this.showFraming(t);
+		(this.config?.entity !== e.entity || this.config?.cover_type !== e.cover_type || this.config?.window_image !== e.window_image) && this.cancelPhoto(), this.config = e, this.root.querySelector("#kind").value = e.cover_type ?? "garage", this.input("entity").value = e.entity ?? "", this.input("name").value = e.name ?? "", this.input("seconds").value = String(e.travel_seconds ?? 10), this.input("tilt-seconds").value = String(e.tilt_seconds ?? 1), this.input("shade-opacity").value = String(e.shade_opacity ?? 100), this.input("window-image").value = e.window_image ?? "", this.input("bar-width").value = String(e.glazing_bar_width ?? 3), this.input("bar-color").value = e.glazing_bar_color ?? "#30566a", this.showBarWidth();
+		for (let [t, , , , n] of vf) this.input(t).value = String(e[t] ?? n), this.showFraming(t);
 		this.showOpacity(), this.root.querySelector("#layout").value = e.variant ?? "normal", this.root.querySelector("#roof").value = e.roof_type ?? "pitched", this.input("right-entity").value = e.right_entity ?? "", this.input("left-label").value = e.left_label ?? "", this.input("right-label").value = e.right_label ?? "", this.input("right-seconds").value = String(e.right_travel_seconds ?? e.travel_seconds ?? 10), this.input("light").value = e.light_entity ?? "";
-		let t = Ud(e);
+		let t = Jd(e);
 		this.input("custom").checked = t !== void 0, this.input("kelvin").value = String(t ?? 2700), this.input("right-light").value = e.right_light_entity ?? "", this.layout();
 	}
 	set hass(e) {
@@ -15083,10 +15270,10 @@ var rf = [
 		}
 	}
 	updateSuggestion() {
-		let e = Kd(this.assistant?.states[this.input("entity").value]?.attributes.device_class), t = this.root.querySelector("#suggestion");
-		t.hidden = !e || e === this.kind, !t.hidden && e && (t.textContent = `This entity reports device class ${e}. Suggested cover type: ${Gd[e].label}.`);
+		let e = $d(this.assistant?.states[this.input("entity").value]?.attributes.device_class), t = this.root.querySelector("#suggestion");
+		t.hidden = !e || e === this.kind, !t.hidden && e && (t.textContent = `This entity reports device class ${e}. Suggested cover type: ${Xd[e].label}.`);
 	}
-}, of = [
+}, bf = [
 	{
 		type: "gleam-energy-graph",
 		name: "Gleam Energy Graph",
@@ -15102,13 +15289,13 @@ var rf = [
 	{
 		type: "gleam-cover",
 		name: "Gleam Cover (Experimental)",
-		element: ef,
-		description: "Garage doors and roller shades with live cover status and controls."
+		element: hf,
+		description: "Garage doors, roller shades and slatted blinds with live cover status and controls."
 	}
 ];
-for (let { type: e, element: t, ...n } of of) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
+for (let { type: e, element: t, ...n } of bf) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
 	type: e,
 	...n,
 	preview: !1
 });
-customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", Ed), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", Yu), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", af);
+customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", Ed), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", Yu), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", yf);

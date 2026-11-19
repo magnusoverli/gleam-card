@@ -3,7 +3,7 @@ import { uploadWindowPhoto } from "./window-photo";
 import { editorPanelStyles } from "../../shared/editor-styles";
 import { settings } from "./model";
 import { sharedTemperature, MIN_KELVIN, MAX_KELVIN } from "./garage-settings";
-import { kinds, suggestedKind, type CoverKind } from "./kinds";
+import { kinds, suggestedKind, isWindowCover, type CoverKind } from "./kinds";
 
 const framing = [
   ["window_image_zoom","Photo zoom",100,300,100],
@@ -36,20 +36,22 @@ export class GleamCoverEditor extends HTMLElement {
       <details><summary>Cover movement<small id="travel-summary"></small></summary><div class="fields">
       <small>Set the time the cover takes to travel in either direction (1–300 seconds).</small>
       <div class="fields pair"><label><span id="time-label"></span><input id="seconds" required type="number" min="1" max="300" step="any"></label>
-      <label data-double>Right door travel time (seconds)<input id="right-seconds" type="number" min="1" max="300" step="any"></label></div></div></details>
+      <label data-double>Right door travel time (seconds)<input id="right-seconds" type="number" min="1" max="300" step="any"></label></div>
+      <label data-blind>Tilt transition (seconds)<input id="tilt-seconds" required type="number" min="0" max="300" step="any">
+        <small>Time to animate a new reported slat angle. Default 1 second; 0 is immediate.</small></label></div></details>
       <details><summary>Card appearance<small>Display name<span data-garage>, roof style and door labels</span></small></summary><div class="fields">
       <label>Display name<input id="name" placeholder="Entity name"></label>
-      <fieldset data-shade><legend>Glazing bars</legend><div class="fields">
+      <fieldset data-window><legend>Glazing bars</legend><div class="fields">
         <label>Width · <span id="bar-reading"></span><input id="bar-width" type="range" min="0" max="10" step="1"></label>
         <label>Bar color<input id="bar-color" type="color"></label></div></fieldset>
-      <div data-shade class="fields"><label>Add window photo
+      <div data-window class="fields"><label>Add window photo
         <input id="window-photo" type="file" accept="image/*">
         <small>Choose a picture from this device to upload to Home Assistant.</small></label>
         <small id="photo-status" role="status"></small></div>
-      <label data-shade>Window view image · optional
+      <label data-window>Window view image · optional
         <input id="window-image" placeholder="/local/garden.jpg" spellcheck="false">
         <small>Enter an image URL or a /local/ path. Leave blank for the default sky.</small></label>
-      <fieldset data-shade><legend>Photo framing</legend><div class="fields">
+      <fieldset data-window><legend>Photo framing</legend><div class="fields">
       ${framing.map(([key,label,min,max])=>`<label>${label} · <span id="${key}-value"></span><input id="${key}" type="range" min="${min}" max="${max}" step="1"></label>`).join("")}
       <small>At 100% the photo fills the window. Zoom in to pan farther.</small></div></fieldset>
       <label data-shade>Fabric opacity · <span id="opacity-reading"></span>
@@ -92,16 +94,18 @@ export class GleamCoverEditor extends HTMLElement {
       if (event.target === this.root.querySelector("#kind") || this.kind !== "garage" || config.cover_type) config.cover_type = this.kind;
       if (this.input("name").value.trim()) config.name = this.input("name").value.trim(); else delete config.name;
       if (variant === "normal") delete config.variant; else config.variant = variant;
+      if (this.kind === "blind" && this.input("tilt-seconds").valueAsNumber !== 1) config.tilt_seconds = this.input("tilt-seconds").valueAsNumber;
+      else delete config.tilt_seconds;
       const opacity = this.input("shade-opacity").valueAsNumber;
       if (this.kind === "shade" && opacity !== 100) config.shade_opacity = opacity; else delete config.shade_opacity;
       const width = this.input("bar-width").valueAsNumber, color = this.input("bar-color").value;
-      if (this.kind === "shade" && width !== 3) config.glazing_bar_width = width; else delete config.glazing_bar_width;
-      if (this.kind === "shade" && color !== "#30566a") config.glazing_bar_color = color; else delete config.glazing_bar_color;
+      if (isWindowCover(this.kind) && width !== 3) config.glazing_bar_width = width; else delete config.glazing_bar_width;
+      if (isWindowCover(this.kind) && color !== "#30566a") config.glazing_bar_color = color; else delete config.glazing_bar_color;
       const image = this.input("window-image").value.trim();
-      if (this.kind === "shade" && image) config.window_image = image; else delete config.window_image;
+      if (isWindowCover(this.kind) && image) config.window_image = image; else delete config.window_image;
       for (const [key,,,,initial] of framing) {
         const n=this.input(key).valueAsNumber;
-        if (this.kind === "shade" && n !== initial) config[key]=n; else delete config[key];
+        if (isWindowCover(this.kind) && n !== initial) config[key]=n; else delete config[key];
       }
       if (this.kind === "garage" && this.root.querySelector<HTMLSelectElement>("#roof")!.value === "flat") config.roof_type = "flat"; else delete config.roof_type;
       if (variant === "double") {
@@ -134,7 +138,7 @@ export class GleamCoverEditor extends HTMLElement {
   disconnectedCallback() { this.cancelPhoto(); }
   private async choosePhoto() {
     const picker = this.input("window-photo"), file = picker.files?.[0];
-    if (!file || this.kind !== "shade") return;
+    if (!file || !isWindowCover(this.kind)) return;
     picker.value = "";
     const generation = ++this.uploadGeneration, status = this.root.querySelector("#photo-status")!;
     status.textContent = "Uploading photo…";
@@ -183,8 +187,11 @@ export class GleamCoverEditor extends HTMLElement {
     if (layout.selectedOptions[0]?.disabled) layout.value = "normal";
     const variant = layout.value as NonNullable<CoverConfig["variant"]>;
     const garage = this.kind === "garage";
+    this.root.querySelector<HTMLElement>("[data-blind]")!.hidden = this.input("tilt-seconds").disabled = this.kind !== "blind";
     for (const el of this.root.querySelectorAll<HTMLElement>("[data-shade]")) el.hidden = this.kind !== "shade";
-    this.input("window-image").disabled = this.input("shade-opacity").disabled = this.kind !== "shade";
+    for (const el of this.root.querySelectorAll<HTMLElement>("[data-window]")) el.hidden = !isWindowCover(this.kind);
+    this.input("window-image").disabled = !isWindowCover(this.kind);
+    this.input("shade-opacity").disabled = this.kind !== "shade";
     for (const el of this.root.querySelectorAll<HTMLElement>("[data-garage]")) el.hidden = !garage;
     this.input("light").disabled = this.input("custom").disabled = !garage;
     const double = variant === "double";
@@ -216,6 +223,7 @@ export class GleamCoverEditor extends HTMLElement {
     this.input("entity").value = config.entity ?? "";
     this.input("name").value = config.name ?? "";
     this.input("seconds").value = String(config.travel_seconds ?? 10);
+    this.input("tilt-seconds").value = String(config.tilt_seconds ?? 1);
     this.input("shade-opacity").value = String(config.shade_opacity ?? 100);
     this.input("window-image").value = config.window_image ?? "";
     this.input("bar-width").value = String(config.glazing_bar_width ?? 3);

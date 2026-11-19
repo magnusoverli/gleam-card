@@ -1,8 +1,33 @@
 # Gleam Cover
 
-**Experimental:** choose Garage or Roller shade in the visual editor. Omit
+**Experimental:** choose Garage, Roller shade or Slatted blind in the visual editor. Omit
 `cover_type` to keep the original garage illustration. Device-class suggestions
 do not override an existing choice.
+
+## Slatted blind · Development build
+
+All cover types show a **Lift position** slider when the entity supports
+`SET_POSITION`. Release the slider to request 0–100% open. The target is
+separate from the reported position. Each Double garage bay checks its own
+capabilities. On blinds, this slider moves the rail; **Slat tilt** changes angle.
+
+```yaml
+type: custom:gleam-cover
+cover_type: blind
+entity: cover.studio_blinds
+variant: compact
+tilt_seconds: 1       # Per reported tilt change; 0 disables animation
+```
+
+As the rail rises it picks up slats from the bottom. Lowering it deposits
+each slat at its resting height. Use Normal or Compact. Set up the window photo, crop and glazing bars just as
+for Roller shade. Raising the blind stacks the slats; tilting them changes how
+much of the view shows through without changing the lift position.
+The separate tilt slider needs `SET_TILT_POSITION`; open/close/stop tilt
+buttons appear only for their respective capabilities. An unreported tilt has
+a symbolic angle, not a measured percentage. Set **Cover movement → Tilt transition**
+to 0–300 seconds (default 1). A new tilt report during movement redirects the
+animation from its current angle. Lift timing is independent. Fabric opacity is shade-only.
 
 ## Roller shade · New in v0.0.8
 
@@ -38,8 +63,8 @@ Clear the image field to restore the blue sky.
 Roller shades support Normal and Compact. The fabric rolls up into a fixed
 headrail. A percentage appears only for a reported `current_position`; Open
 alone can mean partially open. Movement estimates never become measured
-percentages. The card offers the same supported Open/Close commands as Garage;
-there is no position-setting or tilt control. Double, roof style and lights
+percentages. The card offers the same supported lift controls as Garage;
+tilt is blind-specific. Double, roof style and lights
 are garage-specific.
 
 ## Garage

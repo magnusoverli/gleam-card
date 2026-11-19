@@ -1,5 +1,22 @@
 import { test, expect } from "@playwright/test";
 
+test("blind batches lift and tilt on retained slats and goes idle", async ({page})=>{
+  await page.goto("/cover/");
+  await page.getByLabel("Example").selectOption("cover.demo_blind");
+  await expect(page.locator("#cover .shade-rail")).toHaveAttribute("transform","translate(0 0)");
+  const metrics=await page.evaluate(async()=>{
+    const {cover,hass}=window.demo, id="cover.demo_blind", bay=cover.shadowRoot.querySelector("gleam-cover-bay");
+    const slat=bay.shadowRoot.querySelector(".slats rect"), start=performance.now();
+    for(let i=1;i<=50;i++)cover.hass={...hass,states:{[id]:{state:"open",attributes:{current_position:i,current_tilt_position:100-i,supported_features:131}}}};
+    const cpuMs=performance.now()-start;
+    await new Promise(requestAnimationFrame);
+    return {cpuMs,toFrameMs:performance.now()-start,reused:slat===bay.shadowRoot.querySelector(".slats rect")};
+  });
+  console.log("Slatted blind (SVG)",metrics);
+  expect(metrics.reused).toBe(true);
+  await expect.poll(()=>page.locator("#cover gleam-cover-bay").evaluate(b=>b.frame)).toBe(0);
+});
+
 test("shade reuses its fabric and frame scheduler across measured-position updates", async ({page}) => {
   await page.goto("/cover/");
   await page.getByLabel("Example").selectOption("cover.demo_shade");

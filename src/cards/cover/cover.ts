@@ -1,9 +1,10 @@
 import { foundationStyles } from "../../shared/theme";
 import type { CoverConfig, EntityState, HomeAssistant } from "../../types";
-import { action, elapsed, fraction, position, send, settings, type Travel } from "./model";
+import { action, canSetPosition, elapsed, fraction, position, send, sendPosition, settings, type Travel } from "./model";
 import { labelCenter, type Side } from "./garage";
 import { sharedTemperature } from "./garage-settings";
-import { kinds, suggestedKind, type CoverKind } from "./kinds";
+import { kinds, suggestedKind, isWindowCover, type CoverKind } from "./kinds";
+import { tiltControls, tiltMarkup, tiltPosition } from "./tilt";
 
 const template = (kind: CoverKind, side?: Side) => `<style>${foundationStyles}
 :host{container-type:inline-size;min-width:0}ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
@@ -15,7 +16,8 @@ svg{display:block;width:100%;height:clamp(100px,40cqi,180px)}
 .detail{min-width:0}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;min-height:40px}
 .state{font-size:16px;color:#86ecf2}.age,.hint{color:var(--gleam-muted,#8ba8c6);font-size:12px}
 ha-card[data-state=open] .state{color:#ffc27c}
-ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.shade-rail){visibility:hidden}
+ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.slats,.shade-rail){visibility:hidden}
+.tilt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tilt label,.tilt input,.lift-slider,.lift-slider input{display:block;width:100%}
 .action:disabled{cursor:default}.hint{margin:0}.hint:empty{display:none}
 @container(min-width:590px){ha-card{grid-template-columns:1.15fr 1fr;column-gap:20px}.scene{grid-column:1;grid-row:1/3}header{align-self:end}.detail{align-self:start}}
 :host([compact]) ha-card{display:block;padding:8px}.row{flex-wrap:wrap}
@@ -37,7 +39,8 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 }
 </style><ha-card>${side ? "" : '<span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header>'}<div class="scene">${kinds[kind].markup(side)}</div>
 <div class="detail"><div class="row"><div><strong class="state" role="status"></strong><span class="age"></span></div>
-<button id="action" class="action" hidden></button></div><p class="hint"></p></div></ha-card>`;
+<button id="action" class="action" hidden></button></div><label class="lift-slider" hidden>Lift position · <span></span>
+<input type="range" aria-label="${side ? `${side} door lift position` : 'Lift position'}" min="0" max="100" step="1"></label>${kind==="blind"?tiltMarkup:""}<p class="hint"></p></div></ha-card>`;
 
 export class GleamCover extends HTMLElement {
   private root = this.attachShadow({mode:"open"});
@@ -80,7 +83,7 @@ export class GleamCover extends HTMLElement {
         this.root.querySelector(".bays")!.append(labels,...this.bays);
       } else {
         const bay = new CoverBay(kind);
-        bay.toggleAttribute("shade",kind === "shade");
+        bay.toggleAttribute("shade",isWindowCover(kind));
         bay.toggleAttribute("compact",variant === "compact");
         const style = document.createElement("style");
         style.textContent = ":host{display:block;min-width:0}";
@@ -113,8 +116,15 @@ class CoverBay extends HTMLElement {
   private config?: ReturnType<typeof settings>;
   private client?: HomeAssistant;
   private entity?: EntityState;
-  private renderDoor: (p:number) => void;
+  private renderDoor: (p:number,tilt?:number) => void;
+  private updateTilt?: ReturnType<typeof tiltControls>;
+  private lastTilt?: number;
+  private tiltTarget?: number;
+  private tiltTravel?: Travel;
   private button: HTMLButtonElement;
+  private slider: HTMLInputElement;
+  private positionTarget?: number;
+  private draft?: number;
   private observer?: IntersectionObserver;
   private visible = false;
   private frame = 0;
@@ -136,7 +146,11 @@ class CoverBay extends HTMLElement {
     super();
     this.root.innerHTML = template(kind,side);
     this.button = this.root.querySelector(".action")!;
+    this.slider = this.root.querySelector(".lift-slider input")!;
+    this.slider.oninput = () => { this.draft=this.slider.valueAsNumber; this.refresh(); };
+    this.slider.onchange = () => void this.setPosition();
     this.renderDoor = kinds[kind].mount(this.root.querySelector("svg")!);
+    if (kind==="blind") this.updateTilt=tiltControls(this.root.querySelector(".tilt")!);
     this.button.onclick = () => void this.act();
   }
   connectedCallback() {
@@ -154,19 +168,21 @@ class CoverBay extends HTMLElement {
     cancelAnimationFrame(this.frame); clearTimeout(this.timer); this.frame = this.timer = 0;
     this.generation++; this.travel = undefined; this.target = undefined; this.confirmed = false;
     this.command = false;
+    this.positionTarget = this.draft = undefined;
+    this.tiltTarget = undefined; this.tiltTravel = undefined;
     this.error = "";
   }
   setConfig(value: CoverConfig) {
     const config = settings(value);
     if (this.kind === "shade" && config.shade_opacity !== this.config?.shade_opacity)
       this.style.setProperty("--shade-opacity", String((config.shade_opacity ?? 100)/100));
-    if (this.kind === "shade" && config.window_image !== this.config?.window_image) {
+    if (isWindowCover(this.kind) && config.window_image !== this.config?.window_image) {
       const image = this.root.querySelector<HTMLImageElement>(".window-view")!;
       image.hidden = !config.window_image?.trim();
       if (!image.hidden) image.src = config.window_image!.trim();
       else image.removeAttribute("src");
     }
-    if (this.kind === "shade") {
+    if (isWindowCover(this.kind)) {
       if (config.glazing_bar_width !== this.config?.glazing_bar_width) this.style.setProperty("--glazing-width",String(config.glazing_bar_width ?? 3));
       if (config.glazing_bar_color !== this.config?.glazing_bar_color) this.style.setProperty("--glazing-color",config.glazing_bar_color ?? "#30566a");
       if (config.window_image_zoom !== this.config?.window_image_zoom) this.style.setProperty("--photo-scale",String((config.window_image_zoom ?? 100)/100));
@@ -200,17 +216,40 @@ class CoverBay extends HTMLElement {
     const id = this.kind === "garage" && this.config.light_entity, lamp = id ? this.client?.states[id] : undefined;
     this.toggleAttribute("lamp-off", !!id && lamp?.state !== "on");
     const next = this.client?.states[this.config.entity], prev = this.entity;
+    this.updateTilt?.(this.client,this.config.entity,next);
     const state = next?.state, pos = position(next);
-    if (!force && next === prev && state === this.reportedState && pos === this.reportedPosition) return;
+    const tilt = this.updateTilt ? tiltPosition(next) : undefined;
+    const tiltChanged = tilt !== this.tiltTarget;
+    if (!force && next === prev && state === this.reportedState && pos === this.reportedPosition &&
+      !tiltChanged) return;
+    if (tiltChanged) {
+      const now = performance.now();
+      const from = this.tiltTravel ? fraction(this.tiltTravel,now) : this.tiltTarget;
+      const duration = (this.config.tilt_seconds ?? 1)*1000;
+      this.tiltTravel = tilt !== undefined && from !== undefined && from !== tilt && duration > 0
+        ? {from,to:tilt,start:now,duration} : undefined;
+      this.tiltTarget = tilt;
+    }
     if (state !== this.reportedState) this.error = "";
     const previousState = this.reportedState, previousPosition = this.reportedPosition;
     this.reportedState = state; this.reportedPosition = pos;
     this.entity = next;
+    if (this.positionTarget !== undefined) {
+      if (!canSetPosition(next)) {
+        this.positionTarget=undefined; this.travel=undefined;
+      } else {
+        if (pos !== undefined && pos !== this.positionTarget && pos !== previousPosition) {
+          this.p=pos;
+          this.startPositionTravel(this.positionTarget);
+        }
+        this.refresh(); return;
+      }
+    }
     if (this.command && (state === this.target || state === (this.target === "open" ? "opening" : "closing"))) this.acknowledged = true;
     // Some openers expose only 0/100, even during physical travel. Neither
     // the old endpoint nor an early final endpoint is a movement sample.
     const intermediate = pos !== undefined && pos > 0 && pos < 1 &&
-      (this.kind !== "shade" || pos !== previousPosition || state === this.target);
+      (!isWindowCover(this.kind) || pos !== previousPosition || state === this.target);
     if (state === "opening" || state === "closing") {
       const target = state === "opening" ? "open" : "closed";
       if (!prev && pos === undefined) this.p = target === "open" ? 0 : 1;
@@ -221,7 +260,7 @@ class CoverBay extends HTMLElement {
         // illustration to this sample, then roll the remaining distance rather
         // than holding a translucent sheet over the photo until confirmation.
         const to = target === "open" ? 1 : 0;
-        this.travel = this.kind === "shade" && this.target === target && pos !== to
+        this.travel = isWindowCover(this.kind) && this.target === target && pos !== to
           ? {from:pos,to,start:performance.now(),duration:Math.max(1,Math.abs(to-pos)*this.config.travel_seconds*1000)}
           : undefined;
       }
@@ -231,7 +270,7 @@ class CoverBay extends HTMLElement {
       }
       if (state === this.target) {
         this.confirmed = true;
-        if (!this.travel && this.kind === "shade" && pos === undefined) this.p = state === "open" ? 1 : 0;
+        if (!this.travel && isWindowCover(this.kind) && pos === undefined) this.p = state === "open" ? 1 : 0;
       }
       else if (!this.command && (!this.target || previousState !== state)) {
         this.travel = undefined; this.target = undefined;
@@ -242,7 +281,7 @@ class CoverBay extends HTMLElement {
   }
   private async act() {
     const direction = action(this.entity);
-    if (!this.client || !this.config || !direction || this.target) return;
+    if (!this.client || !this.config || !direction || this.target || this.positionTarget !== undefined) return;
     const seq = ++this.generation;
     this.begin(direction === "open" ? "open" : "closed");
     this.command = true;
@@ -256,15 +295,38 @@ class CoverBay extends HTMLElement {
       this.sync(true);
     }
   }
+  private startPositionTravel(to:number) {
+    this.travel={from:this.p,to,start:performance.now(),duration:Math.max(1,Math.abs(to-this.p)*this.config!.travel_seconds*1000)};
+  }
+  private async setPosition() {
+    const percent=this.slider.valueAsNumber;
+    this.draft=undefined;
+    if (!this.client || !this.config || !canSetPosition(this.entity) || this.target || this.positionTarget !== undefined ||
+        !Number.isInteger(percent) || percent<0 || percent>100) { this.refresh(); return; }
+    const seq=++this.generation;
+    this.positionTarget=percent/100;
+    this.error="";
+    this.startPositionTravel(this.positionTarget);
+    this.confirmBy=performance.now()+this.config.travel_seconds*1000+5000;
+    this.refresh();
+    try { await sendPosition(this.client,this.config.entity,percent); }
+    catch {
+      if (seq!==this.generation || this.positionTarget===undefined) return;
+      this.positionTarget=undefined; this.travel=undefined; this.error="Position command failed.";
+      this.sync(true);
+    }
+  }
   private paint = () => {
     this.frame = 0;
     if (this.travel) {
       this.p = fraction(this.travel, performance.now());
       if (this.p === this.travel.to) this.travel = undefined;
     }
-    this.renderDoor(this.p);
+    this.lastTilt = this.tiltTravel ? fraction(this.tiltTravel,performance.now()) : this.tiltTarget;
+    if (this.lastTilt === this.tiltTarget) this.tiltTravel = undefined;
+    this.renderDoor(this.p,this.lastTilt);
     this.lastPainted = this.p;
-    if (this.travel) this.frame = requestAnimationFrame(this.paint);
+    if (this.travel || this.tiltTravel) this.frame = requestAnimationFrame(this.paint);
     else this.refresh();
   };
   private refresh = () => {
@@ -275,6 +337,14 @@ class CoverBay extends HTMLElement {
       this.p = this.travel.to; this.travel = undefined;
     }
     const now = performance.now(), state = this.entity?.state ?? "unavailable";
+    if (this.positionTarget !== undefined) {
+      const actual = position(this.entity) ?? (state === "closed" ? 0 : undefined);
+      if (!this.travel && actual === this.positionTarget && (state==="open" || state==="closed")) this.positionTarget=undefined;
+      else if (now>=this.confirmBy) {
+        this.travel=undefined; this.positionTarget=undefined; this.p=actual ?? (state==="open"?1:0);
+        this.error="Target position not confirmed.";
+      }
+    }
     const travelEnd = this.confirmBy - 5000;
     if (this.command) this.confirmed = state === this.target;
     if (!this.travel && this.confirmed && (!this.command || now >= travelEnd)) {
@@ -296,7 +366,7 @@ class CoverBay extends HTMLElement {
       if (node.textContent !== text) node.textContent = text;
     };
     if (!this.side) put("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? kinds[this.kind].label));
-    const measured = this.kind === "shade" && known ? position(this.entity) : undefined;
+    const measured = isWindowCover(this.kind) && known ? position(this.entity) : undefined;
     put(".state", label[0].toUpperCase()+label.slice(1)+(measured === undefined ? "" : ` · ${Math.round(measured*100)}% open`));
     const age = state === "closed" || state === "open" ? elapsed(this.entity?.last_changed) : "";
     put(".age", age ? ` · ${age}` : "");
@@ -304,15 +374,23 @@ class CoverBay extends HTMLElement {
     surface.setAttribute("data-state",state); surface.toggleAttribute("data-unknown",!known);
     const direction = action(this.entity);
     this.button.hidden = !pending && !direction;
-    this.button.disabled = !!pending || !direction;
+    this.button.disabled = !!pending || !direction || this.positionTarget!==undefined;
+    this.slider.parentElement!.hidden = !canSetPosition(this.entity);
+    this.slider.disabled = !canSetPosition(this.entity) || !!this.target || this.positionTarget!==undefined;
+    const actual = position(this.entity), wanted = this.draft ?? (this.positionTarget===undefined ? undefined : Math.round(this.positionTarget*100));
+    const value=wanted ?? (actual===undefined ? (state==="closed"?0:50) : Math.round(actual*100));
+    this.slider.value=String(value);
+    const liftText=wanted!==undefined ? `Target ${wanted}%` : actual===undefined ? "Not reported" : `${value}% open`;
+    put(".lift-slider span",liftText);
+    this.slider.setAttribute("aria-valuetext",liftText);
     const caption = pending || (direction === "open" ? "Open" : "Close");
     put(".action", caption);
     this.button.setAttribute("aria-label", this.side ? `${caption} ${this.config?.name || `${this.side} door`}` : caption);
     put(".hint", this.error);
     if (!active) return;
-    if ((this.travel || this.p !== this.lastPainted) && !this.frame) this.frame = requestAnimationFrame(this.paint);
+    if ((this.travel || this.tiltTravel || this.p !== this.lastPainted || this.lastTilt !== this.tiltTarget) && !this.frame) this.frame = requestAnimationFrame(this.paint);
     const ageDelay = age ? 60000 - (Date.now()-Date.parse(this.entity!.last_changed!)) % 60000 : Infinity;
-    const deadline = this.command && now < travelEnd ? travelEnd : waiting && this.target ? this.confirmBy : Infinity;
+    const deadline = this.positionTarget!==undefined ? this.confirmBy : this.command && now < travelEnd ? travelEnd : waiting && this.target ? this.confirmBy : Infinity;
     const delay = Math.min(ageDelay, Math.max(1,deadline-now));
     if (Number.isFinite(delay)) this.timer = window.setTimeout(this.refresh,delay);
   };

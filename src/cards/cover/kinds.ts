@@ -1,6 +1,7 @@
 import type { CoverConfig } from "../../types";
 import { garage, renderer, type Side } from "./garage";
 import { shade, renderShade } from "./shade";
+import { blind, renderBlind } from "./blind";
 import { validateGarage } from "./garage-settings";
 
 export type CoverKind = NonNullable<CoverConfig["cover_type"]>;
@@ -10,13 +11,23 @@ interface Definition {
   deviceClass: string;
   layouts: readonly Layout[];
   markup: (side?: Side) => string;
-  mount: (svg: SVGSVGElement) => (openness:number) => void;
+  mount: (svg: SVGSVGElement) => (openness:number, tilt?:number) => void;
   validate?: (config: CoverConfig) => void;
 }
 export const kinds: Record<CoverKind, Definition> = {
   garage: {label:"Garage", deviceClass:"garage", layouts:["normal","compact","double"], markup:garage, mount:renderer, validate:validateGarage},
   shade: {label:"Roller shade", deviceClass:"shade", layouts:["normal","compact"], markup:shade, mount:renderShade,
-    validate({shade_opacity: value, window_image, window_image_zoom, window_image_x, window_image_y, glazing_bar_width, glazing_bar_color}) {
+    validate:validateWindow},
+  blind: {label:"Slatted blind", deviceClass:"blind", layouts:["normal","compact"], markup:blind, mount:renderBlind,
+    validate(config) {
+      validateWindow(config);
+      const time = config.tilt_seconds;
+      if (time !== undefined && (!Number.isFinite(time) || time < 0 || time > 300))
+        throw Error("Tilt time must be between 0 and 300 seconds.");
+    }},
+};
+export const isWindowCover = (kind: CoverKind) => kind === "shade" || kind === "blind";
+function validateWindow({shade_opacity: value, window_image, window_image_zoom, window_image_x, window_image_y, glazing_bar_width, glazing_bar_color}:CoverConfig) {
       if (glazing_bar_width !== undefined && (!Number.isInteger(glazing_bar_width) || glazing_bar_width < 0 || glazing_bar_width > 10))
         throw Error("Glazing bar width must be a whole number from 0 to 10.");
       if (glazing_bar_color !== undefined && (typeof glazing_bar_color !== "string" || !/^#[a-f\d]{6}$/i.test(glazing_bar_color)))
@@ -26,8 +37,7 @@ export const kinds: Record<CoverKind, Definition> = {
       if (window_image !== undefined && typeof window_image !== "string") throw Error("Window image must be an image URL or path.");
       if (value !== undefined && (!Number.isInteger(value) || value < 0 || value > 100))
         throw Error("Shade opacity must be a whole percentage from 0 to 100.");
-    }},
-};
+}
 export function suggestedKind(deviceClass: unknown) {
   return (Object.keys(kinds) as CoverKind[]).find(key => kinds[key].deviceClass === deviceClass);
 }

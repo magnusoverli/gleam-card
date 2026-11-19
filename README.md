@@ -24,6 +24,8 @@
 
 **Experimental** · See which garage door is still open, or how far the living room shade is raised. New in **v0.0.8**, Roller shade lets you frame a photo of your own outdoor view behind sheer or blackout fabric.
 
+The development build also supports **Slatted blind**: use the same window and photo settings, with separate lift and tilt when your device supports them.
+
 | Roller shade | Garage door |
 | --- | --- |
 | <img src="docs/images/cover-shade-normal.png" width="400" alt="Living room roller shade at 40% open."> | <img src="docs/images/cover.png" width="400" alt="Garage with the left door closed and the right door open."> |

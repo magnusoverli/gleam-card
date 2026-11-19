@@ -17,6 +17,14 @@ export function position(entity?: EntityState) {
   return typeof p === "number" && Number.isFinite(p) && p >= 0 && p <= 100 ? p / 100 : undefined;
 }
 
+export function canSetPosition(entity?: EntityState) {
+  return !!entity && ["closed","open","opening","closing"].includes(entity.state) && !!(Number(entity.attributes.supported_features) & 4);
+}
+
+export function sendPosition(client: Pick<HomeAssistant,"callService">, entity_id:string, percent:number) {
+  return client.callService("cover","set_cover_position",{entity_id,position:percent});
+}
+
 export function action(entity?: EntityState) {
   const features = Number(entity?.attributes.supported_features);
   if (entity?.state === "closed" && (features & 1)) return "open";

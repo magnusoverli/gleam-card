@@ -5,7 +5,8 @@ const state = (value, attributes = {}) => ({
   state: String(value), attributes, last_updated: new Date(now).toISOString(),
 });
 const states = {
-  "cover.demo_shade": state("open",{device_class:"shade",friendly_name:"Living room shade",supported_features:3,current_position:40}),
+  "cover.demo_blind": state("closed",{device_class:"blind",friendly_name:"Studio blinds",supported_features:7|128,current_position:0,current_tilt_position:50}),
+  "cover.demo_shade": state("open",{device_class:"shade",friendly_name:"Living room shade",supported_features:7,current_position:40}),
   "cover.state_only_shade": state("closed",{device_class:"shade",friendly_name:"Office shade",supported_features:3}),
   "cover.offline_shade": state("unavailable",{device_class:"shade",friendly_name:"Guest room shade",supported_features:3}),
   "cover.right_garage": { ...state("open", { friendly_name:"Right garage", device_class:"garage", supported_features:3 }), last_changed:new Date(now-HOUR).toISOString() },
@@ -61,18 +62,25 @@ const hass = {
     const { entity_id: id, ...values } = data;
     const previous = states[id];
     if (domain === "cover") {
-      const opening = service === "open_cover";
+      if (service === "set_cover_tilt_position") {
+        states[id]={...previous,attributes:{...previous.attributes,current_tilt_position:data.tilt_position}};
+        cover.hass={...hass,states:{...states}};
+        return;
+      }
+      const end = service === "set_cover_position" ? data.position : service === "open_cover" ? 100 : 0;
+      const start = previous.attributes.current_position ?? (previous.state==="closed"?0:100);
+      const opening = end>start;
       const report = value => {
-        const attrs = {...previous.attributes};
-        if (id === "cover.demo_shade") {
-          if (value === "closed" || value === "open") attrs.current_position = opening ? 100 : 0;
+        const attrs = {...states[id].attributes};
+        if (id === "cover.demo_shade" || id === "cover.demo_blind") {
+          if (value === "closed" || value === "open") attrs.current_position = end;
           else delete attrs.current_position;
         }
         states[id] = { ...previous, attributes:attrs, state: value, last_changed: new Date().toISOString() };
         cover.hass = { ...hass, states: { ...states } };
       };
       report(opening ? "opening" : "closing");
-      setTimeout(() => report(opening ? "open" : "closed"), 10000);
+      setTimeout(() => report(end ? "open" : "closed"), 100*Math.abs(end-start));
       return;
     }
     states[id] = { ...previous, attributes: { ...previous.attributes, ...values } };
@@ -106,14 +114,15 @@ layouts.id = "garage-layout";
 layouts.innerHTML = `<span>Garage layout</span> <select><option>Normal</option><option>Compact</option><option>Double</option></select>`;
 const examples = document.createElement("label");
 examples.id = "cover-example";
-examples.innerHTML = `Example <select><option value="">Garage</option><option value="cover.demo_shade">Roller shade · measured position</option><option value="cover.state_only_shade">Roller shade · state only</option><option value="cover.offline_shade">Roller shade · unavailable</option></select>`;
+examples.innerHTML = `Example <select><option value="">Garage</option><option value="cover.demo_blind">Slatted blind · lift and tilt</option><option value="cover.demo_shade">Roller shade · measured position</option><option value="cover.state_only_shade">Roller shade · state only</option><option value="cover.offline_shade">Roller shade · unavailable</option></select>`;
 const applyCoverLayout = () => {
   const id = examples.querySelector("select").value, select = layouts.querySelector("select");
-  layouts.querySelector("span").textContent = id ? "Shade layout" : "Garage layout";
+  const blind = id === "cover.demo_blind";
+  layouts.querySelector("span").textContent = blind ? "Blind layout" : id ? "Shade layout" : "Garage layout";
   select.options[2].hidden = select.options[2].disabled = !!id;
   if (id && select.value === "Double") select.value = "Normal";
   const variant = select.value.toLowerCase();
-  cover.setConfig(id ? {entity:id,cover_type:"shade",variant} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
+  cover.setConfig(id ? {entity:id,cover_type:blind?"blind":"shade",variant} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
   cover.style.gridColumn = `span ${cover.getGridOptions().columns}`;
 };
 layouts.onchange = applyCoverLayout;

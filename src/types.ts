@@ -105,7 +105,8 @@ export interface Card<Config> extends HTMLElement {
 }
 
 export interface CoverConfig {
-  cover_type?: "garage" | "shade";
+  cover_type?: "garage" | "shade" | "blind";
+  tilt_seconds?: number;
   shade_opacity?: number;
   window_image?: string;
   window_image_zoom?: number;
