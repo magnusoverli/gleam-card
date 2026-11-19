@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("bundle renders both cards, camera and series controls work, reconnects cleanly", async ({ page }) => {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await expect(page.locator("gleam-energy-graph canvas")).toBeVisible();
   await page.locator("gleam-thermostat").scrollIntoViewIfNeeded();
   await expect(page.locator("gleam-thermostat canvas")).toBeVisible();
@@ -26,7 +26,7 @@ test("bundle renders both cards, camera and series controls work, reconnects cle
 });
 
 test("translucent bars and price fills composite back-to-front from either side", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await expect.poll(() => page.evaluate(() => window.demo?.energy?._targets?.some(o =>
     o.userData.tip?.startsWith("Recorded price")))).toBe(true);
   const drawOrders = () => page.evaluate(() => {
@@ -55,7 +55,7 @@ test("translucent bars and price fills composite back-to-front from either side"
 });
 
 test("dataset units stay stacked in top-view order across presets", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   for (const name of ["Power", "Voltage"]) await page.getByRole("button", {name, exact:true}).click();
   const layout = () => page.evaluate(() => {
     const { _scene, _camera, _targets } = window.demo.energy;
@@ -92,7 +92,7 @@ test.describe("graph clock", () => {
   test("device and server zones label the same now instant", async ({ page }) => {
     await page.clock.setFixedTime(new Date("2026-11-18T18:16:00Z"));
     await page.addInitScript(() => { window.__haNativeTimeZone = "America/New_York"; });
-    await page.goto("/");
+    await page.goto("/dev/fixture.html");
     await page.waitForFunction(() => window.demo?.energy?._timeFormat);
     await page.evaluate(() => {
       const { energy, hass } = window.demo;
@@ -113,7 +113,7 @@ test.describe("graph clock", () => {
 });
 
 test("right-drag pans the graph without rotating or zooming", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   const canvas = page.locator("gleam-energy-graph canvas");
   await canvas.scrollIntoViewIfNeeded();
   const pose = () => page.evaluate(() => {
@@ -133,7 +133,7 @@ test("right-drag pans the graph without rotating or zooming", async ({ page }) =
 });
 
 test("point light stays centred across camera presets", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   for (const name of ["Front", "Top", "Isometric"]) {
     await page.getByRole("button", { name, exact: true }).click();
     await expect.poll(() => page.evaluate(() => {
@@ -146,7 +146,7 @@ test("point light stays centred across camera presets", async ({ page }) => {
 });
 
 test("vertical Now marker spans the graph except on the price plane", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await expect(page.locator("gleam-energy-graph canvas")).toBeVisible();
   const toggle = name => page.getByRole("button", { name, exact: true }).click();
   const marker = () => page.evaluate(() => {
@@ -194,7 +194,7 @@ test("vertical Now marker spans the graph except on the price plane", async ({ p
 });
 
 test("dataset spacing updates every lane without refetching or replacing GPU resources", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.getByRole("button", { name: "Power", exact: true }).click();
   await page.getByRole("button", { name: "Voltage", exact: true }).click();
   await expect.poll(() => page.evaluate(() => [...new Set(window.demo.energy._targets?.flatMap(o =>
@@ -261,7 +261,7 @@ test("dataset spacing updates every lane without refetching or replacing GPU res
 });
 
 test("thermostat sends only explicit user actions and editor emits configuration", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await expect(page.locator("gleam-thermostat .value")).toHaveText("22");
   expect(await page.evaluate(() => window.demo.calls)).toEqual([]);
   await page.getByRole("button", { name: "Increase target temperature" }).click();
@@ -294,7 +294,7 @@ test("missing WebGL reports an error and leaves thermostat controls usable", asy
       return type.startsWith("webgl") ? null : original.call(this, type, ...args);
     };
   });
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await expect(page.locator("gleam-energy-graph .notice")).toContainText("WebGL 2");
   await expect(page.locator("gleam-energy-graph .live")).toHaveText("0.84");
   await page.evaluate(() => {
@@ -311,7 +311,7 @@ test("missing WebGL reports an error and leaves thermostat controls usable", asy
 });
 
 test("thermostat skips unrelated updates and reuses static GPU geometry", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.locator("gleam-thermostat").scrollIntoViewIfNeeded();
   await expect(page.locator("gleam-thermostat canvas")).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.demo.thermostat._renderer.info.render.frame)).toBeGreaterThan(0);
@@ -337,7 +337,7 @@ test("thermostat skips unrelated updates and reuses static GPU geometry", async 
 });
 
 test("changing graph sensors during a request fetches the latest selection", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.waitForFunction(() => Boolean(window.demo));
   await page.evaluate(() => {
     const { energy, hass } = window.demo;
@@ -360,7 +360,7 @@ test("changing graph sensors during a request fetches the latest selection", asy
 
 for (const order of ["connect first", "configure first"]) {
   test(`off-screen graph defers requests and frames: ${order}`, async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/dev/fixture.html");
     await page.waitForFunction(() => Boolean(window.demo));
     await page.evaluate(async order => {
       const card = document.createElement("gleam-energy-graph");

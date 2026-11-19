@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.locator("gleam-cover").scrollIntoViewIfNeeded();
   await page.evaluate(() => {
     const {cover,hass,calls} = window.demo;

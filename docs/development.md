@@ -12,7 +12,8 @@
 | `src/cards/energy-graph/recorder.ts` | Recorder requests through a narrow client interface |
 | `src/cards/thermostat/commands.ts` | Pure command validation and climate-action transport |
 | `scripts/deploy.js` | Content-hashed filesystem deployment with a stable loader |
-| `dev/preview.js`, `dev/demo.js` | Preview entry point and shared demo with synthetic states, history, and mock actions |
+| `index.html`, `energy-graph/`, `thermostat/`, `cover/` | Public demo gallery and standalone card pages |
+| `dev/preview.js`, `dev/demo.js` | Shared preview entry and synthetic states, history, and mock actions; `/dev/fixture.html` mounts all cards for regression tests |
 | `tests/data.test.js` | Data-contract regression tests |
 | `tests/browser/` | Built-bundle browser and interaction checks |
 | `vite.config.ts` | Single-resource library build and license distribution |

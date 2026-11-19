@@ -1,37 +1,31 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="Try Gleam’s energy timeline, thermostat dial, and single or double garage doors with sample Home Assistant data.">
-    <meta name="color-scheme" content="dark">
-    <title>Gleam Cards · Interactive demo</title>
-    <style>
-      body { margin: 0; background: #050914; color: #d8edff; font: 16px system-ui; }
-      main { max-width: 1200px; margin: auto; padding: clamp(16px,4vw,48px); }
-      h1 { font-size: clamp(2.2rem,6vw,4.6rem); font-weight: 550; letter-spacing: -.05em; margin: 0; }
-      p { color: #a5bdd5; line-height: 1.6; max-width: 68ch; }
-      .eyebrow { color:#80e7ef; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; }
-      nav { display:flex; flex-wrap:wrap; gap:1.25rem; margin: 1rem 0 2rem; }
-      a { color:#93e9f1; text-underline-offset:.22em; }
-      #thermostat { display: block; max-width: 420px; margin: 24px auto; }
-      #garage-layout { display:block; margin:24px 0 8px; } #garage-layout select { font:inherit; }
-      @media(max-width: 500px) { main { padding: 12px; } }
-    </style>
-  </head>
-  <body>
-    <main>
-      <p class="eyebrow">Home Assistant dashboard cards · Live demo</p>
-      <h1>Gleam Cards</h1>
-      <p>Rotate the energy graph, try the heat pump dial, or tap the garage to reveal its door control. Everything here uses sample data; no account or device is connected.</p>
-      <nav aria-label="Explore Gleam Cards">
-        <a href="#garage-layout">Try the garage layouts</a>
-        <a href="https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&amp;repository=gleam-card&amp;category=plugin">Install in Home Assistant</a>
-        <a href="https://github.com/magnusoverli/gleam-card">Source &amp; configuration guides</a>
-      </nav>
-      <div id="cards"></div>
-      <p id="actions" role="status">No mock actions sent.</p>
-    </main>
-    <script type="module" src="./dev/preview.js"></script>
-  </body>
-</html>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore three interactive Home Assistant dashboard cards with sample data.">
+  <title>Gleam Cards · Demo gallery</title>
+  <link rel="stylesheet" href="./dev/gallery.css">
+  <script>
+    const legacy = {"#energy-graph":"energy-graph/", "#thermostat":"thermostat/", "#cover":"cover/", "#garage-layout":"cover/"};
+    function openBookmark() {
+      if (legacy[location.hash]) location.replace(new URL(legacy[location.hash], location.href));
+    }
+    addEventListener("hashchange", openBookmark);
+    openBookmark();
+  </script>
+</head>
+<body><main>
+  <header><p class="kicker">Home Assistant · Interactive gallery</p>
+    <h1>Gleam Cards</h1>
+    <p class="lead">Explore a day of energy use, adjust a heat pump, or open the garage. Pick a card to try it with sample data.</p>
+  </header>
+  <div class="gallery">
+    <a class="tile" href="./energy-graph/"><div class="photo"><img src="./docs/images/energy-graph.png" alt="Energy bars and electricity prices on a 3D timeline"></div>
+      <div class="copy"><small>Stable</small><h2>Energy Graph</h2><p>See how the cost of power lines up with the hours you use it.</p><strong>Explore the timeline →</strong></div></a>
+    <a class="tile" href="./thermostat/"><div class="photo"><img src="./docs/images/thermostat.png" alt="Heat pump temperature dial"></div>
+      <div class="copy"><small>Experimental</small><h2>Thermostat</h2><p>Set a target temperature and try the controls of a simulated heat pump.</p><strong>Try the dial →</strong></div></a>
+    <a class="tile" href="./cover/"><div class="photo"><img src="./docs/images/cover.png" alt="Two garage doors, one open and one closed"></div>
+      <div class="copy"><small>Experimental</small><h2>Cover</h2><p>Watch light spill onto the driveway as a sectional garage door opens.</p><strong>Open the garage →</strong></div></a>
+  </div>
+  <footer>No account or devices needed. <a href="https://github.com/magnusoverli/gleam-card#install">Install in Home Assistant ↗</a></footer>
+</main></body></html>

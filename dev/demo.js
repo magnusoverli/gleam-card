@@ -52,7 +52,9 @@ const hass = {
   },
   async callService(domain, service, data) {
     calls.push({ domain, service, data });
-    document.querySelector("#actions").textContent = `Mock action: ${domain}.${service} ${JSON.stringify(data)}`;
+    const label = states[data.entity_id]?.attributes.friendly_name ?? data.entity_id;
+    const value = Object.entries(data).find(([key]) => key !== "entity_id")?.[1];
+    document.querySelector("#actions").textContent = `${label} · ${service.replaceAll("_"," ")}${value === undefined ? "" : `: ${value}`}`;
     const { entity_id: id, ...values } = data;
     const previous = states[id];
     if (domain === "cover") {
@@ -70,15 +72,25 @@ const hass = {
     queueMicrotask(() => { thermostat.hass = { ...hass, states: { ...states } }; });
   },
 };
-const energy = document.createElement("gleam-energy-graph");
+const mount = document.querySelector("#cards");
+const selected = document.body.dataset.card;
+let energy, thermostat, cover;
+if (!selected || selected === "energy") {
+energy = document.createElement("gleam-energy-graph");
 energy.id = "energy-graph";
 energy.setConfig({ type: "custom:gleam-energy-graph", current_hour_entity: "sensor.current_hour_energy", price_entity: "sensor.electricity_price" });
 energy.hass = hass;
-const thermostat = document.createElement("gleam-thermostat");
+mount.append(energy);
+}
+if (!selected || selected === "thermostat") {
+thermostat = document.createElement("gleam-thermostat");
 thermostat.id = "thermostat";
 thermostat.setConfig({ type: "custom:gleam-thermostat", entity: "climate.heat_pump", name: "Demo heat pump" });
 thermostat.hass = { ...hass, states: { ...states } };
-const cover = document.createElement("gleam-cover");
+mount.append(thermostat);
+}
+if (!selected || selected === "cover") {
+cover = document.createElement("gleam-cover");
 cover.id = "cover";
 cover.setConfig({ entity: "cover.garage_door" });
 cover.hass = hass;
@@ -90,5 +102,6 @@ layouts.onchange = () => {
   cover.style.width = variant === "compact" ? "calc(50% - 4px)" : "";
   cover.setConfig({entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
 };
-document.querySelector("#cards").append(energy, thermostat, layouts, cover);
+mount.append(layouts, cover);
+}
 window.demo = { energy, thermostat, cover, hass, calls, requests };

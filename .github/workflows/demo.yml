@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [index.html, dev/demo.js, dist/gleam-card.js, .github/workflows/demo.yml]
+    paths: [index.html, energy-graph/index.html, thermostat/index.html, cover/index.html, dev/gallery.css, dev/demo.js, 'docs/images/**', dist/gleam-card.js, .github/workflows/demo.yml]
 permissions: {}
 jobs:
   package:
@@ -16,10 +16,12 @@ jobs:
           persist-credentials: false
       - name: Stage the public demo
         run: |
-          mkdir -p site/dev site/dist
+          mkdir -p site/dev site/dist site/docs
           cp index.html site/
+          cp -r energy-graph thermostat cover site/
+          cp -r docs/images site/docs/
           cp dist/gleam-card.js site/dist/
-          cp dev/demo.js site/dev/
+          cp dev/demo.js dev/gallery.css site/dev/
           printf '%s\n' 'import "../dist/gleam-card.js";' 'import "./demo.js";' > site/dev/preview.js
       - uses: actions/upload-pages-artifact@v5.0.0
         with:

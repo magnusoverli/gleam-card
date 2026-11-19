@@ -8,25 +8,25 @@
 
 **Stable** · See when your home used the most energy and what electricity cost that hour. Rotate the timeline to explore, or switch to Front view to compare.
 
-<a href="https://magnusoverli.github.io/gleam-card/#energy-graph"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside the electricity price forecast and power history."></a>
+<a href="https://magnusoverli.github.io/gleam-card/energy-graph/"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside the electricity price forecast and power history."></a>
 
-[**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/#energy-graph) · [Graph settings](docs/energy-graph.md)
+[**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/energy-graph/) · [Graph settings](docs/energy-graph.md)
 
 ## Gleam Thermostat
 
 **Experimental** · Turn the dial to set a target temperature. Fan, preset, and swing controls follow the capabilities of your climate device.
 
-<a href="https://magnusoverli.github.io/gleam-card/#thermostat"><img src="docs/images/thermostat.png" width="320" alt="Gleam Thermostat with a temperature dial and heating mode selected."></a>
+<a href="https://magnusoverli.github.io/gleam-card/thermostat/"><img src="docs/images/thermostat.png" width="320" alt="Gleam Thermostat with a temperature dial and heating mode selected."></a>
 
-[**Try Gleam Thermostat →**](https://magnusoverli.github.io/gleam-card/#thermostat) · [Thermostat settings](docs/thermostat.md)
+[**Try Gleam Thermostat →**](https://magnusoverli.github.io/gleam-card/thermostat/) · [Thermostat settings](docs/thermostat.md)
 
 ## Gleam Cover
 
 **Experimental** · Which garage door is still open? See its state and how long it’s been that way. Tap either door in the Double layout to reveal its own control.
 
-<a href="https://magnusoverli.github.io/gleam-card/#garage-layout"><img src="docs/images/cover.png" width="480" alt="Double garage with the left door closed and the right door open, casting warm light onto the driveway."></a>
+<a href="https://magnusoverli.github.io/gleam-card/cover/"><img src="docs/images/cover.png" width="480" alt="Double garage with the left door closed and the right door open, casting warm light onto the driveway."></a>
 
-[**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/#garage-layout) · [Cover settings](docs/cover.md)
+[**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings](docs/cover.md)
 
 ## Install
 

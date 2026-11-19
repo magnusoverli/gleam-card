@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.waitForFunction(() => window.demo);
   await page.evaluate(() => {
     const Card = customElements.get("gleam-energy-graph");

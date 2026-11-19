@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("releasing just beyond the dial maximum sends maximum, once", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   const dial = page.locator("gleam-thermostat .dial");
   await dial.scrollIntoViewIfNeeded();
   const { x, y, width, height } = await dial.boundingBox();
@@ -18,7 +18,7 @@ test("releasing just beyond the dial maximum sends maximum, once", async ({ page
 });
 
 test("dispatch deadline, early confirmation and reconnect ignore obsolete replies", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   const plus = page.getByRole("button", { name: "Increase target temperature" });
   const message = page.locator("gleam-thermostat .message");
   await plus.scrollIntoViewIfNeeded();

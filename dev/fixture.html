@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Try Gleam’s energy timeline, thermostat dial, and single or double garage doors with sample Home Assistant data.">
+    <meta name="color-scheme" content="dark">
+    <title>Gleam Cards · Interactive demo</title>
+    <style>
+      body { margin: 0; background: #050914; color: #d8edff; font: 16px system-ui; }
+      main { max-width: 1200px; margin: auto; padding: clamp(16px,4vw,48px); }
+      h1 { font-size: clamp(2.2rem,6vw,4.6rem); font-weight: 550; letter-spacing: -.05em; margin: 0; }
+      p { color: #a5bdd5; line-height: 1.6; max-width: 68ch; }
+      .eyebrow { color:#80e7ef; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; }
+      nav { display:flex; flex-wrap:wrap; gap:1.25rem; margin: 1rem 0 2rem; }
+      a { color:#93e9f1; text-underline-offset:.22em; }
+      #thermostat { display: block; max-width: 420px; margin: 24px auto; }
+      #garage-layout { display:block; margin:24px 0 8px; } #garage-layout select { font:inherit; }
+      @media(max-width: 500px) { main { padding: 12px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Home Assistant dashboard cards · Live demo</p>
+      <h1>Gleam Cards</h1>
+      <p>Rotate the energy graph, try the heat pump dial, or tap the garage to reveal its door control. Everything here uses sample data; no account or device is connected.</p>
+      <nav aria-label="Explore Gleam Cards">
+        <a href="#garage-layout">Try the garage layouts</a>
+        <a href="https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&amp;repository=gleam-card&amp;category=plugin">Install in Home Assistant</a>
+        <a href="https://github.com/magnusoverli/gleam-card">Source &amp; configuration guides</a>
+      </nav>
+      <div id="cards"></div>
+      <p id="actions" role="status">No mock actions sent.</p>
+    </main>
+    <script type="module" src="./preview.js"></script>
+  </body>
+</html>

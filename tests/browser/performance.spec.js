@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("garage retains panels and suspends long travel off-screen and on disconnect", async ({ page }, info) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   const card = page.locator("gleam-cover");
   await card.scrollIntoViewIfNeeded();
   await expect.poll(() => card.locator("gleam-cover-bay").evaluate(b => b.visible)).toBe(true);
@@ -30,7 +30,7 @@ test("garage retains panels and suspends long travel off-screen and on disconnec
 });
 
 test("cached graph ignores Recorder-only live states but updates the current-hour reading immediately", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.waitForFunction(() => window.demo?.energy._targets?.length > 5);
   const result = await page.evaluate(async () => {
     const { energy, hass, requests } = window.demo;
@@ -59,7 +59,7 @@ test("cached graph ignores Recorder-only live states but updates the current-hou
 });
 
 test("compact thermostat limits pixel allocation, DOM writes and off-screen startup", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.waitForFunction(() => window.demo);
   const card = page.locator("#compact");
   await page.evaluate(() => {
@@ -101,7 +101,7 @@ test("compact thermostat limits pixel allocation, DOM writes and off-screen star
 });
 
 test("week graph batches strokes and refreshes history with overlap", async ({ page }, info) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.waitForFunction(() => window.demo?.energy._targets?.length > 5);
   const result = await page.evaluate(async () => {
     const { energy: card, hass } = window.demo;
@@ -162,7 +162,7 @@ test("week graph batches strokes and refreshes history with overlap", async ({ p
 });
 
 test("energy updates reuse GPU resources and release them on disconnect", async ({ page }, info) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await expect.poll(() => page.evaluate(() => window.demo?.energy._targets?.length ?? 0)).toBeGreaterThan(0);
   const result = await page.evaluate(async () => {
     const card = window.demo.energy;
@@ -235,7 +235,7 @@ test("energy updates reuse GPU resources and release them on disconnect", async 
 });
 
 test("thermostat batches interaction, retains buffers and suspends off-screen graphics", async ({ page }, info) => {
-  await page.goto("/");
+  await page.goto("/dev/fixture.html");
   await page.locator("gleam-thermostat").scrollIntoViewIfNeeded();
   await expect.poll(() => page.evaluate(() => window.demo?.thermostat._dial?.fraction)).toBeGreaterThan(0);
   const result = await page.evaluate(async () => {
