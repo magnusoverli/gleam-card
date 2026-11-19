@@ -37,9 +37,8 @@ right_label: Driveway             # Set either label independently
 travel_seconds: 10
 right_travel_seconds: 16          # Optional; otherwise uses travel_seconds
 light_entity: light.left_garage
-light_temperature_kelvin: 2700    # Warm left bay
+light_temperature_kelvin: 2700    # Shared by both bays
 right_light_entity: light.right_garage
-right_light_temperature_kelvin: 5500  # Daylight right bay
 ```
 
 **Normal:** only the entity is required.
@@ -67,7 +66,10 @@ haze at a fixed intensity when it reports `on`, regardless of brightness. A miss
 or unavailable light produces no glow and does not disable the door. The
 temperature slider (2000–6500 K) changes the illustration only. Enable
 **Customize light temperature** to use it, or turn customization off for the
-original amber palette. Double configures each bay independently.
+original amber palette. Double uses one garage-wide temperature and two
+independent on/off light entities. For older Double configs, the existing
+`light_temperature_kelvin` wins; if only the former right-door temperature
+was set, it becomes the shared value.
 The card never sends commands to your lights.
 
 The status and elapsed time come from Home Assistant (`last_changed`), not the

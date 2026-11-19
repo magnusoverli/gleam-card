@@ -14446,45 +14446,50 @@ function Ad(e) {
 		"double"
 	].includes(e.variant ?? "normal")) throw Error("Unknown cover variant.");
 	if (e.roof_type !== void 0 && e.roof_type !== "pitched" && e.roof_type !== "flat") throw Error("Roof type must be pitched or flat.");
-	if (kd(e.light_entity, e.light_temperature_kelvin), e.variant === "double") {
-		if (kd(e.right_light_entity, e.right_light_temperature_kelvin), !/^cover\.[a-z0-9_]+$/.test(e.right_entity ?? "") || e.right_entity === e.entity) throw Error("Select a different cover entity for the right door.");
+	let n = jd(e);
+	if (kd(e.light_entity, n), e.variant === "double") {
+		if (kd(e.right_light_entity), !/^cover\.[a-z0-9_]+$/.test(e.right_entity ?? "") || e.right_entity === e.entity) throw Error("Select a different cover entity for the right door.");
 		let n = e.right_travel_seconds ?? t;
 		if (!Number.isFinite(n) || n < 1 || n > 300) throw Error("Right travel time must be 1–300 seconds.");
 	}
 	return {
 		...e,
-		travel_seconds: t
+		travel_seconds: t,
+		light_temperature_kelvin: n
 	};
 }
 function jd(e) {
+	return e.light_temperature_kelvin ?? (e.variant === "double" ? e.right_light_temperature_kelvin : void 0);
+}
+function Md(e) {
 	let t = e?.attributes.current_position;
 	return typeof t == "number" && Number.isFinite(t) && t >= 0 && t <= 100 ? t / 100 : void 0;
 }
-function Md(e) {
+function Nd(e) {
 	let t = Number(e?.attributes.supported_features);
 	if (e?.state === "closed" && t & 1) return "open";
 	if (e?.state === "open" && t & 2) return "close";
 }
-function Nd(e, t, n) {
+function Pd(e, t, n) {
 	return e.callService("cover", `${n}_cover`, { entity_id: t });
 }
-function Pd(e, t) {
+function Fd(e, t) {
 	let n = Math.min(1, Math.max(0, (t - e.start) / e.duration));
 	return n === 1 ? e.to : e.from + (e.to - e.from) * n;
 }
-function Fd(e) {
+function Id(e) {
 	let t = Math.floor((Date.now() - Date.parse(e ?? "")) / 6e4);
 	return !Number.isFinite(t) || t < 0 ? "" : t < 1 ? "Under 1 min" : t < 60 ? `${t} min` : `${Math.floor(t / 60)} h ${t % 60} min`;
 }
 // src/cards/cover/garage.ts
-var Id = Array.from({ length: 16 }, (e, t) => (t + .5) * 30 / 16), Ld = (e) => 78 - e * 1.4, Rd = (e) => 238 + e * .6, zd = Ld(30), Bd = Rd(30), Vd = 260, Hd = 188, Ud = 158;
-function Wd(e) {
+var Ld = Array.from({ length: 16 }, (e, t) => (t + .5) * 30 / 16), Rd = (e) => 78 - e * 1.4, zd = (e) => 238 + e * .6, Bd = Rd(30), Vd = zd(30), Hd = 260, Ud = 188, Wd = 158;
+function Gd(e) {
 	return e === "left" ? -8 : 64;
 }
-var Gd = (e) => `${(Ud - Wd(e)) / Vd * 100}%`;
-function Kd(e) {
-	let t = e ? Hd : 0, n = t / 2, r = e ? Wd(e) : 0;
-	return `<svg viewBox="${e ? `${r} 0 ${Vd}` : "0 0 320"} 174" aria-hidden="true">
+var Kd = (e) => `${(Wd - Gd(e)) / Hd * 100}%`;
+function qd(e) {
+	let t = e ? Ud : 0, n = t / 2, r = e ? Gd(e) : 0;
+	return `<svg viewBox="${e ? `${r} 0 ${Hd}` : "0 0 320"} 174" aria-hidden="true">
   <style>
     .flat-shell,:host([flat-roof]) .pitched-shell{display:none}
     :host([flat-roof]) .flat-shell{display:inline}
@@ -14518,15 +14523,15 @@ function Kd(e) {
     <path d="M78 56H238V142H78Z" fill="url(#interior)"/>
     <rect x="134" y="59" width="48" height="2.5" rx="1.25" fill="#ffe1aa"/>
   </g>
-  <g class="spill"><clipPath id="cast"><rect class="lit-depth" x="${zd}" y="142" width="${Bd - zd}" height="0"/></clipPath><g clip-path="url(#cast)"><path d="M78 142H238L${Bd} 172H${zd}Z" fill="url(#spill)"/></g></g>
+  <g class="spill"><clipPath id="cast"><rect class="lit-depth" x="${Bd}" y="142" width="${Vd - Bd}" height="0"/></clipPath><g clip-path="url(#cast)"><path d="M78 142H238L${Vd} 172H${Bd}Z" fill="url(#spill)"/></g></g>
   <g clip-path="url(#opening)">
     <rect class="door-skin" x="78" y="56" width="160" height="86" fill="#18394d"/>
     ${Array.from({ length: 6 }, (e, t) => `<g class="panel" transform="translate(78 ${56 + t * 14.4})"><rect width="160" height="14.4" fill="url(#metal)"/><path d="M0 .6h160M41 4v6m39-6v6m39-6v6" fill="none" stroke="#67a4b4" stroke-width=".7" opacity=".48"/></g>`).join("")}
   </g>
-  <g class="air" fill="url(#air-scatter)">${Id.map((e) => `<rect x="${Ld(e)}" width="${Rd(e) - Ld(e)}" height="0"/>`).join("")}</g>
+  <g class="air" fill="url(#air-scatter)">${Ld.map((e) => `<rect x="${Rd(e)}" width="${zd(e) - Rd(e)}" height="0"/>`).join("")}</g>
 </svg>`;
 }
-function qd(e) {
+function Jd(e) {
 	let t = [...e.querySelectorAll(".panel")], n = e.querySelector(".door-skin"), r = e.querySelector(".lit-depth"), i = [...e.querySelectorAll(".air rect")], a = -1;
 	return (e) => {
 		if (e === a) return;
@@ -14540,13 +14545,13 @@ function qd(e) {
 		n.setAttribute("height", String(Math.min(86, s - 56)));
 		let l = Math.min(30, 24 * c / (150 - c));
 		r.setAttribute("height", String(l)), i.forEach((e, t) => {
-			let n = Id[t], r = Math.max(0, c - (150 - c) * n / 24);
+			let n = Ld[t], r = Math.max(0, c - (150 - c) * n / 24);
 			e.setAttribute("y", String(142 + n - r)), e.setAttribute("height", String(r));
 		});
 	};
 }
 // src/cards/cover/cover.ts
-var Jd = (e) => `<style>${du}
+var Yd = (e) => `<style>${du}
 :host{container-type:inline-size;min-width:0}ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
 h2{margin:0;font-size:18px;font-weight:550;overflow-wrap:anywhere}
 .scene{border:0;background:none;border-radius:12px;padding:0;width:100%;display:block}
@@ -14565,9 +14570,9 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 :host([bay]) ha-card,:host([bay]) svg{overflow:visible}
 :host([bay]) svg{width:100%;height:auto;pointer-events:none}
 :host([bay]) .detail,:host([bay]) h2{padding-inline:6px}
-</style><ha-card>${e ? "" : "<span class=\"experimental\">Experimental</span><header class=\"badge-clearance\"><h2></h2></header>"}<div class="scene">${Kd(e)}</div>
+</style><ha-card>${e ? "" : "<span class=\"experimental\">Experimental</span><header class=\"badge-clearance\"><h2></h2></header>"}<div class="scene">${qd(e)}</div>
 <div class="detail"><div class="row"><div><strong class="state" role="status"></strong><span class="age"></span></div>
-<button id="action" class="action" hidden></button></div><p class="hint"></p></div></ha-card>`, Yd = class extends HTMLElement {
+<button id="action" class="action" hidden></button></div><p class="hint"></p></div></ha-card>`, Xd = class extends HTMLElement {
 	root = this.attachShadow({ mode: "open" });
 	variant;
 	bays = [];
@@ -14599,16 +14604,16 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
           .labels.flat{top:5cqi}
           .labels h3{position:relative;transform:translateX(-50%);width:62%;text-align:center;font-size:14px;line-height:1.15;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
           </style>
-          <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`, this.bays = [new Xd("left"), new Xd("right")], this.bays.forEach((e) => e.toggleAttribute("bay", !0));
+          <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`, this.bays = [new Zd("left"), new Zd("right")], this.bays.forEach((e) => e.toggleAttribute("bay", !0));
 				let e = document.createElement("div");
 				e.className = "labels";
 				for (let t of ["left", "right"]) {
 					let n = document.createElement("h3");
-					n.style.left = Gd(t), n.style.gridColumn = t === "left" ? "1" : "2", e.append(n);
+					n.style.left = Kd(t), n.style.gridColumn = t === "left" ? "1" : "2", e.append(n);
 				}
 				this.root.querySelector(".bays").append(e, ...this.bays);
 			} else {
-				let e = new Xd();
+				let e = new Zd();
 				e.toggleAttribute("compact", n === "compact");
 				let t = document.createElement("style");
 				t.textContent = ":host{display:block;min-width:0}", this.bays = [e], this.root.replaceChildren(t, e);
@@ -14630,7 +14635,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 				name: t.right_label?.trim(),
 				travel_seconds: t.right_travel_seconds ?? t.travel_seconds,
 				light_entity: t.right_light_entity,
-				light_temperature_kelvin: t.right_light_temperature_kelvin
+				light_temperature_kelvin: t.light_temperature_kelvin
 			});
 		} else this.bays[0].setConfig(t);
 		for (let e of this.bays) e.toggleAttribute("flat-roof", t.roof_type === "flat");
@@ -14639,7 +14644,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	set hass(e) {
 		this.client = e, this.bays.forEach((t) => t.hass = e);
 	}
-}, Xd = class extends HTMLElement {
+}, Zd = class extends HTMLElement {
 	side;
 	root = this.attachShadow({ mode: "open" });
 	config;
@@ -14663,7 +14668,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	error = "";
 	generation = 0;
 	constructor(e) {
-		super(), this.side = e, this.root.innerHTML = Jd(e), this.button = this.root.querySelector(".action"), this.renderDoor = qd(this.root.querySelector("svg")), this.button.onclick = () => void this.act();
+		super(), this.side = e, this.root.innerHTML = Yd(e), this.button = this.root.querySelector(".action"), this.renderDoor = Jd(this.root.querySelector("svg")), this.button.onclick = () => void this.act();
 	}
 	connectedCallback() {
 		this.observer = new IntersectionObserver(([e]) => {
@@ -14693,7 +14698,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	}
 	begin(e) {
 		let t = performance.now();
-		this.travel && (this.p = Pd(this.travel, t));
+		this.travel && (this.p = Fd(this.travel, t));
 		let n = +(e === "open");
 		this.travel = {
 			from: this.p,
@@ -14706,7 +14711,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		if (!this.config || !this.isConnected) return;
 		let t = this.config.light_entity, n = t ? this.client?.states[t] : void 0;
 		this.toggleAttribute("lamp-off", !!t && n?.state !== "on");
-		let r = this.client?.states[this.config.entity], i = this.entity, a = r?.state, o = jd(r);
+		let r = this.client?.states[this.config.entity], i = this.entity, a = r?.state, o = Md(r);
 		if (!e && r === i && a === this.reportedState && o === this.reportedPosition) return;
 		a !== this.reportedState && (this.error = "");
 		let s = this.reportedState;
@@ -14719,19 +14724,19 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		this.refresh();
 	}
 	async act() {
-		let e = Md(this.entity);
+		let e = Nd(this.entity);
 		if (!this.client || !this.config || !e || this.target) return;
 		let t = ++this.generation;
 		this.begin(e === "open" ? "open" : "closed"), this.command = !0, this.acknowledged = !1, this.confirmBy = performance.now() + this.config.travel_seconds * 1e3 + 5e3, this.refresh();
 		try {
-			await Nd(this.client, this.config.entity, e);
+			await Pd(this.client, this.config.entity, e);
 		} catch {
 			if (t !== this.generation || !this.command || this.acknowledged) return;
 			this.command = !1, this.target = void 0, this.travel = void 0, this.error = "Command failed. Check the door and try again.", this.sync(!0);
 		}
 	}
 	paint = () => {
-		this.frame = 0, this.travel && (this.p = Pd(this.travel, performance.now()), this.p === this.travel.to && (this.travel = void 0)), this.renderDoor(this.p), this.travel ? this.frame = requestAnimationFrame(this.paint) : this.refresh();
+		this.frame = 0, this.travel && (this.p = Fd(this.travel, performance.now()), this.p === this.travel.to && (this.travel = void 0)), this.renderDoor(this.p), this.travel ? this.frame = requestAnimationFrame(this.paint) : this.refresh();
 	};
 	refresh = () => {
 		clearTimeout(this.timer), this.timer = 0;
@@ -14740,7 +14745,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		let t = performance.now(), n = this.entity?.state ?? "unavailable", r = this.confirmBy - 5e3;
 		this.command && (this.confirmed = n === this.target), !this.travel && this.confirmed && (!this.command || t >= r) && (this.command = !1, this.target = void 0, this.confirmed = !1);
 		let i = this.target && (this.command ? t >= r : !this.travel && (n === "open" || n === "closed"));
-		i && performance.now() >= this.confirmBy && (this.command = !1, this.target = void 0, this.travel = void 0, this.p = jd(this.entity) ?? (n === "open" ? 1 : n === "closed" ? 0 : this.p), this.error = `Movement not confirmed. Home Assistant still reports ${n}.`);
+		i && performance.now() >= this.confirmBy && (this.command = !1, this.target = void 0, this.travel = void 0, this.p = Md(this.entity) ?? (n === "open" ? 1 : n === "closed" ? 0 : this.p), this.error = `Movement not confirmed. Home Assistant still reports ${n}.`);
 		let a = [
 			"closed",
 			"open",
@@ -14751,11 +14756,11 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 			n.textContent !== t && (n.textContent = t);
 		};
 		this.side || c("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? "Garage")), c(".state", o[0].toUpperCase() + o.slice(1));
-		let l = n === "closed" || n === "open" ? Fd(this.entity?.last_changed) : "";
+		let l = n === "closed" || n === "open" ? Id(this.entity?.last_changed) : "";
 		c(".age", l ? ` · ${l}` : "");
 		let u = this.root.querySelector("ha-card");
 		u.setAttribute("data-state", n), u.toggleAttribute("data-unknown", !a);
-		let d = Md(this.entity);
+		let d = Nd(this.entity);
 		this.button.hidden = !s && !d, this.button.disabled = !!s || !d;
 		let f = s || (d === "open" ? "Open" : "Close");
 		if (c(".action", f), this.button.setAttribute("aria-label", this.side ? `${f} ${this.config?.name || `${this.side} door`}` : f), c(".hint", this.error), !e) return;
@@ -14764,13 +14769,9 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		Number.isFinite(h) && (this.timer = window.setTimeout(this.refresh, h));
 	};
 };
-customElements.get("gleam-cover-bay") || customElements.define("gleam-cover-bay", Xd);
+customElements.get("gleam-cover-bay") || customElements.define("gleam-cover-bay", Zd);
 // src/cards/cover/editor.ts
-var Zd = (e) => `<label>${e ? "Right door light" : "Garage light (single or left door)"} · optional
-  <input id="${e}light" list="lights" pattern="light\\.[a-z0-9_]+"></label>
-  <label class="toggle"><input id="${e}custom" type="checkbox"> Customize ${e ? "right door " : ""}light temperature</label>
-  <label for="${e}kelvin">${e ? "Right door" : "Garage"} light temperature · <span id="${e}reading"></span></label>
-  <input id="${e}kelvin" type="range" min="${Dd}" max="${Od}" step="1">`, Qd = class extends HTMLElement {
+var Qd = class extends HTMLElement {
 	root = this.attachShadow({ mode: "open" });
 	config;
 	choices = "";
@@ -14781,17 +14782,17 @@ var Zd = (e) => `<label>${e ? "Right door light" : "Garage light (single or left
       .toggle{display:flex;align-items:center;gap:8px}input[type=checkbox]{width:auto}input[type=range]{padding:0}
       :focus-visible{outline:2px solid var(--primary-color,#03a9f4);outline-offset:2px}
       small{font-size:12px;color:var(--secondary-text-color,#666)}
-      @container(min-width:440px){.pair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+       @container(min-width:440px){.pair:has([data-double]:not([hidden])),.pair[data-double]{grid-template-columns:repeat(2,minmax(0,1fr))}}
       p{margin:0;color:var(--error-color,#c62828)}p:empty{display:none}</style>
       <form><fieldset><legend>Garage setup</legend><div class="fields">
       <label>Layout<select id="layout"><option value="normal">Normal</option><option value="compact">Compact</option><option value="double">Double</option></select></label>
-      <label><span id="entity-label"></span><input id="entity" list="covers" required pattern="cover\\.[a-z0-9_]+"></label><datalist id="covers"></datalist>
-      <label data-double>Right door entity<input id="right-entity" list="covers" required aria-describedby="duplicate" pattern="cover\\.[a-z0-9_]+"></label>
+      <datalist id="covers"></datalist><div class="fields pair"><label><span id="entity-label"></span><input id="entity" list="covers" required pattern="cover\\.[a-z0-9_]+"></label>
+      <label data-double>Right door entity<input id="right-entity" list="covers" required aria-describedby="duplicate" pattern="cover\\.[a-z0-9_]+"></label></div>
       <p id="duplicate" role="alert"></p></div></fieldset>
       <details><summary>Door movement<small id="travel-summary"></small></summary><div class="fields">
       <small>Set the time a door takes to travel in either direction (1–300 seconds).</small>
-      <label><span id="time-label"></span><input id="seconds" required type="number" min="1" max="300" step="any"></label>
-      <label data-double>Right door travel time (defaults to left)<input id="right-seconds" type="number" min="1" max="300" step="any"></label></div></details>
+      <div class="fields pair"><label><span id="time-label"></span><input id="seconds" required type="number" min="1" max="300" step="any"></label>
+      <label data-double>Right door travel time (seconds)<input id="right-seconds" type="number" min="1" max="300" step="any"></label></div></div></details>
       <details><summary>Card appearance<small>Roof style, display name and door labels</small></summary><div class="fields">
       <label>Display name<input id="name" placeholder="Entity name"></label>
       <label>Roof type<select id="roof"><option value="pitched">Pitched (default)</option><option value="flat">Flat</option></select></label>
@@ -14799,10 +14800,14 @@ var Zd = (e) => `<label>${e ? "Right door light" : "Garage light (single or left
       <label>Left door label<input id="left-label" placeholder="Hidden when blank"></label>
       <label>Right door label<input id="right-label" placeholder="Hidden when blank"></label></div></div></details>
       <details><summary>Garage lighting<small>Optional light entities and illustrated color temperature</small></summary><div class="fields">
-      <datalist id="lights"></datalist>${Zd("")}
-      <fieldset data-double><legend>Right bay</legend><div class="fields">${Zd("right-")}</div></fieldset></div></details>
+      <datalist id="lights"></datalist><div class="fields pair">
+      <label><span id="light-label"></span><input id="light" list="lights" pattern="light\\.[a-z0-9_]+"></label>
+      <label data-double>Right door light · optional<input id="right-light" list="lights" pattern="light\\.[a-z0-9_]+"></label></div>
+      <label class="toggle"><input id="custom" type="checkbox"> Customize garage light temperature</label>
+      <label for="kelvin">Garage light temperature · <span id="reading"></span></label>
+      <input id="kelvin" type="range" min="${Dd}" max="${Od}" step="1"></div></details>
       <p id="invalid" role="status"></p></form>`, this.root.querySelector("form").addEventListener("submit", (e) => e.preventDefault()), this.root.addEventListener("input", (e) => {
-			e.target instanceof HTMLInputElement && ["entity", "right-entity"].includes(e.target.id) && this.layout(), e.target instanceof HTMLInputElement && e.target.type === "range" && this.showTemperature(e.target.id.startsWith("right-") ? "right-" : "");
+			e.target instanceof HTMLInputElement && ["entity", "right-entity"].includes(e.target.id) && this.layout(), e.target instanceof HTMLInputElement && e.target.type === "range" && this.showTemperature();
 		}), this.root.addEventListener("change", () => {
 			let e = this.layout();
 			if (!this.config) return;
@@ -14823,10 +14828,10 @@ var Zd = (e) => `<label>${e ? "Right door light" : "Garage light (single or left
 				e === "double" && r ? n[`${t}_label`] = r : delete n[`${t}_label`];
 			}
 			for (let t of ["", "right"]) {
-				let r = t ? "right-" : "", i = !t || e === "double", a = t ? "right_light_entity" : "light_entity", o = t ? "right_light_temperature_kelvin" : "light_temperature_kelvin";
-				i && this.input(r + "light").value ? n[a] = this.input(r + "light").value : delete n[a], i && this.input(r + "custom").checked ? n[o] = this.input(r + "kelvin").valueAsNumber : delete n[o];
+				let r = t ? "right-" : "", i = !t || e === "double", a = t ? "right_light_entity" : "light_entity";
+				i && this.input(r + "light").value ? n[a] = this.input(r + "light").value : delete n[a];
 			}
-			this.config = Ad(n), this.dispatchEvent(new CustomEvent("config-changed", {
+			delete n.right_light_temperature_kelvin, this.input("custom").checked ? n.light_temperature_kelvin = this.input("kelvin").valueAsNumber : delete n.light_temperature_kelvin, this.config = Ad(n), this.dispatchEvent(new CustomEvent("config-changed", {
 				detail: { config: n },
 				bubbles: !0,
 				composed: !0
@@ -14839,27 +14844,29 @@ var Zd = (e) => `<label>${e ? "Right door light" : "Garage light (single or left
 	invalidField() {
 		return [...this.root.querySelectorAll("input:not(:disabled)")].find((e) => !e.validity.valid);
 	}
-	showTemperature(e) {
-		let t = this.input(e + "kelvin"), n = this.input(e + "custom");
-		t.disabled = n.disabled || !n.checked;
-		let r = n.checked ? `${t.value} K` : "Default warm amber";
-		this.root.querySelector(`#${e}reading`).textContent = r, t.setAttribute("aria-valuetext", r);
+	showTemperature() {
+		let e = this.input("kelvin"), t = this.input("custom");
+		e.disabled = t.disabled || !t.checked;
+		let n = t.checked ? `${e.value} K` : "Default warm amber";
+		this.root.querySelector("#reading").textContent = n, e.setAttribute("aria-valuetext", n);
 	}
 	layout() {
 		let e = this.root.querySelector("#layout").value, t = e === "double";
 		for (let e of this.root.querySelectorAll("[data-double]")) e.hidden = !t;
-		this.input("right-entity").disabled = this.input("right-seconds").disabled = !t, this.input("right-light").disabled = this.input("right-custom").disabled = !t, this.showTemperature(""), this.showTemperature("right-");
+		this.input("right-entity").disabled = this.input("right-seconds").disabled = !t, this.input("right-light").disabled = !t, this.showTemperature();
 		let n = this.input("right-entity"), r = this.input("entity").value.trim(), i = t && r && n.value.trim() === r ? "Both doors use the same cover entity. Choose a different entity for one door." : "";
 		n.setCustomValidity(i), n.setAttribute("aria-invalid", String(!!i));
 		let a = this.root.querySelector("#duplicate");
-		a.textContent !== i && (a.textContent = i), this.root.querySelector("#entity-label").textContent = t ? "Left door entity" : "Garage cover entity", this.root.querySelector("#time-label").textContent = t ? "Left door travel time (seconds)" : "Travel time (seconds)";
+		a.textContent !== i && (a.textContent = i), this.root.querySelector("#entity-label").textContent = t ? "Left door entity" : "Garage cover entity", this.root.querySelector("#light-label").textContent = t ? "Left door light · optional" : "Garage light · optional", this.root.querySelector("#time-label").textContent = t ? "Left door travel time (seconds)" : "Travel time (seconds)";
 		let o = this.input("seconds").value || "—";
 		this.root.querySelector("#travel-summary").textContent = t ? `Left: ${o} s · Right: ${this.input("right-seconds").value || o} s` : `${o} seconds to open or close`;
 		let s = this.invalidField();
 		return this.root.querySelector("#invalid").textContent = s?.closest("details") ? `${s.labels?.[0]?.textContent?.trim()}: ${s.validationMessage}` : "", e;
 	}
 	setConfig(e) {
-		this.config = e, this.input("entity").value = e.entity ?? "", this.input("name").value = e.name ?? "", this.input("seconds").value = String(e.travel_seconds ?? 10), this.root.querySelector("#layout").value = e.variant ?? "normal", this.root.querySelector("#roof").value = e.roof_type ?? "pitched", this.input("right-entity").value = e.right_entity ?? "", this.input("left-label").value = e.left_label ?? "", this.input("right-label").value = e.right_label ?? "", this.input("right-seconds").value = String(e.right_travel_seconds ?? ""), this.input("light").value = e.light_entity ?? "", this.input("custom").checked = e.light_temperature_kelvin !== void 0, this.input("kelvin").value = String(e.light_temperature_kelvin ?? 2700), this.input("right-light").value = e.right_light_entity ?? "", this.input("right-custom").checked = e.right_light_temperature_kelvin !== void 0, this.input("right-kelvin").value = String(e.right_light_temperature_kelvin ?? 2700), this.layout();
+		this.config = e, this.input("entity").value = e.entity ?? "", this.input("name").value = e.name ?? "", this.input("seconds").value = String(e.travel_seconds ?? 10), this.root.querySelector("#layout").value = e.variant ?? "normal", this.root.querySelector("#roof").value = e.roof_type ?? "pitched", this.input("right-entity").value = e.right_entity ?? "", this.input("left-label").value = e.left_label ?? "", this.input("right-label").value = e.right_label ?? "", this.input("right-seconds").value = String(e.right_travel_seconds ?? e.travel_seconds ?? 10), this.input("light").value = e.light_entity ?? "";
+		let t = jd(e);
+		this.input("custom").checked = t !== void 0, this.input("kelvin").value = String(t ?? 2700), this.input("right-light").value = e.right_light_entity ?? "", this.layout();
 	}
 	set hass(e) {
 		let t = Object.keys(e.states).filter((e) => /^(cover|light)\./.test(e)).sort(), n = t.join("|");
@@ -14884,7 +14891,7 @@ var Zd = (e) => `<label>${e ? "Right door light" : "Garage light (single or left
 	{
 		type: "gleam-cover",
 		name: "Gleam Cover (Experimental)",
-		element: Yd,
+		element: Xd,
 		description: "Garage door status and controls for Home Assistant cover entities."
 	}
 ];

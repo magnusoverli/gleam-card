@@ -82,7 +82,7 @@ export class GleamCover extends HTMLElement {
       this.bays[0].setConfig({entity:config.entity,name:config.left_label?.trim(),travel_seconds:config.travel_seconds,
         light_entity:config.light_entity,light_temperature_kelvin:config.light_temperature_kelvin});
       this.bays[1].setConfig({entity:config.right_entity!,name:config.right_label?.trim(),travel_seconds:config.right_travel_seconds ?? config.travel_seconds,
-        light_entity:config.right_light_entity,light_temperature_kelvin:config.right_light_temperature_kelvin});
+        light_entity:config.right_light_entity,light_temperature_kelvin:config.light_temperature_kelvin});
     } else this.bays[0].setConfig(config);
     for (const bay of this.bays) bay.toggleAttribute("flat-roof", config.roof_type === "flat");
     if (this.client) this.hass = this.client;

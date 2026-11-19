@@ -195,26 +195,26 @@ test("roof editor changes the shared double roof without replacing either door",
   expect(await skin.evaluate(el => el.isConnected)).toBe(true);
 });
 
-test("temperature slider accepts both limits and restores the default independently", async ({page}) => {
+test("one garage temperature slider migrates the old right-only setting and restores amber", async ({page}) => {
   await page.evaluate(() => {
     const editor = document.createElement("gleam-cover-editor");
-    editor.setConfig({variant:"double",entity:"cover.left",right_entity:"cover.right",light_temperature_kelvin:3123});
+    editor.setConfig({variant:"double",entity:"cover.left",right_entity:"cover.right",right_light_temperature_kelvin:3123});
     editor.addEventListener("config-changed",e => window.demo.calls.push(e.detail.config));
     document.body.append(editor);
   });
-  const editor = page.locator("gleam-cover-editor"), slider = editor.locator("#right-kelvin");
+  const editor = page.locator("gleam-cover-editor"), slider = editor.getByRole("slider");
   await editor.locator("summary").filter({hasText:"Garage lighting"}).click();
-  await expect(slider).toBeDisabled();
-  await editor.locator("#right-custom").check();
+  await expect(slider).toHaveCount(1);
+  await expect(slider).toHaveValue("3123");
   for (const [key,k] of [["End",6500],["Home",2000],["ArrowRight",2001]]) {
     await slider.press(key);
-    await expect(editor.locator("#right-reading")).toHaveText(`${k} K`);
-    expect(await page.evaluate(()=>window.demo.calls.at(-1).right_light_temperature_kelvin)).toBe(k);
+    await expect(editor.locator("#reading")).toHaveText(`${k} K`);
+    expect(await page.evaluate(()=>window.demo.calls.at(-1).light_temperature_kelvin)).toBe(k);
   }
-  await editor.locator("#right-custom").uncheck();
+  await editor.locator("#custom").uncheck();
   const config = await page.evaluate(()=>window.demo.calls.at(-1));
   expect(config).not.toHaveProperty("right_light_temperature_kelvin");
-  expect(config.light_temperature_kelvin).toBe(3123);
+  expect(config).not.toHaveProperty("light_temperature_kelvin");
 });
 
 test("double bay lighting responds to light-only updates without moving either door", async ({page}) => {
@@ -232,7 +232,7 @@ test("double bay lighting responds to light-only updates without moving either d
     await expect(right.locator(layer)).toHaveCSS("opacity","1");
   }
   await expect(left.locator(".interior rect")).toHaveCSS("fill","rgb(255, 168, 86)");
-  await expect(right.locator("#spill stop").first()).toHaveCSS("stop-color","rgb(220, 236, 255)");
+  await expect(right.locator("#spill stop").first()).toHaveCSS("stop-color","rgb(255, 168, 86)");
   for (const brightness of [128,0,255]) {
     await page.evaluate(b => window.reportLight("on",b), brightness);
     for (const layer of [".interior",".spill",".air"]) await expect(left.locator(layer)).toHaveCSS("opacity","1");

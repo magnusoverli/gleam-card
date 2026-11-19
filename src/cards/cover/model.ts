@@ -14,15 +14,20 @@ export function settings(config: CoverConfig) {
   if (!["normal","compact","double"].includes(config.variant ?? "normal")) throw Error("Unknown cover variant.");
   if (config.roof_type !== undefined && config.roof_type !== "pitched" && config.roof_type !== "flat")
     throw Error("Roof type must be pitched or flat.");
-  validateLamp(config.light_entity, config.light_temperature_kelvin);
+  const kelvin = sharedTemperature(config);
+  validateLamp(config.light_entity, kelvin);
   if (config.variant === "double") {
-    validateLamp(config.right_light_entity, config.right_light_temperature_kelvin);
+    validateLamp(config.right_light_entity);
     if (!/^cover\.[a-z0-9_]+$/.test(config.right_entity ?? "") || config.right_entity === config.entity)
       throw Error("Select a different cover entity for the right door.");
     const right = config.right_travel_seconds ?? seconds;
     if (!Number.isFinite(right) || right < 1 || right > 300) throw Error("Right travel time must be 1–300 seconds.");
   }
-  return { ...config, travel_seconds: seconds };
+  return { ...config, travel_seconds: seconds, light_temperature_kelvin: kelvin };
+}
+
+export function sharedTemperature(config: CoverConfig) {
+  return config.light_temperature_kelvin ?? (config.variant === "double" ? config.right_light_temperature_kelvin : undefined);
 }
 
 export function position(entity?: EntityState) {

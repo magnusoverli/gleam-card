@@ -30,6 +30,8 @@ jobs:
           }
           file dist/gleam-card.js > gleam-card.js
           test -s gleam-card.js
+          file CHANGELOG.md | awk -v heading="## [$version](" \
+            '/^## / { include = index($0, heading) == 1; next } include { print }' > release-notes.md
+          grep -q '[^[:space:]]' release-notes.md
           gh release create "v$version" gleam-card.js --target "$GITHUB_SHA" \
-            --title "Gleam Cards $version" --generate-notes \
-            --notes "Includes Gleam Energy Graph (Stable), Gleam Thermostat (Experimental), and Gleam Cover (Experimental). Try the garage's Normal, Compact, and Double layouts in the [interactive demo](https://magnusoverli.github.io/gleam-card/#garage-layout)."
+            --title "Gleam Cards $version" --notes-file release-notes.md

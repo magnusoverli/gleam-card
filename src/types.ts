@@ -115,6 +115,7 @@ export interface CoverConfig {
   light_entity?: string;
   light_temperature_kelvin?: number;
   right_light_entity?: string;
+  /** Legacy read fallback. New configurations use light_temperature_kelvin for both bays. */
   right_light_temperature_kelvin?: number;
   left_label?: string;
   right_label?: string;
