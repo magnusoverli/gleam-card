@@ -22,13 +22,13 @@
 
 ## Gleam Cover
 
-**Experimental** · See which garage door is still open, or how far the living room shade is raised. New in **v0.0.8**, Roller shade lets you frame a photo of your own outdoor view behind sheer or blackout fabric.
+**Experimental** · See which garage door is still open, raise a roller shade over a photo of your own view, or tilt the slats of a lowered blind.
 
-The development build also supports **Slatted blind**: use the same window and photo settings, with separate lift and tilt when your device supports them.
+**New in v0.0.9:** Slatted blind animates lift and tilt independently. All three cover types offer a lift-position slider when the device supports it.
 
-| Roller shade | Garage door |
-| --- | --- |
-| <img src="docs/images/cover-shade-normal.png" width="400" alt="Living room roller shade at 40% open."> | <img src="docs/images/cover.png" width="400" alt="Garage with the left door closed and the right door open."> |
+| Slatted blind | Roller shade | Garage door |
+| --- | --- | --- |
+| <img src="docs/images/cover-blind.png" width="300" alt="Lowered studio blind showing separate lift and slat tilt controls."> | <img src="docs/images/cover-shade-normal.png" width="300" alt="Living room roller shade at 40% open."> | <img src="docs/images/cover.png" width="300" alt="Garage with the left door closed and the right door open."> |
 
 [**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings](docs/cover.md)
 
@@ -47,7 +47,7 @@ type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
 ```
 
-For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For a garage door or roller shade, choose **Gleam Cover (Experimental)**, select the cover type, and pick your `cover.*` entity.
+For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For a blind, shade, or garage door, choose **Gleam Cover (Experimental)**, select the cover type, and pick your `cover.*` entity.
 
 <details>
 <summary>Manual installation</summary>

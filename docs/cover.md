@@ -4,12 +4,18 @@
 `cover_type` to keep the original garage illustration. Device-class suggestions
 do not override an existing choice.
 
-## Slatted blind · Development build
+## Lift position · New in v0.0.9
 
 All cover types show a **Lift position** slider when the entity supports
 `SET_POSITION`. Release the slider to request 0–100% open. The target is
 separate from the reported position. Each Double garage bay checks its own
 capabilities. On blinds, this slider moves the rail; **Slat tilt** changes angle.
+
+## Slatted blind · New in v0.0.9
+
+In **Cover setup**, choose **Slatted blind** and select your `cover.*` entity.
+To try tilt before connecting a device, open the [Cover demo](https://magnusoverli.github.io/gleam-card/cover/)
+and select **Slatted blind · lift and tilt** under **Example**.
 
 ```yaml
 type: custom:gleam-cover

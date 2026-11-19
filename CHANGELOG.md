@@ -2,12 +2,18 @@
 
 ## Unreleased
 
-### 🪟 Gleam Cover
+## [0.0.9](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.9) · 2026-11-19
 
-- Set the lift position with a 0–100% slider on covers supporting `SET_POSITION`. On blinds, the rail picks up and deposits individual slats as it travels.
+### 🪟 Gleam Cover: introducing Slatted blind
 
-- Add Slatted blind in Normal and Compact layouts, with independent lift and capability-aware tilt, including window photos and framing.
-- Slats animate between reported angles over a configurable tilt transition (default one second).
+Let light in without raising the blind. Choose **Slatted blind** in the visual editor to control slat angle separately from lift, in Normal or Compact layout.
+
+- **Lift and stack.** The rising rail collects each slat from the bottom. Lower it and each slat settles back into place.
+- **Tilt independently.** The card shows only the tilt controls your entity supports. Set **Cover movement → Tilt transition** to match your motor; the default is one second.
+- **Keep your view.** Use the same window photos, crop, zoom and glazing bars as Roller shade.
+- **Set a lift target on any supported cover.** Release the **Lift position** slider to request 0–100% open on a blind, shade or garage door. The target stays distinct from the reported position.
+
+[Try the simulated blind](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings and YAML](https://github.com/magnusoverli/gleam-card/blob/v0.0.9/docs/cover.md)
 
 ## [0.0.8](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.8) · 2026-11-19
 
