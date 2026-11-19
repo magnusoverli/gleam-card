@@ -63,6 +63,14 @@ Tests inject narrow clients instead of requiring a live Home Assistant.
 
 ## Rendering
 
+Cover illustrations are listed in `src/cards/cover/kinds.ts`. Each definition
+declares its label, device class, layouts, optional config validator, SVG
+markup and retained rendering function. Supply only normalized visual openness
+to that function. Reported state/position, commands, timeouts, visibility and
+animation scheduling stay in the shared controller. Add new device-specific
+options to the editor only when applicable; never infer an action from the
+illustration or device class.
+
 - Energy uses bounded object pools and shared geometry/materials. Unchanged
   label textures survive updates; expired slots are released. Individual
   transparent bars retain sorting and tooltip behavior rather than instancing.

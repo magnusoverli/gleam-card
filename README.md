@@ -22,7 +22,7 @@
 
 ## Gleam Cover
 
-**Experimental** · Which garage door is still open? See its state and how long it’s been that way. In Double layout, each door has its own control.
+**Experimental** · See which garage door is still open, or how far the living room shade is raised. New in **v0.0.8**, Roller shade lets you frame a photo of your own outdoor view behind sheer or blackout fabric.
 
 <a href="https://magnusoverli.github.io/gleam-card/cover/"><img src="docs/images/cover.png" width="480" alt="Double garage with the left door closed and the right door open, casting warm light onto the driveway."></a>
 
@@ -43,7 +43,7 @@ type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
 ```
 
-For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For a garage door, choose **Gleam Cover (Experimental)** and select a `cover.*` entity.
+For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For a garage door or roller shade, choose **Gleam Cover (Experimental)**, select the cover type, and pick your `cover.*` entity.
 
 <details>
 <summary>Manual installation</summary>

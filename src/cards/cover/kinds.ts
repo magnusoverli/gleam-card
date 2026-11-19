@@ -1,0 +1,33 @@
+import type { CoverConfig } from "../../types";
+import { garage, renderer, type Side } from "./garage";
+import { shade, renderShade } from "./shade";
+import { validateGarage } from "./garage-settings";
+
+export type CoverKind = NonNullable<CoverConfig["cover_type"]>;
+type Layout = NonNullable<CoverConfig["variant"]>;
+interface Definition {
+  label: string;
+  deviceClass: string;
+  layouts: readonly Layout[];
+  markup: (side?: Side) => string;
+  mount: (svg: SVGSVGElement) => (openness:number) => void;
+  validate?: (config: CoverConfig) => void;
+}
+export const kinds: Record<CoverKind, Definition> = {
+  garage: {label:"Garage", deviceClass:"garage", layouts:["normal","compact","double"], markup:garage, mount:renderer, validate:validateGarage},
+  shade: {label:"Roller shade", deviceClass:"shade", layouts:["normal","compact"], markup:shade, mount:renderShade,
+    validate({shade_opacity: value, window_image, window_image_zoom, window_image_x, window_image_y, glazing_bar_width, glazing_bar_color}) {
+      if (glazing_bar_width !== undefined && (!Number.isInteger(glazing_bar_width) || glazing_bar_width < 0 || glazing_bar_width > 10))
+        throw Error("Glazing bar width must be a whole number from 0 to 10.");
+      if (glazing_bar_color !== undefined && (typeof glazing_bar_color !== "string" || !/^#[a-f\d]{6}$/i.test(glazing_bar_color)))
+        throw Error("Glazing bar color must be a six-digit hex color.");
+      for (const [n,min,max] of [[window_image_zoom,100,300],[window_image_x,0,100],[window_image_y,0,100]] as const)
+        if (n !== undefined && (!Number.isInteger(n) || n < min || n > max)) throw Error(`Photo framing must use whole percentages from ${min} to ${max}.`);
+      if (window_image !== undefined && typeof window_image !== "string") throw Error("Window image must be an image URL or path.");
+      if (value !== undefined && (!Number.isInteger(value) || value < 0 || value > 100))
+        throw Error("Shade opacity must be a whole percentage from 0 to 100.");
+    }},
+};
+export function suggestedKind(deviceClass: unknown) {
+  return (Object.keys(kinds) as CoverKind[]).find(key => kinds[key].deviceClass === deviceClass);
+}

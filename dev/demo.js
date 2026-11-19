@@ -5,6 +5,9 @@ const state = (value, attributes = {}) => ({
   state: String(value), attributes, last_updated: new Date(now).toISOString(),
 });
 const states = {
+  "cover.demo_shade": state("open",{device_class:"shade",friendly_name:"Living room shade",supported_features:3,current_position:40}),
+  "cover.state_only_shade": state("closed",{device_class:"shade",friendly_name:"Office shade",supported_features:3}),
+  "cover.offline_shade": state("unavailable",{device_class:"shade",friendly_name:"Guest room shade",supported_features:3}),
   "cover.right_garage": { ...state("open", { friendly_name:"Right garage", device_class:"garage", supported_features:3 }), last_changed:new Date(now-HOUR).toISOString() },
   "cover.garage_door": { ...state("closed", { friendly_name: "Garage", device_class: "garage", supported_features: 3 }), last_changed: new Date(now - 134 * 60000).toISOString() },
   "sensor.total_energy": state(1200, { unit_of_measurement: "kWh" }),
@@ -60,7 +63,12 @@ const hass = {
     if (domain === "cover") {
       const opening = service === "open_cover";
       const report = value => {
-        states[id] = { ...previous, state: value, last_changed: new Date().toISOString() };
+        const attrs = {...previous.attributes};
+        if (id === "cover.demo_shade") {
+          if (value === "closed" || value === "open") attrs.current_position = opening ? 100 : 0;
+          else delete attrs.current_position;
+        }
+        states[id] = { ...previous, attributes:attrs, state: value, last_changed: new Date().toISOString() };
         cover.hass = { ...hass, states: { ...states } };
       };
       report(opening ? "opening" : "closing");
@@ -95,14 +103,22 @@ cover.id = "cover";
 cover.hass = hass;
 const layouts = document.createElement("label");
 layouts.id = "garage-layout";
-layouts.innerHTML = `Garage layout <select><option>Normal</option><option>Compact</option><option>Double</option></select>`;
+layouts.innerHTML = `<span>Garage layout</span> <select><option>Normal</option><option>Compact</option><option>Double</option></select>`;
+const examples = document.createElement("label");
+examples.id = "cover-example";
+examples.innerHTML = `Example <select><option value="">Garage</option><option value="cover.demo_shade">Roller shade · measured position</option><option value="cover.state_only_shade">Roller shade · state only</option><option value="cover.offline_shade">Roller shade · unavailable</option></select>`;
 const applyCoverLayout = () => {
-  const variant = layouts.querySelector("select").value.toLowerCase();
-  cover.setConfig({entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
+  const id = examples.querySelector("select").value, select = layouts.querySelector("select");
+  layouts.querySelector("span").textContent = id ? "Shade layout" : "Garage layout";
+  select.options[2].hidden = select.options[2].disabled = !!id;
+  if (id && select.value === "Double") select.value = "Normal";
+  const variant = select.value.toLowerCase();
+  cover.setConfig(id ? {entity:id,cover_type:"shade",variant} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
   cover.style.gridColumn = `span ${cover.getGridOptions().columns}`;
 };
 layouts.onchange = applyCoverLayout;
+examples.onchange = applyCoverLayout;
 applyCoverLayout();
-mount.append(layouts, cover);
+mount.append(examples, layouts, cover);
 }
 window.demo = { energy, thermostat, cover, hass, calls, requests };

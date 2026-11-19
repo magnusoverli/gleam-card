@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## [0.0.8](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.8) · 2026-11-19
+
+### 🪟 Gleam Cover: introducing Roller shade
+
+Put the view from your own window on your dashboard and watch the fabric roll up to reveal it. Choose **Cover type → Roller shade** in the visual editor. Garage remains the default, so existing cards need no changes.
+
+#### 🎛️ Movement and status
+
+- **Measured or state-only.** Use Normal or Compact layout. A shade that reports 40% open shows that measurement; a state-only shade never shows an invented percentage.
+- **Timed travel.** Set the full movement time to match your motor. The illustration keeps moving between sparse position reports, while the readout follows Home Assistant. Open and Close are offered according to device capabilities.
+
+#### 🖼️ Make the window yours
+- Match sheer or blackout fabric using **Card appearance → Fabric opacity**. The window frame and bottom rail stay solid.
+- Upload a photo from your phone or computer in **Card appearance**, or paste a URL in **Window view image**, to show the actual view behind the roller shade.
+- Frame the outdoor view with photo zoom and horizontal/vertical position sliders.
+- Customize the roller shade’s glazing bar color and width, or hide the bars entirely.
+
+**[Try the Cover demo](https://magnusoverli.github.io/gleam-card/cover/)** and select a roller shade from **Example**, or follow the [setup guide and YAML example](https://github.com/magnusoverli/gleam-card/blob/v0.0.8/docs/cover.md). Gleam Cover retains its **Experimental** badge.
+
 ## [0.0.7](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.7) · 2026-11-19
 
 ### 🏡 Gleam Cover: your doors, your lights, one tap

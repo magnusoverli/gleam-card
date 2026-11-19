@@ -1,5 +1,24 @@
 import { test, expect } from "@playwright/test";
 
+test("shade reuses its fabric and frame scheduler across measured-position updates", async ({page}) => {
+  await page.goto("/cover/");
+  await page.getByLabel("Example").selectOption("cover.demo_shade");
+  const cloth = page.locator("#cover .shade-cloth");
+  await expect(cloth).toHaveAttribute("transform",/scale\(1 0\.6\)/);
+  const result = await page.evaluate(async ()=>{
+    const {cover,hass} = window.demo, entity = hass.states["cover.demo_shade"];
+    const bay = cover.shadowRoot.querySelector("gleam-cover-bay"), fabric = bay.shadowRoot.querySelector(".shade-cloth");
+    const start = performance.now();
+    for(let i=1;i<=50;i++) cover.hass = {...hass,states:{"cover.demo_shade":{...entity,attributes:{...entity.attributes,current_position:i}}}};
+    const cpuMs = performance.now()-start;
+    await new Promise(requestAnimationFrame);
+    return {cpuMs,updateToFrameMs:performance.now()-start,reused:fabric===bay.shadowRoot.querySelector(".shade-cloth"),idle:bay.frame===0};
+  });
+  expect(result.reused && result.idle).toBe(true);
+  await expect(cloth).toHaveAttribute("transform",/scale\(1 0\.5\)/);
+  console.log("roller shade (retained SVG)",result);
+});
+
 test("garage retains panels and suspends long travel off-screen and on disconnect", async ({ page }, info) => {
   await page.goto("/dev/fixture.html");
   const card = page.locator("gleam-cover");

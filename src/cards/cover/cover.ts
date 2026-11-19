@@ -1,17 +1,21 @@
 import { foundationStyles } from "../../shared/theme";
 import type { CoverConfig, EntityState, HomeAssistant } from "../../types";
 import { action, elapsed, fraction, position, send, settings, type Travel } from "./model";
-import { garage, labelCenter, renderer, type Side } from "./garage";
+import { labelCenter, type Side } from "./garage";
+import { sharedTemperature } from "./garage-settings";
+import { kinds, suggestedKind, type CoverKind } from "./kinds";
 
-const template = (side?: Side) => `<style>${foundationStyles}
+const template = (kind: CoverKind, side?: Side) => `<style>${foundationStyles}
 :host{container-type:inline-size;min-width:0}ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
 h2{margin:0;font-size:18px;font-weight:550;overflow-wrap:anywhere}
 .scene{border:0;background:none;border-radius:12px;padding:0;width:100%;display:block}
+:host([shade]) .scene{position:relative;isolation:isolate}
+.shade-layer{position:absolute;inset:0;pointer-events:none;transform:translateZ(0)}
 svg{display:block;width:100%;height:clamp(100px,40cqi,180px)}
 .detail{min-width:0}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;min-height:40px}
 .state{font-size:16px;color:#86ecf2}.age,.hint{color:var(--gleam-muted,#8ba8c6);font-size:12px}
 ha-card[data-state=open] .state{color:#ffc27c}
-ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air){visibility:hidden}
+ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.shade-rail){visibility:hidden}
 .action:disabled{cursor:default}.hint{margin:0}.hint:empty{display:none}
 @container(min-width:590px){ha-card{grid-template-columns:1.15fr 1fr;column-gap:20px}.scene{grid-column:1;grid-row:1/3}header{align-self:end}.detail{align-self:start}}
 :host([compact]) ha-card{display:block;padding:8px}.row{flex-wrap:wrap}
@@ -22,25 +26,38 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 :host([bay]) ha-card,:host([bay]) svg{overflow:visible}
 :host([bay]) svg{width:100%;height:auto;pointer-events:none}
 :host([bay]) .detail,:host([bay]) h2{padding-inline:6px}
-</style><ha-card>${side ? "" : '<span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header>'}<div class="scene">${garage(side)}</div>
+/* A moving shade changes both its status and its action caption on arrival.
+   Keep those changes out of the window's layout (and scroll anchoring). */
+:host([shade]) .row{display:grid;grid-template-columns:minmax(0,1fr) 9em;gap:6px}
+:host([shade]) .action{width:100%}
+@container(max-width:420px){
+  :host([shade]) .row{grid-template-columns:1fr}
+  :host([shade]) .row>div{min-height:3lh}
+  :host([shade]) .age{display:block}
+}
+</style><ha-card>${side ? "" : '<span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header>'}<div class="scene">${kinds[kind].markup(side)}</div>
 <div class="detail"><div class="row"><div><strong class="state" role="status"></strong><span class="age"></span></div>
 <button id="action" class="action" hidden></button></div><p class="hint"></p></div></ha-card>`;
 
 export class GleamCover extends HTMLElement {
   private root = this.attachShadow({mode:"open"});
   private variant?: CoverConfig["variant"];
+  private kind?: CoverKind;
   private bays: CoverBay[] = [];
   private client?: HomeAssistant;
   static getConfigElement() { return document.createElement("gleam-cover-editor"); }
   static getStubConfig(hass?: HomeAssistant) {
     const ids = Object.keys(hass?.states ?? {}).filter(id => id.startsWith("cover."));
-    return { entity: ids.find(id => hass?.states[id].attributes.device_class === "garage") ?? ids[0] ?? "cover.garage_door" };
+    const entity = ids.find(id => suggestedKind(hass?.states[id].attributes.device_class)) ?? ids[0] ?? "cover.garage_door";
+    return { entity, cover_type:suggestedKind(hass?.states[entity]?.attributes.device_class) ?? "garage" };
   }
   getCardSize() { return this.variant === "compact" ? 2 : 4; }
   getGridOptions() { return { columns: this.variant === "compact" ? 6 : 12, rows: "auto", min_columns: this.variant === "double" ? 12 : 6 }; }
   setConfig(value: CoverConfig) {
     const config = settings(value), variant = config.variant ?? "normal";
-    if (variant !== this.variant) {
+    const kind = config.cover_type ?? "garage";
+    if (variant !== this.variant || kind !== this.kind) {
+      this.kind = kind;
       this.variant = variant;
       if (variant === "double") {
         this.root.innerHTML = `<style>${foundationStyles}:host{min-width:0}ha-card{padding:12px}
@@ -50,7 +67,7 @@ export class GleamCover extends HTMLElement {
           .labels h3{position:relative;transform:translateX(-50%);width:62%;text-align:center;font-size:14px;line-height:1.15;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
           </style>
           <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`;
-        this.bays = [new CoverBay("left"), new CoverBay("right")];
+        this.bays = [new CoverBay(kind,"left"), new CoverBay(kind,"right")];
         this.bays.forEach(b => b.toggleAttribute("bay",true));
         const labels = document.createElement("div");
         labels.className = "labels";
@@ -62,7 +79,8 @@ export class GleamCover extends HTMLElement {
         }
         this.root.querySelector(".bays")!.append(labels,...this.bays);
       } else {
-        const bay = new CoverBay();
+        const bay = new CoverBay(kind);
+        bay.toggleAttribute("shade",kind === "shade");
         bay.toggleAttribute("compact",variant === "compact");
         const style = document.createElement("style");
         style.textContent = ":host{display:block;min-width:0}";
@@ -80,9 +98,9 @@ export class GleamCover extends HTMLElement {
         heading.hidden = !names[i];
       });
       this.bays[0].setConfig({entity:config.entity,name:config.left_label?.trim(),travel_seconds:config.travel_seconds,
-        light_entity:config.light_entity,light_temperature_kelvin:config.light_temperature_kelvin});
+        light_entity:config.light_entity,light_temperature_kelvin:sharedTemperature(config)});
       this.bays[1].setConfig({entity:config.right_entity!,name:config.right_label?.trim(),travel_seconds:config.right_travel_seconds ?? config.travel_seconds,
-        light_entity:config.right_light_entity,light_temperature_kelvin:config.light_temperature_kelvin});
+        light_entity:config.right_light_entity,light_temperature_kelvin:sharedTemperature(config)});
     } else this.bays[0].setConfig(config);
     for (const bay of this.bays) bay.toggleAttribute("flat-roof", config.roof_type === "flat");
     if (this.client) this.hass = this.client;
@@ -100,6 +118,7 @@ class CoverBay extends HTMLElement {
   private observer?: IntersectionObserver;
   private visible = false;
   private frame = 0;
+  private lastPainted = -1;
   private timer = 0;
   private p = 0;
   private travel?: Travel;
@@ -113,11 +132,11 @@ class CoverBay extends HTMLElement {
   private error = "";
   private generation = 0;
 
-  constructor(private side?: Side) {
+  constructor(private kind: CoverKind = "garage", private side?: Side) {
     super();
-    this.root.innerHTML = template(side);
+    this.root.innerHTML = template(kind,side);
     this.button = this.root.querySelector(".action")!;
-    this.renderDoor = renderer(this.root.querySelector("svg")!);
+    this.renderDoor = kinds[kind].mount(this.root.querySelector("svg")!);
     this.button.onclick = () => void this.act();
   }
   connectedCallback() {
@@ -139,6 +158,21 @@ class CoverBay extends HTMLElement {
   }
   setConfig(value: CoverConfig) {
     const config = settings(value);
+    if (this.kind === "shade" && config.shade_opacity !== this.config?.shade_opacity)
+      this.style.setProperty("--shade-opacity", String((config.shade_opacity ?? 100)/100));
+    if (this.kind === "shade" && config.window_image !== this.config?.window_image) {
+      const image = this.root.querySelector<HTMLImageElement>(".window-view")!;
+      image.hidden = !config.window_image?.trim();
+      if (!image.hidden) image.src = config.window_image!.trim();
+      else image.removeAttribute("src");
+    }
+    if (this.kind === "shade") {
+      if (config.glazing_bar_width !== this.config?.glazing_bar_width) this.style.setProperty("--glazing-width",String(config.glazing_bar_width ?? 3));
+      if (config.glazing_bar_color !== this.config?.glazing_bar_color) this.style.setProperty("--glazing-color",config.glazing_bar_color ?? "#30566a");
+      if (config.window_image_zoom !== this.config?.window_image_zoom) this.style.setProperty("--photo-scale",String((config.window_image_zoom ?? 100)/100));
+      if (config.window_image_x !== this.config?.window_image_x) this.style.setProperty("--photo-x",`${config.window_image_x ?? 50}%`);
+      if (config.window_image_y !== this.config?.window_image_y) this.style.setProperty("--photo-y",`${config.window_image_y ?? 50}%`);
+    }
     if (config.entity !== this.config?.entity) { this.reset(); this.entity = undefined; }
     if (config.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
       const k = config.light_temperature_kelvin;
@@ -163,27 +197,42 @@ class CoverBay extends HTMLElement {
   }
   private sync(force: boolean) {
     if (!this.config || !this.isConnected) return;
-    const id = this.config.light_entity, lamp = id ? this.client?.states[id] : undefined;
+    const id = this.kind === "garage" && this.config.light_entity, lamp = id ? this.client?.states[id] : undefined;
     this.toggleAttribute("lamp-off", !!id && lamp?.state !== "on");
     const next = this.client?.states[this.config.entity], prev = this.entity;
     const state = next?.state, pos = position(next);
     if (!force && next === prev && state === this.reportedState && pos === this.reportedPosition) return;
     if (state !== this.reportedState) this.error = "";
-    const previousState = this.reportedState;
+    const previousState = this.reportedState, previousPosition = this.reportedPosition;
     this.reportedState = state; this.reportedPosition = pos;
     this.entity = next;
     if (this.command && (state === this.target || state === (this.target === "open" ? "opening" : "closing"))) this.acknowledged = true;
     // Some openers expose only 0/100, even during physical travel. Neither
     // the old endpoint nor an early final endpoint is a movement sample.
-    const measured = pos !== undefined && (!this.travel || (pos > 0 && pos < 1));
+    const intermediate = pos !== undefined && pos > 0 && pos < 1 &&
+      (this.kind !== "shade" || pos !== previousPosition || state === this.target);
     if (state === "opening" || state === "closing") {
       const target = state === "opening" ? "open" : "closed";
       if (!prev && pos === undefined) this.p = target === "open" ? 0 : 1;
       if (!this.command && this.target !== target && (!prev || state !== previousState)) this.begin(target);
-      if (measured) { this.travel = undefined; this.p = pos; }
+      if (pos !== undefined && (!this.travel || intermediate)) {
+        this.p = pos;
+        // Moving shades often send only a few position samples. Anchor the
+        // illustration to this sample, then roll the remaining distance rather
+        // than holding a translucent sheet over the photo until confirmation.
+        const to = target === "open" ? 1 : 0;
+        this.travel = this.kind === "shade" && this.target === target && pos !== to
+          ? {from:pos,to,start:performance.now(),duration:Math.max(1,Math.abs(to-pos)*this.config.travel_seconds*1000)}
+          : undefined;
+      }
     } else if (state === "open" || state === "closed") {
-      if (measured) { this.travel = undefined; this.p = pos; }
-      if (state === this.target) this.confirmed = true;
+      if (pos !== undefined && (!this.travel || intermediate)) {
+        this.travel = undefined; this.p = pos;
+      }
+      if (state === this.target) {
+        this.confirmed = true;
+        if (!this.travel && this.kind === "shade" && pos === undefined) this.p = state === "open" ? 1 : 0;
+      }
       else if (!this.command && (!this.target || previousState !== state)) {
         this.travel = undefined; this.target = undefined;
         this.p = pos ?? (state === "closed" ? 0 : 1);
@@ -214,6 +263,7 @@ class CoverBay extends HTMLElement {
       if (this.p === this.travel.to) this.travel = undefined;
     }
     this.renderDoor(this.p);
+    this.lastPainted = this.p;
     if (this.travel) this.frame = requestAnimationFrame(this.paint);
     else this.refresh();
   };
@@ -245,8 +295,9 @@ class CoverBay extends HTMLElement {
       const node = this.root.querySelector(selector)!;
       if (node.textContent !== text) node.textContent = text;
     };
-    if (!this.side) put("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? "Garage"));
-    put(".state", label[0].toUpperCase()+label.slice(1));
+    if (!this.side) put("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? kinds[this.kind].label));
+    const measured = this.kind === "shade" && known ? position(this.entity) : undefined;
+    put(".state", label[0].toUpperCase()+label.slice(1)+(measured === undefined ? "" : ` · ${Math.round(measured*100)}% open`));
     const age = state === "closed" || state === "open" ? elapsed(this.entity?.last_changed) : "";
     put(".age", age ? ` · ${age}` : "");
     const surface = this.root.querySelector("ha-card")!;
@@ -259,8 +310,7 @@ class CoverBay extends HTMLElement {
     this.button.setAttribute("aria-label", this.side ? `${caption} ${this.config?.name || `${this.side} door`}` : caption);
     put(".hint", this.error);
     if (!active) return;
-    if (this.travel && !this.frame) this.frame = requestAnimationFrame(this.paint);
-    else if (!this.travel) this.renderDoor(this.p);
+    if ((this.travel || this.p !== this.lastPainted) && !this.frame) this.frame = requestAnimationFrame(this.paint);
     const ageDelay = age ? 60000 - (Date.now()-Date.parse(this.entity!.last_changed!)) % 60000 : Infinity;
     const deadline = this.command && now < travelEnd ? travelEnd : waiting && this.target ? this.confirmBy : Infinity;
     const delay = Math.min(ageDelay, Math.max(1,deadline-now));

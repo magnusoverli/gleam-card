@@ -1,13 +1,54 @@
 # Gleam Cover
 
-**Experimental:** garage doors are the first supported cover type. Blinds,
-shades and curtains do not yet have their own visuals or controls.
+**Experimental:** choose Garage or Roller shade in the visual editor. Omit
+`cover_type` to keep the original garage illustration. Device-class suggestions
+do not override an existing choice.
 
-Choose **Gleam Cover (Experimental)** in the card picker. This version illustrates one garage
-door per `cover.*` entity. Pick a layout in the editor:
+## Roller shade · New in v0.0.8
 
-**Garage setup** keeps the layout and required door entities visible. Expand
-**Door movement** for travel times, **Card appearance** for the name, roof and
+Select **Cover type → Roller shade** and choose your shade entity. Under
+**Cover movement**, enter the time for a full open or close. Only the entity
+and cover type are needed in YAML; the other fields below illustrate optional
+customizations.
+
+```yaml
+type: custom:gleam-cover
+cover_type: shade
+entity: cover.living_room_shade
+variant: compact
+shade_opacity: 65       # Fabric only; 0–100%, default 100 (opaque)
+window_image: /local/garden.jpg   # Optional view behind the pane and shade
+window_image_zoom: 150            # 100–300%; default 100 (fill the pane)
+window_image_x: 30                # 0 = left, 100 = right; default 50
+window_image_y: 60                # 0 = top, 100 = bottom; default 50
+glazing_bar_width: 5              # 0–10; 0 hides both bars, default 3
+glazing_bar_color: "#436878"      # Default #30566a
+```
+
+Under **Card appearance → Add window photo**, choose an image from your phone
+or computer. It uploads to your Home Assistant instance; save the card to keep
+the returned image URL. Some phones also offer the camera in the image picker.
+Alternatively, under **Window view image**, enter a photo URL, or put a
+photo in your Home Assistant `www` folder (e.g. `www/garden.jpg`) and enter
+`/local/garden.jpg`. The image is center-cropped to the window without
+stretching and stays still behind the crossbars, fabric and bottom rail.
+Use **Photo framing** to zoom in and move the crop horizontally or vertically.
+Clear the image field to restore the blue sky.
+
+Roller shades support Normal and Compact. The fabric rolls up into a fixed
+headrail. A percentage appears only for a reported `current_position`; Open
+alone can mean partially open. Movement estimates never become measured
+percentages. The card offers the same supported Open/Close commands as Garage;
+there is no position-setting or tilt control. Double, roof style and lights
+are garage-specific.
+
+## Garage
+
+Choose **Gleam Cover (Experimental)** in the card picker. Each illustrated cover
+uses one `cover.*` entity.
+
+**Cover setup** keeps the type, layout and required entities visible. Expand
+**Cover movement** for travel times, **Card appearance** for the name, roof and
 bay labels, or **Garage lighting** for lamps and color temperature. Right-door
 settings appear only in Double.
 

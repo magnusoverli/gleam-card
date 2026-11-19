@@ -6,6 +6,7 @@ export interface EntityState {
 }
 
 export interface HomeAssistant {
+  fetchWithAuth?(path: string, init: RequestInit): Promise<Response>;
   states: Record<string, EntityState>;
   config?: { time_zone?: string; unit_system?: { temperature?: string } };
   locale?: { language?: string; time_zone?: string };
@@ -104,6 +105,14 @@ export interface Card<Config> extends HTMLElement {
 }
 
 export interface CoverConfig {
+  cover_type?: "garage" | "shade";
+  shade_opacity?: number;
+  window_image?: string;
+  window_image_zoom?: number;
+  window_image_x?: number;
+  window_image_y?: number;
+  glazing_bar_width?: number;
+  glazing_bar_color?: string;
   roof_type?: "pitched" | "flat";
   type?: "custom:gleam-cover";
   entity: string;
