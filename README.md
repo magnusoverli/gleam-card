@@ -8,7 +8,7 @@
 
 **Stable** · See when your home used the most energy and what electricity cost that hour. Rotate the timeline to explore, or switch to Front view to compare.
 
-<a href="https://magnusoverli.github.io/gleam-card/energy-graph/"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside the electricity price forecast and power history."></a>
+<a href="https://magnusoverli.github.io/gleam-card/energy-graph/"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside a stepped electricity price forecast."></a>
 
 [**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/energy-graph/) · [Graph settings](docs/energy-graph.md)
 
