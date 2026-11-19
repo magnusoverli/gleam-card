@@ -1,5 +1,6 @@
 export interface EntityState {
   state: string;
+  last_changed?: string;
   last_updated?: string | number;
   attributes: Record<string, unknown>;
 }
@@ -100,4 +101,14 @@ export interface ThermostatConfig {
 export interface Card<Config> extends HTMLElement {
   hass: HomeAssistant;
   setConfig(config: Config): void;
+}
+
+export interface CoverConfig {
+  type?: "custom:gleam-cover";
+  entity: string;
+  name?: string;
+  travel_seconds?: number;
+  variant?: "normal" | "compact" | "double";
+  right_entity?: string;
+  right_travel_seconds?: number;
 }

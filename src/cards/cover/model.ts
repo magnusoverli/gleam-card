@@ -1,0 +1,42 @@
+import type { CoverConfig, EntityState, HomeAssistant } from "../../types";
+
+export function settings(config: CoverConfig) {
+  if (!/^cover\.[a-z0-9_]+$/.test(config?.entity)) throw Error("Select a cover entity.");
+  const seconds = config.travel_seconds ?? 10;
+  if (!Number.isFinite(seconds) || seconds < 1 || seconds > 300) throw Error("Travel time must be 1–300 seconds.");
+  if (!["normal","compact","double"].includes(config.variant ?? "normal")) throw Error("Unknown cover variant.");
+  if (config.variant === "double") {
+    if (!/^cover\.[a-z0-9_]+$/.test(config.right_entity ?? "") || config.right_entity === config.entity)
+      throw Error("Select a different cover entity for the right door.");
+    const right = config.right_travel_seconds ?? seconds;
+    if (!Number.isFinite(right) || right < 1 || right > 300) throw Error("Right travel time must be 1–300 seconds.");
+  }
+  return { ...config, travel_seconds: seconds };
+}
+
+export function position(entity?: EntityState) {
+  const p = entity?.attributes.current_position;
+  return typeof p === "number" && Number.isFinite(p) && p >= 0 && p <= 100 ? p / 100 : undefined;
+}
+
+export function action(entity?: EntityState) {
+  const features = Number(entity?.attributes.supported_features);
+  if (entity?.state === "closed" && (features & 1)) return "open";
+  if (entity?.state === "open" && (features & 2)) return "close";
+}
+
+export function send(client: Pick<HomeAssistant, "callService">, id: string, direction: "open" | "close") {
+  return client.callService("cover", `${direction}_cover`, { entity_id: id });
+}
+
+export interface Travel { from: number; to: number; start: number; duration: number }
+export function fraction(travel: Travel, now: number) {
+  const t = Math.min(1, Math.max(0, (now - travel.start) / travel.duration));
+  return t === 1 ? travel.to : travel.from + (travel.to - travel.from) * t;
+}
+
+export function elapsed(since?: string) {
+  const m = Math.floor((Date.now() - Date.parse(since ?? "")) / 60000);
+  if (!Number.isFinite(m) || m < 0) return "";
+  return m < 1 ? "Under 1 min" : m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
+}

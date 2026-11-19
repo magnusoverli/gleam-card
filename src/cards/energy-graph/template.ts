@@ -3,27 +3,20 @@ import { foundationStyles } from "../../shared/theme";
 export const graphTemplate = `
   <style>
     ${foundationStyles}
-    :host{display:block;container-type:inline-size;color:#d8edff;font-family:var(--ha-font-family-body,Inter,system-ui,sans-serif)}
-    *{box-sizing:border-box}ha-card{display:block;overflow:hidden;border:1px solid #1d3b60;border-radius:22px;
-      background:radial-gradient(ellipse at 16% 0%,#122c60 0%,#080e24 50%,#050914 100%);
-      box-shadow:0 12px 50px #02071680;color:#d8edff}
+    :host{container-type:inline-size}
     header{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;padding:14px 22px 6px}
     .readouts,.controls{display:grid;gap:8px;max-width:100%}.controls{margin-left:auto}
     .eyebrow{font-size:10px;font-weight:700;letter-spacing:.24em;color:#67c7e3}
     h2{font-size:25px;letter-spacing:-.04em;margin:0;font-weight:600;overflow-wrap:anywhere}
-    .sub{font-size:12px;color:#8ba8c6;line-height:1.6}.kpis{display:flex;gap:24px}
-    .kpi span{display:block;font-size:10px;letter-spacing:.09em;color:#8ba8c6;text-transform:uppercase}
+    .sub{font-size:12px;color:var(--gleam-muted,#8ba8c6);line-height:1.6}.kpis{display:flex;gap:24px}
+    .kpi span{display:block;font-size:10px;letter-spacing:.09em;color:var(--gleam-muted,#8ba8c6);text-transform:uppercase}
     .kpi strong{display:block;margin-top:6px;font-size:calc(var(--value-base,23px) * var(--value-scale,1));font-weight:500;white-space:nowrap}
     .live{color:var(--gleam-energy)}.price{color:var(--gleam-price)}
     nav{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
-    button{font:inherit;cursor:pointer;border:1px solid #24405f;background:#0b1830;color:#9fb4cb;
-      padding:7px 10px;border-radius:30px;font-size:11px;display:flex;align-items:center;gap:7px;white-space:nowrap}
-    button[aria-pressed=true]{color:#f0faff;border-color:#406580;background:#102944}
-    button:focus-visible{outline:2px solid #7eeaff;outline-offset:3px}
+    button{display:flex;align-items:center;gap:7px;white-space:nowrap}
     .dot{width:7px;height:7px;border-radius:50%;background:var(--color);box-shadow:0 0 10px var(--color)}
     .stage{position:relative;width:100%;aspect-ratio:2.2;min-height:220px;max-height:650px}
     .camera-controls{gap:6px}
-    [hidden]{display:none!important}
     .camera-controls button{font-size:10px;padding:6px 9px}
     canvas{display:block;width:100%;height:100%;touch-action:none}
     .tip{position:absolute;pointer-events:none;z-index:2;display:none;white-space:pre-line;line-height:1.8;

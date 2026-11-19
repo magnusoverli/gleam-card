@@ -1,11 +1,14 @@
 import { GleamEnergyGraph } from "./cards/energy-graph/gleam-energy-graph.js";
 import { GleamEnergyGraphEditor } from "./cards/energy-graph/editor";
 import { GleamThermostat, GleamThermostatEditor } from "./cards/thermostat/gleam-thermostat.js";
-import type { Card, EnergyConfig, ThermostatConfig } from "./types";
+import { GleamCover } from "./cards/cover/cover";
+import { GleamCoverEditor } from "./cards/cover/editor";
+import type { Card, CoverConfig, EnergyConfig, ThermostatConfig } from "./types";
 
 // Check the public integration contract without adding a runtime base class.
 const Energy: new () => Card<EnergyConfig> = GleamEnergyGraph;
 const Thermostat: new () => Card<ThermostatConfig> = GleamThermostat;
+const Cover: new () => Card<CoverConfig> = GleamCover;
 
 declare global {
   interface Window {
@@ -18,6 +21,8 @@ const cards = [
     description: "Interactive energy and price timeline with power and voltage lanes." },
   { type: "gleam-thermostat", name: "Gleam Thermostat (Experimental)", element: Thermostat,
     description: "Experimental climate controls with limited real-device testing." },
+  { type: "gleam-cover", name: "Gleam Cover (Experimental)", element: Cover,
+    description: "Garage door status and controls for Home Assistant cover entities." },
 ];
 
 for (const { type, element, ...metadata } of cards) {
@@ -33,3 +38,4 @@ if (!customElements.get("gleam-thermostat-editor")) {
 if (!customElements.get("gleam-energy-graph-editor")) {
   customElements.define("gleam-energy-graph-editor", GleamEnergyGraphEditor);
 }
+if (!customElements.get("gleam-cover-editor")) customElements.define("gleam-cover-editor", GleamCoverEditor);

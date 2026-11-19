@@ -1,5 +1,9 @@
 # Project conventions
 
+- For new cards and changes to dashboard UI, follow the
+  [Gleam card design guide](docs/card-design.md). Use the Energy Graph as the
+  visual reference and `src/shared/theme.ts` for the shared frame and controls.
+
 - Use **Home Assistant Marketplace**, or **Marketplace** for short, in
   user-facing text and documentation.
 - Preserve technical filenames, API identifiers, and configuration keys when

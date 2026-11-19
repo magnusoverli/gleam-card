@@ -32,4 +32,4 @@ jobs:
           test -s gleam-card.js
           gh release create "v$version" gleam-card.js --target "$GITHUB_SHA" \
             --title "Gleam Cards $version" --generate-notes \
-            --notes "Gleam Energy Graph (stable) and Gleam Thermostat (experimental)."
+            --notes "Includes Gleam Energy Graph (Stable), Gleam Thermostat (Experimental), and Gleam Cover (Experimental). Try the garage's Normal, Compact, and Double layouts in the [interactive demo](https://magnusoverli.github.io/gleam-card/#garage-layout)."

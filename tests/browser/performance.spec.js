@@ -1,5 +1,34 @@
 import { test, expect } from "@playwright/test";
 
+test("garage retains panels and suspends long travel off-screen and on disconnect", async ({ page }, info) => {
+  await page.goto("/");
+  const card = page.locator("gleam-cover");
+  await card.scrollIntoViewIfNeeded();
+  await expect.poll(() => card.locator("gleam-cover-bay").evaluate(b => b.visible)).toBe(true);
+  const result = await page.evaluate(async () => {
+    const { cover,hass } = window.demo;
+    const bay = cover.shadowRoot.querySelector("gleam-cover-bay"), panel = bay.shadowRoot.querySelector(".panel");
+    const frame = () => new Promise(resolve => requestAnimationFrame(resolve));
+    cover.setConfig({entity:"cover.garage_door",travel_seconds:40});
+    const start = performance.now();
+    cover.hass = {...hass,states:{"cover.garage_door":{state:"opening",attributes:{supported_features:3}}}};
+    const updateCpuMs = performance.now()-start;
+    await frame();
+    return { updateCpuMs, interactionToFrameMs:performance.now()-start,
+      reused:bay.shadowRoot.querySelector(".panel")===panel, position:bay.p };
+  });
+  expect(result.reused).toBe(true);
+  expect(result.position).toBeGreaterThan(0);
+  expect(result.position).toBeLessThan(.1);
+  await page.evaluate(() => { window.demo.cover.style.marginTop="3000px"; window.scrollTo(0,0); });
+  await expect.poll(() => card.locator("gleam-cover-bay").evaluate(b => b.frame)).toBe(0);
+  await page.evaluate(() => { const c=window.demo.cover; c.remove(); document.body.append(c); });
+  await card.scrollIntoViewIfNeeded();
+  await expect(card.locator(".state")).toHaveText("Opening");
+  await expect(card.locator(".panel")).toHaveCount(6);
+  console.log(`${info.project.name} cover (SVG): ${JSON.stringify(result)}`);
+});
+
 test("cached graph ignores Recorder-only live states but updates the current-hour reading immediately", async ({ page }) => {
   await page.goto("/");
   await page.waitForFunction(() => window.demo?.energy._targets?.length > 5);

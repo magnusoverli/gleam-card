@@ -85,10 +85,9 @@ export class GleamThermostat extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         ${foundationStyles}
-        :host{display:block;min-width:0;color:#d8edff;font-family:var(--ha-font-family-body,Inter,system-ui,sans-serif)}
-        *{box-sizing:border-box}[hidden]{display:none!important}ha-card{display:block;width:100%;min-width:0;min-height:0;padding:0;margin-inline:auto;overflow:hidden;border-radius:var(--radius,22px);border:1px solid #1d3b60;
-          background:radial-gradient(ellipse at 15% 0%,#122c60,var(--background,#080e24) 55%,#050914);color:#d8edff;
-          box-shadow:0 8px 30px #02071660;--accent:#ffab70}
+        :host{min-width:0}
+        ha-card{width:100%;min-width:0;min-height:0;padding:0;margin-inline:auto;
+          --gleam-radius:var(--radius,22px);--gleam-surface:var(--background,#080e24);--accent:#ffab70}
         .viewport{position:relative;width:100%;min-width:0}
         .content{display:flow-root;width:100%;padding:var(--padding,20px);transform-origin:top left}
         ha-card.fixed .viewport{height:100%;overflow:auto;overscroll-behavior:contain}
@@ -96,19 +95,15 @@ export class GleamThermostat extends HTMLElement {
         ha-card.fixed.scale .content{position:absolute}
         header{display:flex;align-items:center;justify-content:space-between;gap:12px}
         header>*{min-width:0;overflow-wrap:anywhere}
-        .experimental{display:inline-block;margin-top:3px;padding:2px 7px;border:1px solid #796340;
-          border-radius:12px;color:#ffd598;font-size:10px}
         h2{margin:0;font-size:19px;font-weight:500}.mode{font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
         .dial{height:var(--dial-height,265px);position:relative;touch-action:none;cursor:pointer;border-radius:20px}
-        .dial:focus-visible{outline:2px solid #7eeaff}
         canvas{width:100%;height:100%;display:block}
         .reading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;
-          pointer-events:none;gap:6px}.caption{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#8ba8c6}
+          pointer-events:none;gap:6px}.caption{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gleam-muted,#8ba8c6)}
         .temperature{font-size:var(--temperature-size,58px);line-height:1.1;letter-spacing:-.06em;font-weight:400;color:var(--accent)}
-        .unit{font-size:22px;letter-spacing:0}.ambient{font-size:11px;color:#8ba8c6;text-align:center}
+        .unit{font-size:22px;letter-spacing:0}.ambient{font-size:11px;color:var(--gleam-muted,#8ba8c6);text-align:center}
         .adjust{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:-8px}
-        button,select{font:inherit;border:1px solid #24405f;background:#0b1830;color:#c3d9ed;border-radius:24px;cursor:pointer}
-        button{padding:7px 12px;font-size:11px}button:focus-visible,select:focus-visible{outline:2px solid #7eeaff;outline-offset:2px}
+        button{padding-inline:12px}
         .adjust button{font-size:24px;width:46px;height:42px;padding:0}
         .range-wrap{margin:14px 8px 12px}.range-wrap label{display:block;color:#8ba8c6;font-size:10px;margin-bottom:8px}
         input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}

@@ -8,10 +8,11 @@
 | `src/shared/theme.ts` | Shared shadow-DOM style foundation |
 | `src/cards/energy-graph/` | Energy card and pure data transforms |
 | `src/cards/thermostat/` | Thermostat and its visual editor |
+| `src/cards/cover/` | Layouts, per-door state and controls, SVG garage and visual editor |
 | `src/cards/energy-graph/recorder.ts` | Recorder requests through a narrow client interface |
 | `src/cards/thermostat/commands.ts` | Pure command validation and climate-action transport |
 | `scripts/deploy.js` | Content-hashed filesystem deployment with a stable loader |
-| `dev/preview.js` | Synthetic Home Assistant states, history, statistics and mock actions |
+| `dev/preview.js`, `dev/demo.js` | Preview entry point and shared demo with synthetic states, history, and mock actions |
 | `tests/data.test.js` | Data-contract regression tests |
 | `tests/browser/` | Built-bundle browser and interaction checks |
 | `vite.config.ts` | Single-resource library build and license distribution |
@@ -46,7 +47,8 @@ the manifest. Register the loader once; reload the dashboard after deployment.
 
 The browser tests build the distribution and load it in desktop and mobile-sized
 Chromium. Tests cover rendering, registration, series/camera interactions,
-disconnect/reconnect, explicit climate actions, editor changes, and WebGL failure.
+disconnect/reconnect, explicit climate actions, independent garage commands,
+late cover reports, editor changes, and WebGL failure.
 All service calls are mocks. No live Home Assistant or physical-device
 verification is implied by passing these tests.
 
@@ -67,6 +69,9 @@ Tests inject narrow clients instead of requiring a live Home Assistant.
   draw call. HTML feedback is immediate; graphics are frame-coalesced.
 - Both suspend hidden rendering, avoid idle loops and release GPU resources
   on disconnect.
+- Cover animates retained SVG elements only during travel. Each bay in Double
+  has its own command and confirmation state. In the demo, switch **Garage layout**
+  to **Double** to try both bays without connecting hardware.
 
 `npm run benchmark` reports warmed chart-update CPU time, draw calls, GPU resource
 counts and thermostat interaction-to-render-callback latency. JSON results are
@@ -83,6 +88,9 @@ The reference handoff mentioned external tests on another machine. Those files
 were not supplied; this repository contains its own portable regression suite.
 
 ## Adding cards
+
+Start with the [Gleam card design guide](card-design.md) for appearance,
+interaction, rendering and the checks to run before shipping.
 
 Add the card under `src/cards/<type>/`, reuse the shared style foundation, and
 register it centrally in `src/index.ts` as `gleam-<type>`. Keep data transforms

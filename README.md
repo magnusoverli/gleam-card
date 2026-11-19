@@ -2,9 +2,7 @@
 
 [![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
 
-**Your energy use and electricity prices on one timeline.** Rotate the graph to explore a day in depth, or switch to Front view to see which hours used the most energy.
-
-The Energy Graph and Thermostat are the first two cards in a planned Gleam series. The long-term goal is to cover most everyday Home Assistant dashboard needs with cards that look and feel consistent.
+**Interactive cards for your Home Assistant dashboard.** Compare energy use with electricity prices, adjust the heat pump, or see which garage door is still open. Each card has a visual editor and runs locally.
 
 [**Try the live demo ↗**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install) · [Release notes](https://github.com/magnusoverli/gleam-card/releases/latest)
 
@@ -25,6 +23,12 @@ Set a target temperature by turning the dial or using the keyboard. Fan, preset,
 
 </details>
 
+### Gleam Cover · Experimental
+
+Garage doors are the first supported cover type. See whether the garage is closed and for how long, or monitor two independent doors under one roof. [Try the three layouts](https://magnusoverli.github.io/gleam-card/#garage-layout): choose **Double**, then tap either door to reveal its own control. [Cover settings →](docs/cover.md)
+
+Gleam Cover is included from **v0.0.6** onward.
+
 ## Install
 
 [![Open Gleam Cards in your Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&repository=gleam-card&category=plugin)
@@ -40,7 +44,7 @@ type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
 ```
 
-For climate controls, choose **Gleam Thermostat (Experimental)** in the card picker or use `type: custom:gleam-thermostat` with `entity: climate.heat_pump`. Installing the package doesn’t add either card to a dashboard automatically.
+For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For a garage door, choose **Gleam Cover (Experimental)** and select a `cover.*` entity.
 
 <details>
 <summary>Manual installation</summary>
@@ -51,9 +55,9 @@ Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/
 
 ## Requirements and support
 
-The cards bundle Three.js and run locally, without a CDN or a separate backend integration. The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial.
+The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial. Cover draws its garage in SVG and does not require WebGL. No card needs a CDN or a separate backend integration.
 
-[Graph configuration and sensor requirements](docs/energy-graph.md) · [Thermostat configuration](docs/thermostat.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
+[Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md) · [Cover guide](docs/cover.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
 
 For local previews, builds, and tests, see [Development](docs/development.md). Release instructions are in [Publishing](docs/publishing.md).
 

@@ -1,7 +1,7 @@
 # Publish Gleam Cards
 
 Submit **one Dashboard package** (`plugin` in the catalog). The root `hacs.json`
-names `gleam-card.js`. The stable Energy Graph and experimental Thermostat use
+names `gleam-card.js`. The stable Energy Graph and experimental Thermostat and Cover cards use
 the same bundle and release; there is no integration manifest or hassfest job.
 
 1. **Prepare the candidate.** Set the package and lockfile version together with
@@ -21,7 +21,7 @@ the same bundle and release; there is no integration manifest or hassfest job.
    on `main`. It checks the package version against the lockfile, requires a passing
    Marketplace validation for the same commit, then creates a regular `vX.Y.Z`
    release with the exact committed `gleam-card.js` attached. Test the README installation link on a clean dashboard and
-   verify that both picker entries appear after a reload.
+    verify that all three picker entries appear after a reload.
 5. **Request catalog inclusion.** As owner or major contributor, fork
    [`hacs/default`](https://github.com/hacs/default) under your personal account.
    Branch from `master`, insert `magnusoverli/gleam-card` alphabetically in the
