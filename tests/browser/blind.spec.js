@@ -9,14 +9,14 @@ test("request a partial lift once; bottom slats ride the rail while top slats st
   await expect(slats.nth(1)).toHaveAttribute("y","31");
   await lift.fill("50");
   await page.clock.fastForward(5200);
-  await expect(card.locator(".state")).toHaveText("Open · 50% open");
+  await expect(card.locator(".lift-value")).toHaveText("50%");
   expect(await page.evaluate(()=>window.demo.calls)).toEqual([{domain:"cover",service:"set_cover_position",data:{entity_id:"cover.demo_blind",position:50}}]);
   await expect(slats.nth(1)).toHaveAttribute("y","31");
   const y=i=>slats.nth(i).getAttribute("y").then(Number);
   expect(await y(13)-await y(12)).toBe(1);
   await lift.press("Home");
   await page.clock.fastForward(5200);
-  await expect(card.locator(".state")).toHaveText("Closed · 0% open");
+  await expect(card.locator(".lift-value")).toHaveText("0%");
   expect(await y(13)-await y(12)).toBe(9);
 });
 
@@ -39,7 +39,7 @@ test("blind tilt changes slats without moving the lift; commands respect each ca
   await page.goto("/cover/");
   await page.getByLabel("Example").selectOption("cover.demo_blind");
   const card=page.locator("#cover"), slat=card.locator(".slats rect").first(), rail=card.locator(".shade-rail");
-  await expect(card.locator(".state")).toHaveText("Closed · 0% open");
+  await expect(card.locator(".lift-value")).toHaveText("0%");
   await expect(rail).toHaveAttribute("transform","translate(0 0)");
   const initialHeight=await slat.getAttribute("height"), initialRail=await rail.getAttribute("transform");
   await card.getByRole("slider",{name:/Slat tilt/}).press("End");

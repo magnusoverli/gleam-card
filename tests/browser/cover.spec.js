@@ -1,5 +1,20 @@
 import { test, expect } from "@playwright/test";
 
+test("partial lift offers both supported directions without needing SET_POSITION", async ({page}) => {
+  const card=page.locator("#cover"), open=card.getByRole("button",{name:"Open",exact:true}), close=card.getByRole("button",{name:"Close",exact:true});
+  await page.evaluate(()=>window.reportDoor("open",{current_position:45,supported_features:1}));
+  await expect(open).toBeVisible();
+  await expect(close).toBeHidden();
+  await page.evaluate(()=>window.reportDoor("open",{current_position:45,supported_features:3}));
+  await expect(close).toBeVisible();
+  await expect(card.getByRole("slider")).toBeHidden();
+  await open.click();
+  expect(await page.evaluate(()=>window.demo.calls)).toEqual([["cover","open_cover",{entity_id:"cover.garage_door"}]]);
+  await expect(card.locator(".action")).toHaveText("Opening…");
+  await expect(card.locator(".action")).toBeDisabled();
+  await expect(card.locator(".extra-open")).toBeHidden();
+});
+
 test.beforeEach(async ({ page }) => {
   await page.goto("/dev/fixture.html");
   await page.locator("gleam-cover").scrollIntoViewIfNeeded();

@@ -41,6 +41,7 @@ export class GleamCoverEditor extends HTMLElement {
         <small>Time to animate a new reported slat angle. Default 1 second; 0 is immediate.</small></label></div></details>
       <details><summary>Card appearance<small>Display name<span data-garage>, roof style and door labels</span></small></summary><div class="fields">
       <label>Display name<input id="name" placeholder="Entity name"></label>
+      <label data-window>Window aspect ratio<select id="window-ratio"><option value="landscape">Landscape (default)</option><option value="portrait">Portrait</option><option value="square">Square</option></select></label>
       <fieldset data-window><legend>Glazing bars</legend><div class="fields">
         <label>Width · <span id="bar-reading"></span><input id="bar-width" type="range" min="0" max="10" step="1"></label>
         <label>Bar color<input id="bar-color" type="color"></label></div></fieldset>
@@ -97,6 +98,9 @@ export class GleamCoverEditor extends HTMLElement {
       if (this.kind === "blind" && this.input("tilt-seconds").valueAsNumber !== 1) config.tilt_seconds = this.input("tilt-seconds").valueAsNumber;
       else delete config.tilt_seconds;
       const opacity = this.input("shade-opacity").valueAsNumber;
+      const ratio = this.root.querySelector<HTMLSelectElement>("#window-ratio")!.value;
+      if (isWindowCover(this.kind) && (ratio === "square" || ratio === "portrait")) config.window_aspect_ratio = ratio;
+      else delete config.window_aspect_ratio;
       if (this.kind === "shade" && opacity !== 100) config.shade_opacity = opacity; else delete config.shade_opacity;
       const width = this.input("bar-width").valueAsNumber, color = this.input("bar-color").value;
       if (isWindowCover(this.kind) && width !== 3) config.glazing_bar_width = width; else delete config.glazing_bar_width;
@@ -226,6 +230,7 @@ export class GleamCoverEditor extends HTMLElement {
     this.input("tilt-seconds").value = String(config.tilt_seconds ?? 1);
     this.input("shade-opacity").value = String(config.shade_opacity ?? 100);
     this.input("window-image").value = config.window_image ?? "";
+    this.root.querySelector<HTMLSelectElement>("#window-ratio")!.value = config.window_aspect_ratio ?? "landscape";
     this.input("bar-width").value = String(config.glazing_bar_width ?? 3);
     this.input("bar-color").value = config.glazing_bar_color ?? "#30566a";
     this.showBarWidth();

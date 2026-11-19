@@ -5,6 +5,7 @@ const state = (value, attributes = {}) => ({
   state: String(value), attributes, last_updated: new Date(now).toISOString(),
 });
 const states = {
+  "cover.demo_shutter": state("open",{device_class:"shutter",friendly_name:"Patio shutter",supported_features:7,current_position:35}),
   "cover.demo_blind": state("closed",{device_class:"blind",friendly_name:"Studio blinds",supported_features:7|128,current_position:0,current_tilt_position:50}),
   "cover.demo_shade": state("open",{device_class:"shade",friendly_name:"Living room shade",supported_features:7,current_position:40}),
   "cover.state_only_shade": state("closed",{device_class:"shade",friendly_name:"Office shade",supported_features:3}),
@@ -72,7 +73,7 @@ const hass = {
       const opening = end>start;
       const report = value => {
         const attrs = {...states[id].attributes};
-        if (id === "cover.demo_shade" || id === "cover.demo_blind") {
+        if (id === "cover.demo_shade" || id === "cover.demo_blind" || id === "cover.demo_shutter") {
           if (value === "closed" || value === "open") attrs.current_position = end;
           else delete attrs.current_position;
         }
@@ -114,15 +115,15 @@ layouts.id = "garage-layout";
 layouts.innerHTML = `<span>Garage layout</span> <select><option>Normal</option><option>Compact</option><option>Double</option></select>`;
 const examples = document.createElement("label");
 examples.id = "cover-example";
-examples.innerHTML = `Example <select><option value="">Garage</option><option value="cover.demo_blind">Slatted blind · lift and tilt</option><option value="cover.demo_shade">Roller shade · measured position</option><option value="cover.state_only_shade">Roller shade · state only</option><option value="cover.offline_shade">Roller shade · unavailable</option></select>`;
+examples.innerHTML = `Example <select><option value="">Garage</option><option value="cover.demo_shutter">Roller shutter</option><option value="cover.demo_blind">Slatted blind · lift and tilt</option><option value="cover.demo_shade">Roller shade · measured position</option><option value="cover.state_only_shade">Roller shade · state only</option><option value="cover.offline_shade">Roller shade · unavailable</option></select>`;
 const applyCoverLayout = () => {
   const id = examples.querySelector("select").value, select = layouts.querySelector("select");
-  const blind = id === "cover.demo_blind";
-  layouts.querySelector("span").textContent = blind ? "Blind layout" : id ? "Shade layout" : "Garage layout";
+  const kind = id ? states[id].attributes.device_class : "garage";
+  layouts.querySelector("span").textContent = `${kind[0].toUpperCase()+kind.slice(1)} layout`;
   select.options[2].hidden = select.options[2].disabled = !!id;
   if (id && select.value === "Double") select.value = "Normal";
   const variant = select.value.toLowerCase();
-  cover.setConfig(id ? {entity:id,cover_type:blind?"blind":"shade",variant} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
+  cover.setConfig(id ? {entity:id,cover_type:kind,variant} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
   cover.style.gridColumn = `span ${cover.getGridOptions().columns}`;
 };
 layouts.onchange = applyCoverLayout;

@@ -64,6 +64,11 @@ Tests inject narrow clients instead of requiring a live Home Assistant.
 ## Rendering
 
 Cover illustrations are listed in `src/cards/cover/kinds.ts`. Each definition
+sets a `sceneFamily` for styling and editor fields, and a separate `motionPolicy`
+for handling sparse position feedback. `window-scene.ts` owns the shared frame,
+geometry, photo layer and aspect sizing; each renderer owns its moving covering.
+Validate window settings in common and type-only settings in the type definition.
+Each definition also
 declares its label, device class, layouts, optional config validator, SVG
 markup and retained rendering function. Supply only normalized visual openness
 to that function. Reported state/position, commands, timeouts, visibility and

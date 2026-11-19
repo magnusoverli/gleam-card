@@ -24,11 +24,13 @@
 
 **Experimental** · See which garage door is still open, raise a roller shade over a photo of your own view, or tilt the slats of a lowered blind.
 
-**New in v0.0.9:** Slatted blind animates lift and tilt independently. All three cover types offer a lift-position slider when the device supports it.
+**New in v0.0.10:** Roller shutter draws rigid slats retracting into a housing above the window. Shades, blinds and shutters can now match a portrait, square or landscape window. All four cover types offer a lift-position slider when the device supports it.
 
-| Slatted blind | Roller shade | Garage door |
-| --- | --- | --- |
-| <img src="docs/images/cover-blind.png" width="300" alt="Lowered studio blind showing separate lift and slat tilt controls."> | <img src="docs/images/cover-shade-normal.png" width="300" alt="Living room roller shade at 40% open."> | <img src="docs/images/cover.png" width="300" alt="Garage with the left door closed and the right door open."> |
+| Roller shutter | Slatted blind |
+| --- | --- |
+| <img src="docs/images/cover-shutter.png" width="360" alt="Partially open patio roller shutter with lift controls."> | <img src="docs/images/cover-blind.png" width="360" alt="Lowered studio blind showing separate lift and slat tilt controls."> |
+| **Roller shade** | **Garage door** |
+| <img src="docs/images/cover-shade-normal.png" width="360" alt="Living room roller shade at 40% open."> | <img src="docs/images/cover.png" width="360" alt="Garage with the left door closed and the right door open."> |
 
 [**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings](docs/cover.md)
 

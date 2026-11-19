@@ -1,8 +1,8 @@
-import { windowScene } from "./shade";
+import { windowScene, windowLeft, windowTop, windowWidth, windowTravel } from "./window-scene";
 
-const count = 14, pitch = 126 / count;
+const count = 14, pitch = windowTravel / count;
 export const blind = () => windowScene(`<g class="slats">${Array.from({length:count},(_,i)=>
-  `<rect x="62" y="${22+i*pitch}" width="196" height="${pitch}" rx="1" fill="url(#fabric)" stroke="#687f80" stroke-width=".5"/>`
+  `<rect x="${windowLeft}" y="${windowTop+i*pitch}" width="${windowWidth}" height="${pitch}" rx="1" fill="url(#fabric)" stroke="#687f80" stroke-width=".5"/>`
 ).join("")}</g>`);
 
 export function renderBlind(background: SVGSVGElement) {
@@ -13,15 +13,15 @@ export function renderBlind(background: SVGSVGElement) {
     if (lift === lastLift && tilt === lastTilt) return;
     // On its ladder the slat hangs at a fixed height. Once the rising bottom
     // rail reaches it, it rides the stack (one unit of thickness per slat).
-    const bottom = 126 - lift*(126-count);
+    const bottom = windowTravel - lift*(windowTravel-count);
     const level = (i:number) => Math.min(i*pitch,bottom-(count-i));
     const projected = 1 + (pitch-1)*Math.cos(tilt*Math.PI/2);
     slats.forEach((slat,i) => {
       const y = level(i);
-      if (lift !== lastLift) slat.setAttribute("y",String(22+y));
+      if (lift !== lastLift) slat.setAttribute("y",String(windowTop+y));
       slat.setAttribute("height",String(Math.min(projected,level(i+1)-y)));
     });
-    if (lift !== lastLift) rail.setAttribute("transform",`translate(0 ${bottom-126})`);
+    if (lift !== lastLift) rail.setAttribute("transform",`translate(0 ${bottom-windowTravel})`);
     lastLift=lift; lastTilt=tilt;
   };
 }

@@ -25,10 +25,13 @@ export function sendPosition(client: Pick<HomeAssistant,"callService">, entity_i
   return client.callService("cover","set_cover_position",{entity_id,position:percent});
 }
 
-export function action(entity?: EntityState) {
+export type Direction = "open" | "close";
+export function available(entity: EntityState | undefined, direction: Direction) {
+  if (!entity || (entity.state !== "open" && entity.state !== "closed")) return false;
   const features = Number(entity?.attributes.supported_features);
-  if (entity?.state === "closed" && (features & 1)) return "open";
-  if (entity?.state === "open" && (features & 2)) return "close";
+  const p = position(entity);
+  if (direction === "open") return !!(features & 1) && (p === undefined ? entity.state === "closed" : p < 1);
+  return !!(features & 2) && (p === undefined ? entity.state === "open" : p > 0);
 }
 
 export function send(client: Pick<HomeAssistant, "callService">, id: string, direction: "open" | "close") {

@@ -1,15 +1,40 @@
 # Gleam Cover
 
-**Experimental:** choose Garage, Roller shade or Slatted blind in the visual editor. Omit
+**Experimental:** choose Garage, Roller shade, Slatted blind or Roller shutter in the visual editor. Omit
 `cover_type` to keep the original garage illustration. Device-class suggestions
 do not override an existing choice.
 
 ## Lift position · New in v0.0.9
 
+For a roller shade, slatted blind or roller shutter, **Card appearance → Window
+aspect ratio** changes the illustrated window (not the dashboard tile). Choose
+`portrait`, `square`, or the original `landscape` default. Photos fill the pane
+without stretching; zoom and position still control the crop.
+
 All cover types show a **Lift position** slider when the entity supports
 `SET_POSITION`. Release the slider to request 0–100% open. The target is
 separate from the reported position. Each Double garage bay checks its own
 capabilities. On blinds, this slider moves the rail; **Slat tilt** changes angle.
+
+When a stationary cover reports a position between 0% and 100%, **Open**
+and **Close** are both available if the device supports both actions. This also
+works on covers that report position but cannot set an exact target.
+
+## Roller shutter · New in v0.0.10
+
+Choose **Cover setup → Cover type → Roller shutter** to show interlocking slats
+moving as a single opaque curtain along fixed guides. Raising the shutter rolls
+the slats into a housing above the window. Use Normal or Compact layout, set
+the full travel time, and optionally add a window photo and glazing bars.
+Unlike Slatted blind, this illustration has no tilt controls.
+
+```yaml
+type: custom:gleam-cover
+cover_type: shutter
+entity: cover.patio_shutter
+variant: compact
+travel_seconds: 18
+```
 
 ## Slatted blind · New in v0.0.9
 
@@ -48,6 +73,7 @@ cover_type: shade
 entity: cover.living_room_shade
 variant: compact
 shade_opacity: 65       # Fabric only; 0–100%, default 100 (opaque)
+window_aspect_ratio: portrait
 window_image: /local/garden.jpg   # Optional view behind the pane and shade
 window_image_zoom: 150            # 100–300%; default 100 (fill the pane)
 window_image_x: 30                # 0 = left, 100 = right; default 50

@@ -1,5 +1,26 @@
 import { test, expect } from "@playwright/test";
 
+test("window cover footer mutations during position reports",async({page})=>{
+  await page.goto("/cover/");
+  await page.getByLabel("Example").selectOption("cover.demo_shade");
+  const metrics=await page.evaluate(()=>{
+    const {cover,hass}=window.demo,id="cover.demo_shade",bay=cover.shadowRoot.querySelector("gleam-cover-bay");
+    const observer=new MutationObserver(()=>{});
+    observer.observe(bay.shadowRoot.querySelector(".detail"),{attributes:true,childList:true,subtree:true});
+    const report=p=>{cover.hass={...hass,states:{[id]:{...hass.states[id],attributes:{...hass.states[id].attributes,current_position:p}}}};};
+    const start=performance.now();
+    for(let i=1;i<=50;i++)report(i);
+    const changed=observer.takeRecords().length;
+    for(let i=0;i<50;i++)report(50);
+    const unchanged=observer.takeRecords().length;
+    observer.disconnect();
+    return {changed,unchanged,cpuMs:performance.now()-start};
+  });
+  console.log("window footer:",metrics);
+  expect(metrics.changed).toBeGreaterThan(0);
+  expect(metrics.unchanged).toBe(0);
+});
+
 test("blind batches lift and tilt on retained slats and goes idle", async ({page})=>{
   await page.goto("/cover/");
   await page.getByLabel("Example").selectOption("cover.demo_blind");

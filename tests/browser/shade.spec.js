@@ -1,5 +1,32 @@
 import {test,expect} from "@playwright/test";
 
+test("aspect presets resize all window panes and keep the moving rail aligned with the photo",async({page})=>{
+  await page.goto("/cover/");
+  const example=page.getByLabel("Example"), card=page.locator("#cover");
+  for(const [id,kind] of [["cover.demo_shade","shade"],["cover.demo_blind","blind"],["cover.demo_shutter","shutter"]]){
+    await example.selectOption(id);
+    const photo=card.locator("foreignObject"), rail=card.locator(".shade-rail");
+    const handle=await rail.elementHandle();
+    for(const [ratio,expected] of [["portrait",2/3],["square",1],["landscape",194/125]]){
+      await card.evaluate((el,[entity,cover_type,window_aspect_ratio])=>el.setConfig({entity,cover_type,window_aspect_ratio,glazing_bar_width:7}),[id,kind,ratio]);
+      const p=await photo.boundingBox(), r=await rail.boundingBox();
+      expect(p.width/p.height).toBeCloseTo(expected,2);
+      expect(r.width/p.width).toBeCloseTo(198/194,2);
+      expect(Math.abs(r.x+r.width/2-p.x-p.width/2)).toBeLessThan(1);
+      const bars=card.locator(".glazing-bars");
+      const span=await bars.evaluate(el=>el.getBBox().width*el.getScreenCTM().a);
+      expect(span).toBeCloseTo(p.width,1);
+      const [vertical,horizontal]=await bars.evaluate(el=>{
+        const m=el.getScreenCTM(), stroke=parseFloat(getComputedStyle(el).strokeWidth);
+        return [stroke*m.a,stroke*m.d];
+      });
+      expect(vertical).toBeCloseTo(horizontal,3);
+      expect(vertical).toBeCloseTo(7*p.height/125,2);
+    }
+    expect(await handle.evaluate(el=>el.isConnected)).toBe(true);
+  }
+});
+
 test("window pixels remain stable at the end of opening with a photo", async ({page}) => {
   await page.goto("/cover/");
   await page.getByLabel("Example").selectOption("cover.state_only_shade");
@@ -158,7 +185,7 @@ test("fabric opacity changes independently of the rail and measured position", a
     await slider.press(key);
     await expect(card.locator(".shade-cloth")).toHaveCSS("opacity",opacity);
     await expect(card.locator(".shade-rail")).toHaveCSS("opacity","1");
-    await expect(card.locator(".state")).toHaveText("Open · 40% open");
+    await expect(card.locator(".lift-value")).toHaveText("40%");
   }
 });
 
@@ -194,7 +221,8 @@ test("roller shade distinguishes measured, state-only and unavailable feedback",
   await page.goto("/cover/");
   const demo = page.getByLabel("Example"), card = page.locator("#cover");
   await demo.selectOption("cover.demo_shade");
-  await expect(card.locator(".state")).toHaveText("Open · 40% open");
+  await expect(card.locator(".state")).toHaveText("Open");
+  await expect(card.locator(".lift-value")).toHaveText("40%");
   await expect(card.locator(".shade-cloth")).toHaveAttribute("transform",/scale\(1 0\.6\)/);
   await expect(card.locator(".door-skin")).toHaveCount(0);
   await page.getByLabel("Shade layout").selectOption({label:"Compact"});

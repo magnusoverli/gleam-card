@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## [0.0.10](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.10) · 2026-11-19
+
+### 🪟 Gleam Cover: introducing Roller shutter
+
+- **Rigid shutter slats.** Choose Roller shutter in Normal or Compact layout. The slats travel together into a fixed housing above the window.
+- **Match your window.** Choose Portrait, Square or Landscape for shades, blinds and shutters. The photo crops without stretching, and glazing bars keep their configured thickness. Landscape remains the default.
+- **Open or close from halfway.** A stationary cover with a reported partial position offers both directions when supported. Buttons have fixed sizes for Normal and Compact layouts.
+- **A clearer readout.** Window illustrations are larger, and covers with a lift slider show the percentage beside the slider instead of repeating it in the status line.
+- **Fewer redundant updates.** Window renderers share their frame geometry, and unchanged position reports no longer rewrite the footer.
+
+[Try the roller shutter](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings and YAML](https://github.com/magnusoverli/gleam-card/blob/v0.0.10/docs/cover.md)
+
 ## [0.0.9](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.9) · 2026-11-19
 
 ### 🪟 Gleam Cover: introducing Slatted blind
