@@ -1,24 +1,23 @@
 # Gleam Cards
 
-[![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
+Interactive cards for Home Assistant. Install one bundle, then use each card’s visual editor to make it fit your dashboard.
 
-**Interactive cards for your Home Assistant dashboard.** Compare energy use with electricity prices, adjust the heat pump, or see which garage door is still open. Each card has a visual editor and runs locally.
+[**Try the live demo →**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install)
 
-[**Try the live demo ↗**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install) · [Release notes](https://github.com/magnusoverli/gleam-card/releases/latest)
+## Explore the cards
+
+| Card & guide | At a glance | Live demo |
+| --- | --- | --- |
+| **[Energy Graph](docs/energy-graph.md)**<br>Stable | Compare hourly energy use with electricity prices on a 3D timeline. | [Try Gleam Energy Graph](https://magnusoverli.github.io/gleam-card/#energy-graph) |
+| **[Thermostat](docs/thermostat.md)**<br>Experimental | Turn the dial to set the temperature. Controls adapt to your climate device. | [Try Gleam Thermostat](https://magnusoverli.github.io/gleam-card/#thermostat) |
+| **[Cover](docs/cover.md)**<br>Experimental | See which garage door is open and for how long. Control one door or two. | [Try Gleam Cover](https://magnusoverli.github.io/gleam-card/#garage-layout) |
+
+<details>
+<summary>See the energy graph</summary>
 
 ![Gleam Energy Graph showing hourly consumption bars beside a stepped price forecast and power history](docs/images/energy-graph.png)
 
-### Energy Graph · Stable
-
-Start with a single cumulative meter. Add price, power, or voltage when you’re ready; if your price sensor publishes tomorrow’s rates, the graph shows those too.
-
-[**Try Gleam Energy Graph**](https://magnusoverli.github.io/gleam-card/#energy-graph) · [Configure the graph →](docs/energy-graph.md)
-
-### Thermostat · Experimental
-
-Set a target temperature by turning the dial or using the keyboard. Fan, preset, and swing controls follow the capabilities of your climate entity. Real-device testing is limited.
-
-[**Try Gleam Thermostat**](https://magnusoverli.github.io/gleam-card/#thermostat) · [Thermostat settings →](docs/thermostat.md)
+</details>
 
 <details>
 <summary>See the thermostat</summary>
@@ -26,14 +25,6 @@ Set a target temperature by turning the dial or using the keyboard. Fan, preset,
 ![Gleam Thermostat showing the temperature dial, heating mode and experimental badge](docs/images/thermostat.png)
 
 </details>
-
-### Gleam Cover · Experimental
-
-Garage doors are the first supported cover type. See whether the garage is closed and for how long, or monitor two independent doors under one roof. In the demo, choose **Double**, then tap either door to reveal its own control.
-
-[**Try Gleam Cover**](https://magnusoverli.github.io/gleam-card/#garage-layout) · [Cover settings →](docs/cover.md)
-
-Gleam Cover is included from **v0.0.6** onward.
 
 <details>
 <summary>See the cover</summary>
@@ -67,6 +58,8 @@ Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/
 </details>
 
 ## Requirements and support
+
+[Release notes](https://github.com/magnusoverli/gleam-card/releases/latest) · [![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
 
 The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial. Cover draws its garage in SVG and does not require WebGL. No card needs a CDN or a separate backend integration.
 
