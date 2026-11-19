@@ -22,7 +22,7 @@
 
 ## Gleam Cover
 
-**Experimental** · Which garage door is still open? See its state and how long it’s been that way. Tap either door in the Double layout to reveal its own control.
+**Experimental** · Which garage door is still open? See its state and how long it’s been that way. In Double layout, each door has its own control.
 
 <a href="https://magnusoverli.github.io/gleam-card/cover/"><img src="docs/images/cover.png" width="480" alt="Double garage with the left door closed and the right door open, casting warm light onto the driveway."></a>
 
@@ -53,6 +53,8 @@ Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/
 </details>
 
 ## Requirements and support
+
+[Changelog, including unreleased changes](CHANGELOG.md)
 
 [Release notes](https://github.com/magnusoverli/gleam-card/releases/latest) · [![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
 

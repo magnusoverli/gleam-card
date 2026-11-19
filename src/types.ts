@@ -104,6 +104,7 @@ export interface Card<Config> extends HTMLElement {
 }
 
 export interface CoverConfig {
+  roof_type?: "pitched" | "flat";
   type?: "custom:gleam-cover";
   entity: string;
   name?: string;
@@ -111,4 +112,10 @@ export interface CoverConfig {
   variant?: "normal" | "compact" | "double";
   right_entity?: string;
   right_travel_seconds?: number;
+  light_entity?: string;
+  light_temperature_kelvin?: number;
+  right_light_entity?: string;
+  right_light_temperature_kelvin?: number;
+  left_label?: string;
+  right_label?: string;
 }

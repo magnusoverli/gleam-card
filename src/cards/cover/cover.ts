@@ -1,7 +1,7 @@
 import { foundationStyles } from "../../shared/theme";
 import type { CoverConfig, EntityState, HomeAssistant } from "../../types";
 import { action, elapsed, fraction, position, send, settings, type Travel } from "./model";
-import { garage, renderer, type Side } from "./garage";
+import { garage, labelCenter, renderer, type Side } from "./garage";
 
 const template = (side?: Side) => `<style>${foundationStyles}
 :host{container-type:inline-size;min-width:0}ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
@@ -12,7 +12,7 @@ svg{display:block;width:100%;height:clamp(100px,40cqi,180px)}
 .state{font-size:16px;color:#86ecf2}.age,.hint{color:var(--gleam-muted,#8ba8c6);font-size:12px}
 ha-card[data-state=open] .state{color:#ffc27c}
 ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air){visibility:hidden}
-.action:disabled{cursor:default}.hint{margin:0;min-height:1.4em}
+.action:disabled{cursor:default}.hint{margin:0}.hint:empty{display:none}
 @container(min-width:590px){ha-card{grid-template-columns:1.15fr 1fr;column-gap:20px}.scene{grid-column:1;grid-row:1/3}header{align-self:end}.detail{align-self:start}}
 :host([compact]) ha-card{display:block;padding:8px}.row{flex-wrap:wrap}
 :host([compact]) svg{height:clamp(64px,44cqi,104px)}
@@ -22,7 +22,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 :host([bay]) ha-card,:host([bay]) svg{overflow:visible}
 :host([bay]) svg{width:100%;height:auto;pointer-events:none}
 :host([bay]) .detail,:host([bay]) h2{padding-inline:6px}
-</style><ha-card><header><h2></h2>${side ? "" : '<span class="experimental">Experimental</span>'}</header><button class="scene" aria-label="${side ? `${side} door controls` : 'Garage controls'}" aria-expanded="false" aria-controls="action">${garage(side)}</button>
+</style><ha-card>${side ? "" : '<span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header>'}<div class="scene">${garage(side)}</div>
 <div class="detail"><div class="row"><div><strong class="state" role="status"></strong><span class="age"></span></div>
 <button id="action" class="action" hidden></button></div><p class="hint"></p></div></ha-card>`;
 
@@ -44,11 +44,23 @@ export class GleamCover extends HTMLElement {
       this.variant = variant;
       if (variant === "double") {
         this.root.innerHTML = `<style>${foundationStyles}:host{min-width:0}ha-card{padding:12px}
-          h2{font-size:18px;margin:0 0 8px;overflow-wrap:anywhere}.bays{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:560px;margin-inline:auto}</style>
-          <ha-card><header><h2></h2><span class="experimental">Experimental</span></header><div class="bays"></div></ha-card>`;
+          h2{font-size:18px;margin:0 0 8px;overflow-wrap:anywhere}.bays{position:relative;container-type:inline-size;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:560px;margin-inline:auto}
+          .labels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));position:absolute;inset-inline:0;top:1cqi;transform:translateY(-100%);z-index:1;pointer-events:none}
+          .labels.flat{top:5cqi}
+          .labels h3{position:relative;transform:translateX(-50%);width:62%;text-align:center;font-size:14px;line-height:1.15;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+          </style>
+          <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`;
         this.bays = [new CoverBay("left"), new CoverBay("right")];
         this.bays.forEach(b => b.toggleAttribute("bay",true));
-        this.root.querySelector(".bays")!.append(...this.bays);
+        const labels = document.createElement("div");
+        labels.className = "labels";
+        for (const side of ["left","right"] as const) {
+          const heading = document.createElement("h3");
+          heading.style.left = labelCenter(side);
+          heading.style.gridColumn = side === "left" ? "1" : "2";
+          labels.append(heading);
+        }
+        this.root.querySelector(".bays")!.append(labels,...this.bays);
       } else {
         const bay = new CoverBay();
         bay.toggleAttribute("compact",variant === "compact");
@@ -59,9 +71,20 @@ export class GleamCover extends HTMLElement {
     }
     if (variant === "double") {
       this.root.querySelector("h2")!.textContent = config.name ?? "Garage";
-      this.bays[0].setConfig({entity:config.entity,name:"Left door",travel_seconds:config.travel_seconds});
-      this.bays[1].setConfig({entity:config.right_entity!,name:"Right door",travel_seconds:config.right_travel_seconds ?? config.travel_seconds});
+      const labels = this.root.querySelector<HTMLElement>(".labels")!;
+      const names = [config.left_label?.trim(),config.right_label?.trim()];
+      labels.hidden = !names.some(Boolean);
+      labels.classList.toggle("flat",config.roof_type === "flat");
+      labels.querySelectorAll("h3").forEach((heading,i) => {
+        heading.textContent = names[i] ?? "";
+        heading.hidden = !names[i];
+      });
+      this.bays[0].setConfig({entity:config.entity,name:config.left_label?.trim(),travel_seconds:config.travel_seconds,
+        light_entity:config.light_entity,light_temperature_kelvin:config.light_temperature_kelvin});
+      this.bays[1].setConfig({entity:config.right_entity!,name:config.right_label?.trim(),travel_seconds:config.right_travel_seconds ?? config.travel_seconds,
+        light_entity:config.right_light_entity,light_temperature_kelvin:config.right_light_temperature_kelvin});
     } else this.bays[0].setConfig(config);
+    for (const bay of this.bays) bay.toggleAttribute("flat-roof", config.roof_type === "flat");
     if (this.client) this.hass = this.client;
   }
   set hass(value: HomeAssistant) { this.client = value; this.bays.forEach(b => b.hass = value); }
@@ -73,7 +96,6 @@ class CoverBay extends HTMLElement {
   private client?: HomeAssistant;
   private entity?: EntityState;
   private renderDoor: (p:number) => void;
-  private scene: HTMLButtonElement;
   private button: HTMLButtonElement;
   private observer?: IntersectionObserver;
   private visible = false;
@@ -88,17 +110,14 @@ class CoverBay extends HTMLElement {
   private acknowledged = false;
   private reportedState?: string;
   private reportedPosition?: number;
-  private revealed = false;
   private error = "";
   private generation = 0;
 
   constructor(private side?: Side) {
     super();
     this.root.innerHTML = template(side);
-    this.scene = this.root.querySelector(".scene")!;
     this.button = this.root.querySelector(".action")!;
     this.renderDoor = renderer(this.root.querySelector("svg")!);
-    this.scene.onclick = () => { this.revealed = !this.revealed; this.refresh(); };
     this.button.onclick = () => void this.act();
   }
   connectedCallback() {
@@ -116,11 +135,21 @@ class CoverBay extends HTMLElement {
     cancelAnimationFrame(this.frame); clearTimeout(this.timer); this.frame = this.timer = 0;
     this.generation++; this.travel = undefined; this.target = undefined; this.confirmed = false;
     this.command = false;
-    this.revealed = false; this.error = "";
+    this.error = "";
   }
   setConfig(value: CoverConfig) {
     const config = settings(value);
     if (config.entity !== this.config?.entity) { this.reset(); this.entity = undefined; }
+    if (config.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
+      const k = config.light_temperature_kelvin;
+      this.toggleAttribute("tinted", k !== undefined);
+      if (k === undefined) this.style.removeProperty("--lamp-color");
+      else {
+        // Warm amber through neutral white to cool daylight.
+        const t = (k - 2000) / 4500;
+        this.style.setProperty("--lamp-color",`rgb(${Math.round(255-35*t)} ${Math.round(168+68*t)} ${Math.round(86+169*t)})`);
+      }
+    }
     this.config = config; this.sync(true);
   }
   set hass(value: HomeAssistant) { this.client = value; this.sync(false); }
@@ -134,6 +163,8 @@ class CoverBay extends HTMLElement {
   }
   private sync(force: boolean) {
     if (!this.config || !this.isConnected) return;
+    const id = this.config.light_entity, lamp = id ? this.client?.states[id] : undefined;
+    this.toggleAttribute("lamp-off", !!id && lamp?.state !== "on");
     const next = this.client?.states[this.config.entity], prev = this.entity;
     const state = next?.state, pos = position(next);
     if (!force && next === prev && state === this.reportedState && pos === this.reportedPosition) return;
@@ -162,7 +193,7 @@ class CoverBay extends HTMLElement {
   }
   private async act() {
     const direction = action(this.entity);
-    if (!this.client || !this.config || !direction || this.target || !this.revealed) return;
+    if (!this.client || !this.config || !direction || this.target) return;
     const seq = ++this.generation;
     this.begin(direction === "open" ? "open" : "closed");
     this.command = true;
@@ -198,11 +229,11 @@ class CoverBay extends HTMLElement {
     if (this.command) this.confirmed = state === this.target;
     if (!this.travel && this.confirmed && (!this.command || now >= travelEnd)) {
       this.command = false;
-      this.target = undefined; this.confirmed = false; this.revealed = false;
+      this.target = undefined; this.confirmed = false;
     }
     const waiting = this.target && (this.command ? now >= travelEnd : !this.travel && (state === "open" || state === "closed"));
     if (waiting && performance.now() >= this.confirmBy) {
-      this.command = false; this.target = undefined; this.travel = undefined; this.revealed = false;
+      this.command = false; this.target = undefined; this.travel = undefined;
       this.p = position(this.entity) ?? (state === "open" ? 1 : state === "closed" ? 0 : this.p);
       this.error = `Movement not confirmed. Home Assistant still reports ${state}.`;
     }
@@ -214,18 +245,19 @@ class CoverBay extends HTMLElement {
       const node = this.root.querySelector(selector)!;
       if (node.textContent !== text) node.textContent = text;
     };
-    put("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? "Garage"));
+    if (!this.side) put("h2", this.config?.name ?? String(this.entity?.attributes.friendly_name ?? "Garage"));
     put(".state", label[0].toUpperCase()+label.slice(1));
     const age = state === "closed" || state === "open" ? elapsed(this.entity?.last_changed) : "";
     put(".age", age ? ` · ${age}` : "");
     const surface = this.root.querySelector("ha-card")!;
     surface.setAttribute("data-state",state); surface.toggleAttribute("data-unknown",!known);
     const direction = action(this.entity);
-    this.scene.setAttribute("aria-expanded",String(this.revealed));
-    this.button.hidden = !this.revealed || (!pending && !direction);
+    this.button.hidden = !pending && !direction;
     this.button.disabled = !!pending || !direction;
-    put(".action", pending || (direction === "open" ? "Open" : "Close") + (this.side ? ` ${this.side} door` : ""));
-    put(".hint", this.error || (!this.revealed && (direction || pending) ? "Tap garage for controls" : ""));
+    const caption = pending || (direction === "open" ? "Open" : "Close");
+    put(".action", caption);
+    this.button.setAttribute("aria-label", this.side ? `${caption} ${this.config?.name || `${this.side} door`}` : caption);
+    put(".hint", this.error);
     if (!active) return;
     if (this.travel && !this.frame) this.frame = requestAnimationFrame(this.paint);
     else if (!this.travel) this.renderDoor(this.p);

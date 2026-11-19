@@ -11,7 +11,7 @@ test("gallery links open isolated demos and old bookmarks still work", async ({p
   await page.goto("/#garage-layout");
   await expect(page).toHaveURL(/\/cover\/$/);
   await page.getByLabel("Garage layout").selectOption({label:"Double"});
-  await expect(page.getByRole("button",{name:"right door controls"})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Close right door"})).toBeVisible();
 });
 
 test("cover layouts use the same responsive Sections grid", async ({page}) => {

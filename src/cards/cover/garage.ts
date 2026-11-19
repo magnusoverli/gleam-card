@@ -7,16 +7,31 @@ const beamLeft = (depth: number) => 78 - depth * 1.4;
 const beamRight = (depth: number) => 238 + depth * .6;
 const farLeft = beamLeft(30), farRight = beamRight(30);
 export type Side = "left" | "right";
+const bayWidth = 260, baySpacing = 188, doorCenter = 158;
+function bayOrigin(side: Side) {
+  const seam = doorCenter + baySpacing/2;
+  return side === "left" ? seam - bayWidth : seam - baySpacing;
+}
+export const labelCenter = (side: Side) => `${(doorCenter-bayOrigin(side))/bayWidth*100}%`;
 export function garage(side?: Side) {
   // Two abutting viewports show halves of one continuous building. Each bay
   // keeps its own shadow root so gradient and door-clip IDs remain local.
-  const extension = side ? 188 : 0, half = extension/2;
+  const extension = side ? baySpacing : 0, half = extension/2;
   // Keep both openings at their original scale. Split at the middle of the
   // shared pier and put the freed space outside the building.
-  const seam = 158 + half;
-  const viewX = side === "left" ? seam-260 : seam-extension;
-  const view = side ? `${viewX} 0 260` : "0 0 320";
+  const viewX = side ? bayOrigin(side) : 0;
+  const view = side ? `${viewX} 0 ${bayWidth}` : "0 0 320";
   return `<svg viewBox="${view} 174" aria-hidden="true">
+  <style>
+    .flat-shell,:host([flat-roof]) .pitched-shell{display:none}
+    :host([flat-roof]) .flat-shell{display:inline}
+    :host([lamp-off]) :is(.interior,.spill,.air){opacity:0}
+    .interior rect{fill:var(--lamp-color,#ffe1aa)}
+    :host([tinted]) #interior stop:nth-child(1){stop-color:color-mix(in srgb,var(--lamp-color) 74%,#0d1011)}
+    :host([tinted]) #interior stop:nth-child(2){stop-color:color-mix(in srgb,var(--lamp-color) 44%,#0d1011)}
+    :host([tinted]) #interior stop:nth-child(3){stop-color:color-mix(in srgb,var(--lamp-color) 12%,#0d1011)}
+    :host([tinted]) :is(#spill,#air-scatter) stop{stop-color:var(--lamp-color)}
+  </style>
   <defs>
     <radialGradient id="interior" cx=".5" cy="0" r=".95"><stop stop-color="#be905d"/><stop offset=".35" stop-color="#785434"/><stop offset="1" stop-color="#292321"/></radialGradient>
     <linearGradient id="spill" gradientUnits="userSpaceOnUse" x1="0" y1="142" x2="0" y2="172"><stop stop-color="#ffc27c" stop-opacity=".58"/><stop offset=".72" stop-color="#efa155" stop-opacity=".16"/><stop offset="1" stop-color="#efa155" stop-opacity="0"/></linearGradient>
@@ -26,9 +41,14 @@ export function garage(side?: Side) {
     <radialGradient id="air-scatter" r=".64"><stop stop-color="#ffdaa2" stop-opacity=".027"/><stop offset=".65" stop-color="#ffc788" stop-opacity=".019"/><stop offset="1" stop-color="#ffc078" stop-opacity="0"/></radialGradient>
   </defs>
   <g ${side ? 'clip-path="url(#bay-shell)"' : ""}><g transform="translate(${side === 'right' ? -extension : 0} 0)">
-    <path d="M48 142V48l${110+half} -31 ${109+half} 31v94H48Z" fill="#0c192b" stroke="#578ca3"/>
+    <path class="pitched-shell" d="M48 142V48l${110+half} -31 ${109+half} 31v94H48Z" fill="#0c192b" stroke="#578ca3"/>
+    <path class="flat-shell" d="M48 142V48H${267+extension}v94Z" fill="#0c192b" stroke="#578ca3"/>
     <path d="M${267+extension} 48l15-10v94l-15 10Z" fill="#132338" stroke="#395e78"/>
-    <path d="M40 49l${117+half} -35 ${117+half} 35 15-10L${172+half} 4 55 39Z" fill="#142c40" stroke="#6dabbc"/>
+    <path class="pitched-shell" d="M40 49l${117+half} -35 ${117+half} 35 15-10L${172+half} 4 55 39Z" fill="#142c40" stroke="#6dabbc"/>
+    <g class="flat-shell" stroke="#6dabbc">
+      <path d="M40 44l15-10h${234+extension}l-15 10Z" fill="#203950"/>
+      <path d="M40 44h${234+extension}l15-10v5l-15 10H40Z" fill="#142c40"/>
+    </g>
   </g></g>
   <path d="M74 142V52h168v90" fill="#08101d" stroke="#7caabc"/>
   <g class="interior" clip-path="url(#opening)">

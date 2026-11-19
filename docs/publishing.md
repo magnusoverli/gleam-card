@@ -4,7 +4,9 @@ Submit **one Dashboard package** (`plugin` in the catalog). The root `hacs.json`
 names `gleam-card.js`. The stable Energy Graph and experimental Thermostat and Cover cards use
 the same bundle and release; there is no integration manifest or hassfest job.
 
-1. **Prepare the candidate.** Set the package and lockfile version together with
+1. **Prepare the candidate.** Track changes under **Unreleased** in the
+   [changelog](../CHANGELOG.md). When preparing a release, move those entries
+   under its dated version heading. Set the package and lockfile version together with
    `npm version patch --no-git-tag-version` (or specify the desired version).
    Run `npm ci`, `npm test`, and `npm run test:browser`
    (install Playwright Chromium first on a fresh machine). The browser suite builds

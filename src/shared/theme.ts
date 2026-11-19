@@ -7,8 +7,11 @@ export const foundationStyles = `
     font-family: var(--ha-font-family-body, Inter, system-ui, sans-serif);
   }
   * { box-sizing: border-box; }
-  .experimental { display:inline-block;margin-top:3px;padding:2px 7px;border:1px solid #796340;
-    border-radius:12px;color:#ffd598;font-size:10px }
+  .experimental { position:absolute;top:8px;right:8px;z-index:2;pointer-events:none;
+    padding:2px 6px;border:1px solid #796340;border-radius:12px;background:#131c2c;
+    color:#ffd598;font:500 10px/1.2 var(--ha-font-family-body,system-ui,sans-serif) }
+  ha-card:has(>.experimental) {position:relative}
+  .badge-clearance {padding-right:78px}
   [hidden] { display: none !important; }
   ha-card {
     display: block;

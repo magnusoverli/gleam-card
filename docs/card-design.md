@@ -1,5 +1,10 @@
 # Designing a Gleam card
 
+For experimental cards, place one `.experimental` badge directly inside the
+outer `ha-card`. The shared theme pins it to the upper-right corner outside
+the content flow. Use `.badge-clearance` on the adjacent heading so its text
+can wrap beside the badge; keep the badge outside scrollable or scaled content.
+
 Use the stable **Energy Graph** as the visual reference. In the [interactive
 demo](https://magnusoverli.github.io/gleam-card/), notice what you can read
 before touching the chart: the current values, their meaning, and which series

@@ -117,7 +117,7 @@ export class GleamThermostat extends HTMLElement {
         .message{margin-top:12px;color:#efbb85;font-size:11px;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere}
         .message:empty{display:none}.unavailable .temperature{color:#718199}
       </style>
-      <ha-card><div class="viewport"><div class="content"><header><div><h2></h2><span class="experimental">Experimental</span></div><span class="mode"></span></header>
+      <ha-card><span class="experimental">Experimental</span><div class="viewport"><div class="content"><header class="badge-clearance"><div><h2></h2></div><span class="mode"></span></header>
         <div class="dial" role="slider" tabindex="0" aria-label="Target temperature">
           <div class="reading"><span class="caption">Target temperature</span>
             <div class="temperature"><span class="value">—</span><span class="unit"> °C</span></div>

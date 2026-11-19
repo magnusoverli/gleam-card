@@ -1,11 +1,22 @@
 import type { CoverConfig, EntityState, HomeAssistant } from "../../types";
 
+export const MIN_KELVIN = 2000, MAX_KELVIN = 6500;
+function validateLamp(id?: string, kelvin?: number) {
+  if (id !== undefined && !/^light\.[a-z0-9_]+$/.test(id)) throw Error("Select a light entity or leave it blank.");
+  if (kelvin !== undefined && (!Number.isInteger(kelvin) || kelvin < MIN_KELVIN || kelvin > MAX_KELVIN))
+    throw Error(`Light temperature must be a whole number from ${MIN_KELVIN} to ${MAX_KELVIN} K.`);
+}
+
 export function settings(config: CoverConfig) {
   if (!/^cover\.[a-z0-9_]+$/.test(config?.entity)) throw Error("Select a cover entity.");
   const seconds = config.travel_seconds ?? 10;
   if (!Number.isFinite(seconds) || seconds < 1 || seconds > 300) throw Error("Travel time must be 1–300 seconds.");
   if (!["normal","compact","double"].includes(config.variant ?? "normal")) throw Error("Unknown cover variant.");
+  if (config.roof_type !== undefined && config.roof_type !== "pitched" && config.roof_type !== "flat")
+    throw Error("Roof type must be pitched or flat.");
+  validateLamp(config.light_entity, config.light_temperature_kelvin);
   if (config.variant === "double") {
+    validateLamp(config.right_light_entity, config.right_light_temperature_kelvin);
     if (!/^cover\.[a-z0-9_]+$/.test(config.right_entity ?? "") || config.right_entity === config.entity)
       throw Error("Select a different cover entity for the right door.");
     const right = config.right_travel_seconds ?? seconds;
