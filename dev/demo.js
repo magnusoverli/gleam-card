@@ -92,16 +92,17 @@ mount.append(thermostat);
 if (!selected || selected === "cover") {
 cover = document.createElement("gleam-cover");
 cover.id = "cover";
-cover.setConfig({ entity: "cover.garage_door" });
 cover.hass = hass;
 const layouts = document.createElement("label");
 layouts.id = "garage-layout";
 layouts.innerHTML = `Garage layout <select><option>Normal</option><option>Compact</option><option>Double</option></select>`;
-layouts.onchange = () => {
+const applyCoverLayout = () => {
   const variant = layouts.querySelector("select").value.toLowerCase();
-  cover.style.width = variant === "compact" ? "calc(50% - 4px)" : "";
   cover.setConfig({entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
+  cover.style.gridColumn = `span ${cover.getGridOptions().columns}`;
 };
+layouts.onchange = applyCoverLayout;
+applyCoverLayout();
 mount.append(layouts, cover);
 }
 window.demo = { energy, thermostat, cover, hass, calls, requests };

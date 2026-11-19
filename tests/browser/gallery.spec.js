@@ -13,3 +13,16 @@ test("gallery links open isolated demos and old bookmarks still work", async ({p
   await page.getByLabel("Garage layout").selectOption({label:"Double"});
   await expect(page.getByRole("button",{name:"right door controls"})).toBeVisible();
 });
+
+test("cover layouts use the same responsive Sections grid", async ({page}) => {
+  await page.goto("/cover/");
+  const card = page.locator("#cover"), layout = page.getByLabel("Garage layout");
+  const section = await page.locator("#cards").boundingBox();
+  expect(section.width).toBeLessThanOrEqual(500);
+  for (const [name, width] of [["Normal",section.width],["Compact",(section.width-8)/2],["Double",section.width]]) {
+    await layout.selectOption({label:name});
+    const rect = await card.boundingBox();
+    expect(rect.width).toBeCloseTo(width,0);
+    expect(rect.x).toBeCloseTo(section.x,0);
+  }
+});
