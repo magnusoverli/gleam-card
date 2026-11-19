@@ -71,6 +71,7 @@ const hass = {
   },
 };
 const energy = document.createElement("gleam-energy-graph");
+energy.id = "energy-graph";
 energy.setConfig({ type: "custom:gleam-energy-graph", current_hour_entity: "sensor.current_hour_energy", price_entity: "sensor.electricity_price" });
 energy.hass = hass;
 const thermostat = document.createElement("gleam-thermostat");

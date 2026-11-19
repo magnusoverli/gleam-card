@@ -10,11 +10,15 @@
 
 ### Energy Graph · Stable
 
-Start with a single cumulative meter. Add price, power, or voltage when you’re ready; if your price sensor publishes tomorrow’s rates, the graph shows those too. [Configure the graph →](docs/energy-graph.md)
+Start with a single cumulative meter. Add price, power, or voltage when you’re ready; if your price sensor publishes tomorrow’s rates, the graph shows those too.
+
+[**Try Gleam Energy Graph**](https://magnusoverli.github.io/gleam-card/#energy-graph) · [Configure the graph →](docs/energy-graph.md)
 
 ### Thermostat · Experimental
 
-Set a target temperature by turning the dial or using the keyboard. Fan, preset, and swing controls follow the capabilities of your climate entity. Real-device testing is limited; you can [try the demo dial](https://magnusoverli.github.io/gleam-card/#thermostat) without controlling any equipment. [Thermostat settings →](docs/thermostat.md)
+Set a target temperature by turning the dial or using the keyboard. Fan, preset, and swing controls follow the capabilities of your climate entity. Real-device testing is limited.
+
+[**Try Gleam Thermostat**](https://magnusoverli.github.io/gleam-card/#thermostat) · [Thermostat settings →](docs/thermostat.md)
 
 <details>
 <summary>See the thermostat</summary>
@@ -25,7 +29,9 @@ Set a target temperature by turning the dial or using the keyboard. Fan, preset,
 
 ### Gleam Cover · Experimental
 
-Garage doors are the first supported cover type. See whether the garage is closed and for how long, or monitor two independent doors under one roof. [Try the three layouts](https://magnusoverli.github.io/gleam-card/#garage-layout): choose **Double**, then tap either door to reveal its own control. [Cover settings →](docs/cover.md)
+Garage doors are the first supported cover type. See whether the garage is closed and for how long, or monitor two independent doors under one roof. In the demo, choose **Double**, then tap either door to reveal its own control.
+
+[**Try Gleam Cover**](https://magnusoverli.github.io/gleam-card/#garage-layout) · [Cover settings →](docs/cover.md)
 
 Gleam Cover is included from **v0.0.6** onward.
 
