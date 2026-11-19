@@ -24,21 +24,9 @@
 
 **Experimental** · See which garage door is still open, or how far the living room shade is raised. New in **v0.0.8**, Roller shade lets you frame a photo of your own outdoor view behind sheer or blackout fabric.
 
-### Roller shade
-
-| Normal | Compact |
+| Roller shade | Garage door |
 | --- | --- |
-| <img src="docs/images/cover-shade-normal.png" width="400" alt="Normal roller shade with sage fabric and a readout of 40% open."> | <img src="docs/images/cover-shade-compact.png" width="197" alt="The same roller shade at 40% open in a half-width dashboard tile."> |
-
-### Garage door
-
-| Normal | Compact |
-| --- | --- |
-| <img src="docs/images/cover-garage-normal.png" width="400" alt="Normal garage with a closed sectional door and an Open button."> | <img src="docs/images/cover-garage-compact.png" width="197" alt="Closed garage door in the half-width Compact layout."> |
-
-**Double** · Two independently controlled doors under one roof.
-
-<a href="https://magnusoverli.github.io/gleam-card/cover/"><img src="docs/images/cover.png" width="400" alt="Double garage with the left door closed and the right door open, casting warm light onto the driveway."></a>
+| <img src="docs/images/cover-shade-normal.png" width="400" alt="Living room roller shade at 40% open."> | <img src="docs/images/cover.png" width="400" alt="Garage with the left door closed and the right door open."> |
 
 [**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings](docs/cover.md)
 
