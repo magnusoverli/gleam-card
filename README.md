@@ -1,37 +1,32 @@
 # Gleam Cards
 
-Interactive cards for Home Assistant. Install one bundle, then use each card’s visual editor to make it fit your dashboard.
+**A collection of interactive cards for Home Assistant.** Start with the view you want, then make it yours in the visual editor. All three cards run locally and install as one bundle.
 
 [**Try the live demo →**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install)
 
-## Explore the cards
+## Gleam Energy Graph
 
-| Card & guide | At a glance | Live demo |
-| --- | --- | --- |
-| **[Energy Graph](docs/energy-graph.md)**<br>Stable | Compare hourly energy use with electricity prices on a 3D timeline. | [Try Gleam Energy Graph](https://magnusoverli.github.io/gleam-card/#energy-graph) |
-| **[Thermostat](docs/thermostat.md)**<br>Experimental | Turn the dial to set the temperature. Controls adapt to your climate device. | [Try Gleam Thermostat](https://magnusoverli.github.io/gleam-card/#thermostat) |
-| **[Cover](docs/cover.md)**<br>Experimental | See which garage door is open and for how long. Control one door or two. | [Try Gleam Cover](https://magnusoverli.github.io/gleam-card/#garage-layout) |
+**Stable** · See when your home used the most energy and what electricity cost that hour. Rotate the timeline to explore, or switch to Front view to compare.
 
-<details>
-<summary>See the energy graph</summary>
+<a href="https://magnusoverli.github.io/gleam-card/#energy-graph"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside the electricity price forecast and power history."></a>
 
-![Gleam Energy Graph showing hourly consumption bars beside a stepped price forecast and power history](docs/images/energy-graph.png)
+[**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/#energy-graph) · [Graph settings](docs/energy-graph.md)
 
-</details>
+## Gleam Thermostat
 
-<details>
-<summary>See the thermostat</summary>
+**Experimental** · Turn the dial to set a target temperature. Fan, preset, and swing controls follow the capabilities of your climate device.
 
-![Gleam Thermostat showing the temperature dial, heating mode and experimental badge](docs/images/thermostat.png)
+<a href="https://magnusoverli.github.io/gleam-card/#thermostat"><img src="docs/images/thermostat.png" width="320" alt="Gleam Thermostat with a temperature dial and heating mode selected."></a>
 
-</details>
+[**Try Gleam Thermostat →**](https://magnusoverli.github.io/gleam-card/#thermostat) · [Thermostat settings](docs/thermostat.md)
 
-<details>
-<summary>See the cover</summary>
+## Gleam Cover
 
-![Gleam Cover in Double layout: the left garage door is closed and the right door is open, with amber light spilling onto the driveway.](docs/images/cover.png)
+**Experimental** · Which garage door is still open? See its state and how long it’s been that way. Tap either door in the Double layout to reveal its own control.
 
-</details>
+<a href="https://magnusoverli.github.io/gleam-card/#garage-layout"><img src="docs/images/cover.png" width="480" alt="Double garage with the left door closed and the right door open, casting warm light onto the driveway."></a>
+
+[**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/#garage-layout) · [Cover settings](docs/cover.md)
 
 ## Install
 
