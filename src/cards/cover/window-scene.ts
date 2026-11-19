@@ -2,7 +2,9 @@
 export const windowTop = 22, windowTravel = 126, windowLeft = 62, windowWidth = 196;
 const paneWidth = 194, paneHeight = 125, centerX = 160;
 const glazingPath = (width: number) => `M${centerX} 23v${paneHeight}M${centerX-width/2} 88h${width}`;
-export const windowScene = (cover: string) => `<svg viewBox="0 0 320 174" aria-hidden="true">
+const shadeHardware = `<rect class="shade-rail" x="${windowLeft-1}" y="${windowTop+windowTravel-2}" width="${windowWidth+2}" height="5" rx="2.5" fill="url(#bottom-rail)" stroke="#43585d" stroke-width=".7"/>
+  <rect x="54" y="13" width="212" height="13" rx="5" fill="#274656" stroke="#a8d8df"/>`;
+export const windowScene = (cover: string, hardware = shadeHardware) => `<svg viewBox="0 0 320 174" aria-hidden="true">
   <defs><linearGradient id="sky" x2=".7" y2="1"><stop stop-color="#285779"/><stop offset="1" stop-color="#9ac8df"/></linearGradient></defs>
   <g class="window-geometry"><rect x="56" y="16" width="208" height="140" rx="3" fill="#14293a" stroke="#79afbb"/>
   <rect x="63" y="23" width="${paneWidth}" height="${paneHeight}" fill="url(#sky)"/>
@@ -15,12 +17,25 @@ export const windowScene = (cover: string) => `<svg viewBox="0 0 320 174" aria-h
   <g class="window-geometry"><path d="M51 157h218l-5 4H48Z" fill="#253e50" stroke="#628697"/>
 </g></svg>
 <div class="shade-layer"><svg viewBox="0 0 320 174" aria-hidden="true">
-  <defs><linearGradient id="fabric" x2="0" y2="1"><stop stop-color="#607978"/><stop offset=".12" stop-color="#b2c3b6"/><stop offset="1" stop-color="#839d94"/></linearGradient>
+  <defs><linearGradient id="fabric" x2="0" y2="1"><stop stop-color="var(--cover-shadow,#607978)"/><stop offset=".12" stop-color="var(--cover-highlight,#b2c3b6)"/><stop offset="1" stop-color="var(--cover-base,#839d94)"/></linearGradient>
   <linearGradient id="bottom-rail" x2="0" y2="1"><stop stop-color="#637679"/><stop offset=".3" stop-color="#dbe4df"/><stop offset=".62" stop-color="#a5b7b4"/><stop offset="1" stop-color="#53666a"/></linearGradient></defs>
-  <g class="window-geometry">${cover}
-  <rect class="shade-rail" x="${windowLeft-1}" y="${windowTop+windowTravel-2}" width="${windowWidth+2}" height="5" rx="2.5" fill="url(#bottom-rail)" stroke="#43585d" stroke-width=".7"/>
-  <rect x="54" y="13" width="212" height="13" rx="5" fill="#274656" stroke="#a8d8df"/>
-</g></svg></div>`;
+  <clipPath id="exterior-pane"><rect x="63" y="23" width="${paneWidth}" height="${paneHeight}"/></clipPath>
+  <g class="window-geometry">${cover}${hardware}</g></svg></div>`;
+
+// Viewed from indoors, exterior hardware is visible only through the pane.
+// Move the stationary bars once per setting change, never during travel.
+export function setMountingSide(root: ShadowRoot, outside: boolean) {
+  const front = root.querySelector(".shade-layer svg")!;
+  const covering = front.querySelector(".window-geometry")!;
+  const bars = root.querySelector(".glazing-bars")!;
+  if (outside) {
+    covering.setAttribute("clip-path","url(#exterior-pane)");
+    front.append(bars);
+  } else {
+    covering.removeAttribute("clip-path");
+    root.querySelector("foreignObject")!.after(bars);
+  }
+}
 
 // Resize the pane itself so object-fit crops photos at the new ratio rather
 // than squeezing them with the frame. Vertical travel coordinates stay fixed.

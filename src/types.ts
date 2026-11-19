@@ -105,16 +105,19 @@ export interface Card<Config> extends HTMLElement {
 }
 
 export interface CoverConfig {
-  cover_type?: "garage" | "shade" | "blind" | "shutter";
+  cover_type?: "garage" | "shade" | "blind" | "shutter" | "curtain";
+  curtain_opening?: "center" | "left_to_right" | "right_to_left";
   tilt_seconds?: number;
   shade_opacity?: number;
   window_image?: string;
   window_aspect_ratio?: "portrait" | "square" | "landscape";
+  mounting_side?: "inside" | "outside";
   window_image_zoom?: number;
   window_image_x?: number;
   window_image_y?: number;
   glazing_bar_width?: number;
   glazing_bar_color?: string;
+  cover_color?: string;
   roof_type?: "pitched" | "flat";
   type?: "custom:gleam-cover";
   entity: string;

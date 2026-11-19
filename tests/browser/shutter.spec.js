@@ -40,6 +40,7 @@ test("shutter travels as a rigid curtain and confirms a requested partial lift",
   const retained=await curtain.elementHandle();
   await expect(card.getByRole("slider")).toHaveCount(1);
   await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now()+1000));
   await card.getByRole("slider",{name:"Lift position"}).fill("85");
   await page.clock.fastForward(2500);
   expect(await offset()).toBeCloseTo(-75.6,0);

@@ -1,17 +1,30 @@
 # Gleam Cover
 
-**Experimental:** choose Garage, Roller shade, Slatted blind or Roller shutter in the visual editor. Omit
+**Stable:** choose Garage, Roller shade, Slatted blind, Roller shutter or Curtain in the visual editor. Omit
 `cover_type` to keep the original garage illustration. Device-class suggestions
 do not override an existing choice.
 
 ## Lift position · New in v0.0.9
 
-For a roller shade, slatted blind or roller shutter, **Card appearance → Window
+For a roller shade, slatted blind, roller shutter or curtain, **Card appearance → Window
 aspect ratio** changes the illustrated window (not the dashboard tile). Choose
 `portrait`, `square`, or the original `landscape` default. Photos fill the pane
 without stretching; zoom and position still control the crop.
 
-All cover types show a **Lift position** slider when the entity supports
+**Card appearance → Mounting side** sets which side of the glass the cover is on,
+as seen from the room. **Inside** (the default) draws it in front of the glazing
+bars. **Outside** shows it behind the bars and only within the pane. For an
+exterior roller shutter, sun shade, Venetian blind or patio curtain, set
+`mounting_side: outside`. This is an illustration setting; it does not reverse
+opening direction or change the commands sent to the device.
+
+Under **Card appearance**, enable **Customize cover base color** to tint the
+shade fabric, blind slats, shutter slats or curtain panels. In YAML, use a
+quoted six-digit hex color, for example `cover_color: "#865444"`. Folds and
+slats retain their highlights and shadows. The photo, glazing bars and hardware
+keep their own colors. Turn the option off to restore the illustration’s original palette.
+
+All cover types show a **Lift position** slider (**Opening position** for curtains) when the entity supports
 `SET_POSITION`. Release the slider to request 0–100% open. The target is
 separate from the reported position. Each Double garage bay checks its own
 capabilities. On blinds, this slider moves the rail; **Slat tilt** changes angle.
@@ -19,6 +32,31 @@ capabilities. On blinds, this slider moves the rail; **Slat tilt** changes angle
 When a stationary cover reports a position between 0% and 100%, **Open**
 and **Close** are both available if the device supports both actions. This also
 works on covers that report position but cannot set an exact target.
+
+During travel, **Stop** takes the place of the direction buttons if the entity
+advertises Home Assistant’s `STOP` feature. It works during Open, Close and
+position requests, including movement started elsewhere. Each Double garage bay
+checks its own entity. On a blind, **Stop** controls lift; **Stop tilt** remains
+a separate control. The curtain demo supports Stop.
+
+## Curtain · New in v0.0.11
+
+In **Cover setup**, select **Curtain** and choose **Panels**. **Center split**
+(default) opens two panels from the middle; both follow one cover entity.
+For **Single panel**, choose **Opening direction**: left to right gathers on
+the right, and right to left gathers on the left. These options change the
+illustration only: 0% always means closed and 100% fully open. A small stack
+of fabric remains at the track end when fully open.
+
+```yaml
+type: custom:gleam-cover
+entity: cover.living_room_curtain
+cover_type: curtain
+curtain_opening: left_to_right  # center (default), left_to_right, right_to_left
+```
+
+Try all three curtain examples in the Cover demo. Normal and Compact layouts
+support the same window photo, framing and glazing bars as the other windows.
 
 ## Roller shutter · New in v0.0.10
 
@@ -101,7 +139,7 @@ are garage-specific.
 
 ## Garage
 
-Choose **Gleam Cover (Experimental)** in the card picker. Each illustrated cover
+Choose **Gleam Cover** in the card picker. Each illustrated cover
 uses one `cover.*` entity.
 
 **Cover setup** keeps the type, layout and required entities visible. Expand

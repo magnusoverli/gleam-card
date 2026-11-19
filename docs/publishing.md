@@ -1,7 +1,7 @@
 # Publish Gleam Cards
 
 Submit **one Dashboard package** (`plugin` in the catalog). The root `hacs.json`
-names `gleam-card.js`. The stable Energy Graph and experimental Thermostat and Cover cards use
+names `gleam-card.js`. The stable Energy Graph and Cover cards and the experimental Thermostat use
 the same bundle and release; there is no integration manifest or hassfest job.
 
 1. **Prepare the candidate.** Track changes under **Unreleased** in the

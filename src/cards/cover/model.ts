@@ -21,6 +21,10 @@ export function canSetPosition(entity?: EntityState) {
   return !!entity && ["closed","open","opening","closing"].includes(entity.state) && !!(Number(entity.attributes.supported_features) & 4);
 }
 
+export function canStop(entity?: EntityState) {
+  return !!entity && ["closed","open","opening","closing"].includes(entity.state) && !!(Number(entity.attributes.supported_features) & 8);
+}
+
 export function sendPosition(client: Pick<HomeAssistant,"callService">, entity_id:string, percent:number) {
   return client.callService("cover","set_cover_position",{entity_id,position:percent});
 }
@@ -34,7 +38,7 @@ export function available(entity: EntityState | undefined, direction: Direction)
   return !!(features & 2) && (p === undefined ? entity.state === "open" : p > 0);
 }
 
-export function send(client: Pick<HomeAssistant, "callService">, id: string, direction: "open" | "close") {
+export function send(client: Pick<HomeAssistant, "callService">, id: string, direction: Direction | "stop") {
   return client.callService("cover", `${direction}_cover`, { entity_id: id });
 }
 

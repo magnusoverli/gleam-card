@@ -2,7 +2,7 @@ import { windowScene, windowLeft, windowTop, windowWidth, windowTravel } from ".
 
 const count = 14, pitch = windowTravel / count;
 export const blind = () => windowScene(`<g class="slats">${Array.from({length:count},(_,i)=>
-  `<rect x="${windowLeft}" y="${windowTop+i*pitch}" width="${windowWidth}" height="${pitch}" rx="1" fill="url(#fabric)" stroke="#687f80" stroke-width=".5"/>`
+  `<rect x="${windowLeft}" y="${windowTop+i*pitch}" width="${windowWidth}" height="${pitch}" rx="1" fill="url(#fabric)" stroke="var(--cover-shadow,#687f80)" stroke-width=".5"/>`
 ).join("")}</g>`);
 
 export function renderBlind(background: SVGSVGElement) {

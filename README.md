@@ -22,9 +22,11 @@
 
 ## Gleam Cover
 
-**Experimental** · See which garage door is still open, raise a roller shade over a photo of your own view, or tilt the slats of a lowered blind.
+**Stable** · See which garage door is still open, raise a roller shade over a photo of your own view, or tilt the slats of a lowered blind.
 
-**New in v0.0.10:** Roller shutter draws rigid slats retracting into a housing above the window. Shades, blinds and shutters can now match a portrait, square or landscape window. All four cover types offer a lift-position slider when the device supports it.
+**New in v0.0.11:** Draw a center-opening curtain or gather a single panel on either side. Choose the color and mounting side for any window cover, and stop a moving cover when its device supports Stop.
+
+<a href="https://magnusoverli.github.io/gleam-card/cover/"><img src="docs/images/cover-curtain.png" width="360" alt="Partly open living room curtains gathered on both sides of the window."></a>
 
 | Roller shutter | Slatted blind |
 | --- | --- |
@@ -49,7 +51,7 @@ type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
 ```
 
-For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For a blind, shade, or garage door, choose **Gleam Cover (Experimental)**, select the cover type, and pick your `cover.*` entity.
+For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For garage doors or window coverings, choose **Gleam Cover**, select the cover type, and pick your `cover.*` entity.
 
 <details>
 <summary>Manual installation</summary>

@@ -1,5 +1,36 @@
 import { test, expect } from "@playwright/test";
 
+test("curtain batches reports on retained fabric and suspends off-screen",async({page})=>{
+  await page.goto("/cover/");
+  await page.getByLabel("Example").selectOption("cover.demo_curtain:center");
+  const bay=page.locator("#cover gleam-cover-bay");
+  await expect(bay.locator(".curtain-fabric")).toHaveAttribute("transform",/scale/);
+  const metrics=await bay.evaluate(async b=>{
+    const {cover,hass}=window.demo, id="cover.demo_curtain", fabric=b.shadowRoot.querySelector(".curtain-fabric");
+    let writes=0;
+    const count=new MutationObserver(records=>writes+=records.length);
+    count.observe(fabric,{attributes:true});
+    const start=performance.now();
+    for(let i=1;i<=50;i++)cover.hass={...hass,states:{[id]:{state:"open",attributes:{supported_features:7,current_position:i}}}};
+    const cpuMs=performance.now()-start;
+    await new Promise(requestAnimationFrame);
+    writes+=count.takeRecords().length;
+    count.disconnect();
+    return {cpuMs,toFrameMs:performance.now()-start,writes,reused:fabric===b.shadowRoot.querySelector(".curtain-fabric"),idle:b.frame===0};
+  });
+  expect(metrics).toMatchObject({writes:1,reused:true,idle:true});
+  console.log("Curtain (retained SVG)",metrics);
+  await bay.evaluate(b=>{
+    const {cover,hass}=window.demo;
+    cover.style.marginTop="3000px"; window.scrollTo(0,0);
+    cover.hass={...hass,states:{"cover.demo_curtain":{state:"opening",attributes:{supported_features:3,current_position:50}}}};
+  });
+  await expect.poll(()=>bay.evaluate(b=>!b.visible && b.frame===0)).toBe(true);
+  await bay.evaluate(b=>{const c=window.demo.cover;c.remove();if(b.frame || b.timer)throw Error("Active after disconnect");document.body.append(c);});
+  await bay.scrollIntoViewIfNeeded();
+  await expect.poll(()=>bay.evaluate(b=>b.visible && b.frame!==0)).toBe(true);
+});
+
 test("window cover footer mutations during position reports",async({page})=>{
   await page.goto("/cover/");
   await page.getByLabel("Example").selectOption("cover.demo_shade");

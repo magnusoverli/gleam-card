@@ -30,6 +30,8 @@ export class GleamCoverEditor extends HTMLElement {
       <form><fieldset><legend>Cover setup</legend><div class="fields">
       <label>Cover type<select id="kind">${Object.entries(kinds).map(([key,d]) => `<option value="${key}">${d.label}</option>`).join("")}</select></label>
       <label>Layout<select id="layout"><option value="normal">Normal</option><option value="compact">Compact</option><option value="double">Double</option></select></label>
+      <label data-curtain>Panels<select id="panels"><option value="center">Center split (two panels)</option><option value="single">Single panel</option></select></label>
+      <label data-single>Opening direction<select id="opening"><option value="left_to_right">Left to right · gathers on right</option><option value="right_to_left">Right to left · gathers on left</option></select></label>
       <datalist id="covers"></datalist><div class="fields pair"><label><span id="entity-label"></span><input id="entity" list="covers" required pattern="cover\\.[a-z0-9_]+"></label>
       <label data-double>Right door entity<input id="right-entity" list="covers" required aria-describedby="duplicate" pattern="cover\\.[a-z0-9_]+"></label></div>
       <small id="suggestion" hidden></small><p id="duplicate" role="alert"></p></div></fieldset>
@@ -41,7 +43,11 @@ export class GleamCoverEditor extends HTMLElement {
         <small>Time to animate a new reported slat angle. Default 1 second; 0 is immediate.</small></label></div></details>
       <details><summary>Card appearance<small>Display name<span data-garage>, roof style and door labels</span></small></summary><div class="fields">
       <label>Display name<input id="name" placeholder="Entity name"></label>
+      <div data-window class="fields">
+        <label class="toggle"><input id="custom-cover-color" type="checkbox">Customize cover base color</label>
+        <label>Cover base color<input id="cover-color" type="color"></label></div>
       <label data-window>Window aspect ratio<select id="window-ratio"><option value="landscape">Landscape (default)</option><option value="portrait">Portrait</option><option value="square">Square</option></select></label>
+      <label data-window>Mounting side<select id="mounting-side"><option value="inside">Inside (room side)</option><option value="outside">Outside (behind the glass)</option></select></label>
       <fieldset data-window><legend>Glazing bars</legend><div class="fields">
         <label>Width · <span id="bar-reading"></span><input id="bar-width" type="range" min="0" max="10" step="1"></label>
         <label>Bar color<input id="bar-color" type="color"></label></div></fieldset>
@@ -95,10 +101,18 @@ export class GleamCoverEditor extends HTMLElement {
       if (event.target === this.root.querySelector("#kind") || this.kind !== "garage" || config.cover_type) config.cover_type = this.kind;
       if (this.input("name").value.trim()) config.name = this.input("name").value.trim(); else delete config.name;
       if (variant === "normal") delete config.variant; else config.variant = variant;
+      const opening = this.select("opening").value;
+      if (this.kind === "curtain" && this.select("panels").value === "single" && (opening === "left_to_right" || opening === "right_to_left"))
+        config.curtain_opening = opening;
+      else delete config.curtain_opening;
       if (this.kind === "blind" && this.input("tilt-seconds").valueAsNumber !== 1) config.tilt_seconds = this.input("tilt-seconds").valueAsNumber;
       else delete config.tilt_seconds;
       const opacity = this.input("shade-opacity").valueAsNumber;
       const ratio = this.root.querySelector<HTMLSelectElement>("#window-ratio")!.value;
+      if (isWindowCover(this.kind) && this.select("mounting-side").value === "outside") config.mounting_side = "outside";
+      else delete config.mounting_side;
+      if (isWindowCover(this.kind) && this.input("custom-cover-color").checked) config.cover_color = this.input("cover-color").value;
+      else delete config.cover_color;
       if (isWindowCover(this.kind) && (ratio === "square" || ratio === "portrait")) config.window_aspect_ratio = ratio;
       else delete config.window_aspect_ratio;
       if (this.kind === "shade" && opacity !== 100) config.shade_opacity = opacity; else delete config.shade_opacity;
@@ -135,6 +149,7 @@ export class GleamCoverEditor extends HTMLElement {
     });
   }
   private input(id:string) { return this.root.querySelector<HTMLInputElement>(`#${id}`)!; }
+  private select(id:string) { return this.root.querySelector<HTMLSelectElement>(`#${id}`)!; }
   private cancelPhoto() {
     this.uploadGeneration++;
     this.root.querySelector("#photo-status")!.textContent = "";
@@ -191,10 +206,16 @@ export class GleamCoverEditor extends HTMLElement {
     if (layout.selectedOptions[0]?.disabled) layout.value = "normal";
     const variant = layout.value as NonNullable<CoverConfig["variant"]>;
     const garage = this.kind === "garage";
+    this.root.querySelector<HTMLElement>("[data-curtain]")!.hidden = this.select("panels").disabled = this.kind !== "curtain";
+    this.root.querySelector<HTMLElement>("[data-single]")!.hidden = this.select("opening").disabled =
+      this.kind !== "curtain" || this.select("panels").value !== "single";
     this.root.querySelector<HTMLElement>("[data-blind]")!.hidden = this.input("tilt-seconds").disabled = this.kind !== "blind";
     for (const el of this.root.querySelectorAll<HTMLElement>("[data-shade]")) el.hidden = this.kind !== "shade";
     for (const el of this.root.querySelectorAll<HTMLElement>("[data-window]")) el.hidden = !isWindowCover(this.kind);
     this.input("window-image").disabled = !isWindowCover(this.kind);
+    this.select("mounting-side").disabled = !isWindowCover(this.kind);
+    this.input("custom-cover-color").disabled = !isWindowCover(this.kind);
+    this.input("cover-color").disabled = !isWindowCover(this.kind) || !this.input("custom-cover-color").checked;
     this.input("shade-opacity").disabled = this.kind !== "shade";
     for (const el of this.root.querySelectorAll<HTMLElement>("[data-garage]")) el.hidden = !garage;
     this.input("light").disabled = this.input("custom").disabled = !garage;
@@ -225,14 +246,20 @@ export class GleamCoverEditor extends HTMLElement {
     this.config = config;
     this.root.querySelector<HTMLSelectElement>("#kind")!.value = config.cover_type ?? "garage";
     this.input("entity").value = config.entity ?? "";
+    const single = config.curtain_opening === "right_to_left" || config.curtain_opening === "left_to_right";
+    this.select("panels").value = single ? "single" : "center";
+    this.select("opening").value = single ? config.curtain_opening! : "left_to_right";
     this.input("name").value = config.name ?? "";
     this.input("seconds").value = String(config.travel_seconds ?? 10);
     this.input("tilt-seconds").value = String(config.tilt_seconds ?? 1);
     this.input("shade-opacity").value = String(config.shade_opacity ?? 100);
     this.input("window-image").value = config.window_image ?? "";
     this.root.querySelector<HTMLSelectElement>("#window-ratio")!.value = config.window_aspect_ratio ?? "landscape";
+    this.select("mounting-side").value = config.mounting_side ?? "inside";
     this.input("bar-width").value = String(config.glazing_bar_width ?? 3);
     this.input("bar-color").value = config.glazing_bar_color ?? "#30566a";
+    this.input("custom-cover-color").checked = config.cover_color !== undefined;
+    this.input("cover-color").value = config.cover_color ?? "#839d94";
     this.showBarWidth();
     for (const [key,,,,initial] of framing) {
       this.input(key).value=String(config[key] ?? initial);

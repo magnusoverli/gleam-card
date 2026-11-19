@@ -6,6 +6,7 @@ const state = (value, attributes = {}) => ({
 });
 const states = {
   "cover.demo_shutter": state("open",{device_class:"shutter",friendly_name:"Patio shutter",supported_features:7,current_position:35}),
+  "cover.demo_curtain": state("open",{device_class:"curtain",friendly_name:"Living room curtains",supported_features:15,current_position:30}),
   "cover.demo_blind": state("closed",{device_class:"blind",friendly_name:"Studio blinds",supported_features:7|128,current_position:0,current_tilt_position:50}),
   "cover.demo_shade": state("open",{device_class:"shade",friendly_name:"Living room shade",supported_features:7,current_position:40}),
   "cover.state_only_shade": state("closed",{device_class:"shade",friendly_name:"Office shade",supported_features:3}),
@@ -34,6 +35,7 @@ const states = {
   }),
 };
 const calls = [];
+const moving = new Map();
 const requests = [];
 const hass = {
   states,
@@ -63,6 +65,19 @@ const hass = {
     const { entity_id: id, ...values } = data;
     const previous = states[id];
     if (domain === "cover") {
+      if (service === "stop_cover") {
+        const trip = moving.get(id);
+        if (trip) {
+          clearTimeout(trip.timer);
+          const progress = Math.min(1,(performance.now()-trip.at)/Math.max(1,trip.duration));
+          const p = Math.round(trip.start+(trip.end-trip.start)*progress);
+          moving.delete(id);
+          states[id] = {...previous,state:p?"open":"closed",last_changed:new Date().toISOString(),
+            attributes:{...previous.attributes,current_position:p}};
+          cover.hass={...hass,states:{...states}};
+        }
+        return;
+      }
       if (service === "set_cover_tilt_position") {
         states[id]={...previous,attributes:{...previous.attributes,current_tilt_position:data.tilt_position}};
         cover.hass={...hass,states:{...states}};
@@ -73,7 +88,7 @@ const hass = {
       const opening = end>start;
       const report = value => {
         const attrs = {...states[id].attributes};
-        if (id === "cover.demo_shade" || id === "cover.demo_blind" || id === "cover.demo_shutter") {
+        if (attrs.supported_features & 4) {
           if (value === "closed" || value === "open") attrs.current_position = end;
           else delete attrs.current_position;
         }
@@ -81,7 +96,10 @@ const hass = {
         cover.hass = { ...hass, states: { ...states } };
       };
       report(opening ? "opening" : "closing");
-      setTimeout(() => report(end ? "open" : "closed"), 100*Math.abs(end-start));
+      clearTimeout(moving.get(id)?.timer);
+      const duration=100*Math.abs(end-start);
+      const timer=setTimeout(()=>{moving.delete(id);report(end ? "open" : "closed");},duration);
+      moving.set(id,{start,end,duration,at:performance.now(),timer});
       return;
     }
     states[id] = { ...previous, attributes: { ...previous.attributes, ...values } };
@@ -116,14 +134,18 @@ layouts.innerHTML = `<span>Garage layout</span> <select><option>Normal</option><
 const examples = document.createElement("label");
 examples.id = "cover-example";
 examples.innerHTML = `Example <select><option value="">Garage</option><option value="cover.demo_shutter">Roller shutter</option><option value="cover.demo_blind">Slatted blind · lift and tilt</option><option value="cover.demo_shade">Roller shade · measured position</option><option value="cover.state_only_shade">Roller shade · state only</option><option value="cover.offline_shade">Roller shade · unavailable</option></select>`;
+for (const [style,label] of [["center","center split"],["left_to_right","gathers on right"],["right_to_left","gathers on left"]]) {
+  const option = new Option(`Curtain · ${label}`,`cover.demo_curtain:${style}`);
+  examples.querySelector("select").add(option);
+}
 const applyCoverLayout = () => {
-  const id = examples.querySelector("select").value, select = layouts.querySelector("select");
+  const [id,opening] = examples.querySelector("select").value.split(":"), select = layouts.querySelector("select");
   const kind = id ? states[id].attributes.device_class : "garage";
   layouts.querySelector("span").textContent = `${kind[0].toUpperCase()+kind.slice(1)} layout`;
   select.options[2].hidden = select.options[2].disabled = !!id;
   if (id && select.value === "Double") select.value = "Normal";
   const variant = select.value.toLowerCase();
-  cover.setConfig(id ? {entity:id,cover_type:kind,variant} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
+  cover.setConfig(id ? {entity:id,cover_type:kind,variant,curtain_opening:opening} : {entity:"cover.garage_door",variant,right_entity:"cover.right_garage"});
   cover.style.gridColumn = `span ${cover.getGridOptions().columns}`;
 };
 layouts.onchange = applyCoverLayout;

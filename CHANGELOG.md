@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## [0.0.11](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.11) · 2026-11-19
+
+### 🪟 Gleam Cover is stable
+
+Choose **Gleam Cover** in the card picker. Existing configurations keep working without changes.
+
+- Gleam Cover: interrupt travel with Stop when the cover entity supports it, including travel to a requested position.
+
+- Gleam Cover: show shades, blinds, shutters and curtains mounted inside or outside the glass. Existing configurations keep the inside view.
+
+- Gleam Cover: choose a base color for shade fabric, blind and shutter slats, or curtain panels under Card appearance.
+
+- Gleam Cover: add center-split curtains and single panels that gather on either side. All three styles support Normal and Compact layouts and share the window photo and framing controls.
+
+[Try the covers](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings and YAML](https://github.com/magnusoverli/gleam-card/blob/v0.0.11/docs/cover.md)
+
 ## [0.0.10](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.10) · 2026-11-19
 
 ### 🪟 Gleam Cover: introducing Roller shutter

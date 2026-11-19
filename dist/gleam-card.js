@@ -14500,7 +14500,7 @@ function Rd(e) {
 	};
 }
 // src/cards/cover/window-scene.ts
-var zd = 194, Bd = 125, Vd = 160, Hd = (e) => `M${Vd} 23v${Bd}M${Vd - e / 2} 88h${e}`, Ud = (e) => `<svg viewBox="0 0 320 174" aria-hidden="true">
+var zd = 194, Bd = 125, Vd = 160, Hd = (e) => `M${Vd} 23v${Bd}M${Vd - e / 2} 88h${e}`, Ud = "<rect class=\"shade-rail\" x=\"61\" y=\"146\" width=\"198\" height=\"5\" rx=\"2.5\" fill=\"url(#bottom-rail)\" stroke=\"#43585d\" stroke-width=\".7\"/>\n  <rect x=\"54\" y=\"13\" width=\"212\" height=\"13\" rx=\"5\" fill=\"#274656\" stroke=\"#a8d8df\"/>", Wd = (e, t = Ud) => `<svg viewBox="0 0 320 174" aria-hidden="true">
   <defs><linearGradient id="sky" x2=".7" y2="1"><stop stop-color="#285779"/><stop offset="1" stop-color="#9ac8df"/></linearGradient></defs>
   <g class="window-geometry"><rect x="56" y="16" width="208" height="140" rx="3" fill="#14293a" stroke="#79afbb"/>
   <rect x="63" y="23" width="${zd}" height="${Bd}" fill="url(#sky)"/>
@@ -14513,33 +14513,35 @@ var zd = 194, Bd = 125, Vd = 160, Hd = (e) => `M${Vd} 23v${Bd}M${Vd - e / 2} 88h
   <g class="window-geometry"><path d="M51 157h218l-5 4H48Z" fill="#253e50" stroke="#628697"/>
 </g></svg>
 <div class="shade-layer"><svg viewBox="0 0 320 174" aria-hidden="true">
-  <defs><linearGradient id="fabric" x2="0" y2="1"><stop stop-color="#607978"/><stop offset=".12" stop-color="#b2c3b6"/><stop offset="1" stop-color="#839d94"/></linearGradient>
+  <defs><linearGradient id="fabric" x2="0" y2="1"><stop stop-color="var(--cover-shadow,#607978)"/><stop offset=".12" stop-color="var(--cover-highlight,#b2c3b6)"/><stop offset="1" stop-color="var(--cover-base,#839d94)"/></linearGradient>
   <linearGradient id="bottom-rail" x2="0" y2="1"><stop stop-color="#637679"/><stop offset=".3" stop-color="#dbe4df"/><stop offset=".62" stop-color="#a5b7b4"/><stop offset="1" stop-color="#53666a"/></linearGradient></defs>
-  <g class="window-geometry">${e}
-  <rect class="shade-rail" x="61" y="146" width="198" height="5" rx="2.5" fill="url(#bottom-rail)" stroke="#43585d" stroke-width=".7"/>
-  <rect x="54" y="13" width="212" height="13" rx="5" fill="#274656" stroke="#a8d8df"/>
-</g></svg></div>`;
-function Wd(e, t) {
+  <clipPath id="exterior-pane"><rect x="63" y="23" width="${zd}" height="${Bd}"/></clipPath>
+  <g class="window-geometry">${e}${t}</g></svg></div>`;
+function Gd(e, t) {
+	let n = e.querySelector(".shade-layer svg"), r = n.querySelector(".window-geometry"), i = e.querySelector(".glazing-bars");
+	t ? (r.setAttribute("clip-path", "url(#exterior-pane)"), n.append(i)) : (r.removeAttribute("clip-path"), e.querySelector("foreignObject").after(i));
+}
+function Kd(e, t) {
 	let n = t === "square" ? Bd : t === "portrait" ? 250 / 3 : zd;
 	for (let t of e.querySelectorAll(".window-geometry")) t.setAttribute("transform", `translate(${Vd} 0) scale(${n / zd} 1) translate(-160 0)`);
 	let r = e.querySelector("foreignObject");
 	r.setAttribute("x", String(Vd - n / 2)), r.setAttribute("width", String(n)), e.querySelector(".glazing-bars").setAttribute("d", Hd(n));
 }
 // src/cards/cover/shade.ts
-var Gd = () => Ud("<g class=\"shade-cloth\" opacity=\"var(--shade-opacity,1)\"><rect x=\"62\" y=\"22\" width=\"196\" height=\"126\" fill=\"url(#fabric)\"/></g>");
-function Kd(e) {
+var qd = () => Wd("<g class=\"shade-cloth\" opacity=\"var(--shade-opacity,1)\"><rect x=\"62\" y=\"22\" width=\"196\" height=\"126\" fill=\"url(#fabric)\"/></g>");
+function Jd(e) {
 	let t = e.parentElement.querySelector(".shade-layer svg"), n = t.querySelector(".shade-cloth"), r = t.querySelector(".shade-rail"), i = -1;
 	return (e) => {
 		e !== i && (i = e, n.setAttribute("transform", `translate(0 22) scale(1 ${1 - e}) translate(0 -22)`), r.setAttribute("transform", `translate(0 ${-126 * e})`));
 	};
 }
 // src/cards/cover/blind.ts
-var qd = 14, Jd = 126 / qd, Yd = () => Ud(`<g class="slats">${Array.from({ length: qd }, (e, t) => `<rect x="62" y="${22 + t * Jd}" width="196" height="${Jd}" rx="1" fill="url(#fabric)" stroke="#687f80" stroke-width=".5"/>`).join("")}</g>`);
-function Xd(e) {
+var Yd = 14, Xd = 126 / Yd, Zd = () => Wd(`<g class="slats">${Array.from({ length: Yd }, (e, t) => `<rect x="62" y="${22 + t * Xd}" width="196" height="${Xd}" rx="1" fill="url(#fabric)" stroke="var(--cover-shadow,#687f80)" stroke-width=".5"/>`).join("")}</g>`);
+function Qd(e) {
 	let t = e.parentElement, n = [...t.querySelectorAll(".slats rect")], r = t.querySelector(".shade-rail"), i = -1, a = -1;
 	return (e, t = .35) => {
 		if (e === i && t === a) return;
-		let o = 126 - e * (126 - qd), s = (e) => Math.min(e * Jd, o - (qd - e)), c = 1 + (Jd - 1) * Math.cos(t * Math.PI / 2);
+		let o = 126 - e * (126 - Yd), s = (e) => Math.min(e * Xd, o - (Yd - e)), c = 1 + (Xd - 1) * Math.cos(t * Math.PI / 2);
 		n.forEach((t, n) => {
 			let r = s(n);
 			e !== i && t.setAttribute("y", String(22 + r)), t.setAttribute("height", String(Math.min(c, s(n + 1) - r)));
@@ -14547,8 +14549,8 @@ function Xd(e) {
 	};
 }
 // src/cards/cover/shutter.ts
-var Zd = () => Ud("<defs>\n  <clipPath id=\"shutter-opening\"><rect x=\"60\" y=\"22\" width=\"200\" height=\"126\"/></clipPath>\n  <pattern id=\"shutter-profile\" x=\"0\" y=\"22\" width=\"196\" height=\"9\" patternUnits=\"userSpaceOnUse\">\n    <rect width=\"196\" height=\"9\" fill=\"#637c8b\"/>\n    <path d=\"M0 1h196\" stroke=\"#abc1c7\"/><path d=\"M0 7.5h196\" stroke=\"#354b5b\" stroke-width=\"2\"/>\n  </pattern></defs>\n  <path d=\"M60 23v127m200-127v127\" stroke=\"#445968\" stroke-width=\"4\"/>\n  <g clip-path=\"url(#shutter-opening)\"><rect class=\"shutter-curtain\" x=\"62\" y=\"22\" width=\"196\" height=\"126\" fill=\"url(#shutter-profile)\"/></g>");
-function Qd(e) {
+var $d = () => Wd("<defs>\n  <clipPath id=\"shutter-opening\"><rect x=\"60\" y=\"22\" width=\"200\" height=\"126\"/></clipPath>\n  <pattern id=\"shutter-profile\" x=\"0\" y=\"22\" width=\"196\" height=\"9\" patternUnits=\"userSpaceOnUse\">\n    <rect width=\"196\" height=\"9\" fill=\"var(--cover-base,#637c8b)\"/>\n    <path d=\"M0 1h196\" stroke=\"var(--cover-highlight,#abc1c7)\"/><path d=\"M0 7.5h196\" stroke=\"var(--cover-shadow,#354b5b)\" stroke-width=\"2\"/>\n  </pattern></defs>\n  <path d=\"M60 23v127m200-127v127\" stroke=\"#445968\" stroke-width=\"4\"/>\n  <g clip-path=\"url(#shutter-opening)\"><rect class=\"shutter-curtain\" x=\"62\" y=\"22\" width=\"196\" height=\"126\" fill=\"url(#shutter-profile)\"/></g>");
+function ef(e) {
 	let t = e.parentElement, n = t.querySelector(".shutter-curtain"), r = t.querySelector(".shade-rail"), i = -1;
 	return (e) => {
 		if (e === i) return;
@@ -14557,15 +14559,34 @@ function Qd(e) {
 		n.setAttribute("transform", t), r.setAttribute("transform", t);
 	};
 }
+// src/cards/cover/curtain.ts
+var tf = 98, nf = tf / 7, rf = `q${-nf / 2} 3 ${-nf} 0 `.repeat(7), af = () => Wd(`<defs>
+  <linearGradient id="pleat" gradientUnits="userSpaceOnUse" x2="${nf}" spreadMethod="repeat">
+    <stop stop-color="var(--cover-shadow,#445364)"/><stop offset=".24" stop-color="var(--cover-base,#778696)"/>
+    <stop offset=".52" stop-color="var(--cover-highlight,#a7b2bb)"/><stop offset=".76" stop-color="var(--cover-light,#8495a2)"/><stop offset="1" stop-color="var(--cover-shadow,#445364)"/>
+  </linearGradient>
+  <g id="drape"><path class="curtain-fabric" fill="url(#pleat)"
+    d="M0 19h${tf}v130${rf}Z"/></g>
+  </defs>
+  <g class="curtain-panels">
+    <g transform="translate(62 0)"><use class="gather-left" href="#drape"/></g>
+    <g transform="translate(258 0) scale(-1 1)"><use class="gather-right" href="#drape"/></g>
+  </g>`, "<rect x=\"54\" y=\"15\" width=\"212\" height=\"6\" rx=\"3\" fill=\"#475f70\" stroke=\"#aac2cb\"/>");
+function of(e) {
+	let t = e.parentElement.querySelector(".curtain-fabric"), n = -1;
+	return (e) => {
+		n !== e && (n = e, t.setAttribute("transform", `scale(${1 - .88 * e} 1)`));
+	};
+}
 // src/cards/cover/garage-settings.ts
-var $d = 2e3, ef = 6500;
-function tf(e) {
+var sf = 2e3, cf = 6500;
+function lf(e) {
 	return e.light_temperature_kelvin ?? (e.variant === "double" ? e.right_light_temperature_kelvin : void 0);
 }
-function nf(e) {
+function uf(e) {
 	if (e.roof_type !== void 0 && e.roof_type !== "pitched" && e.roof_type !== "flat") throw Error("Roof type must be pitched or flat.");
-	let t = tf(e);
-	if (t !== void 0 && (!Number.isInteger(t) || t < 2e3 || t > 6500)) throw Error(`Light temperature must be a whole number from ${$d} to ${ef} K.`);
+	let t = lf(e);
+	if (t !== void 0 && (!Number.isInteger(t) || t < 2e3 || t > 6500)) throw Error(`Light temperature must be a whole number from ${sf} to ${cf} K.`);
 	let n = e.variant === "double";
 	for (let t of [e.light_entity, n ? e.right_light_entity : void 0]) if (t !== void 0 && !/^light\.[a-z0-9_]+$/.test(t)) throw Error("Select a light entity or leave it blank.");
 	if (!n) return;
@@ -14574,16 +14595,32 @@ function nf(e) {
 	if (!Number.isFinite(r) || r < 1 || r > 300) throw Error("Right travel time must be 1–300 seconds.");
 }
 // src/cards/cover/kinds.ts
-var rf = {
+var df = {
+	curtain: {
+		label: "Curtain",
+		deviceClass: "curtain",
+		sceneFamily: "window",
+		motionPolicy: "interpolate",
+		layouts: ["normal", "compact"],
+		markup: af,
+		mount: of,
+		validate(e) {
+			if (pf(e), e.curtain_opening !== void 0 && ![
+				"center",
+				"left_to_right",
+				"right_to_left"
+			].includes(e.curtain_opening)) throw Error("Curtain opening must be center, left_to_right or right_to_left.");
+		}
+	},
 	shutter: {
 		label: "Roller shutter",
 		deviceClass: "shutter",
 		sceneFamily: "window",
 		motionPolicy: "interpolate",
 		layouts: ["normal", "compact"],
-		markup: Zd,
-		mount: Qd,
-		validate: of
+		markup: $d,
+		mount: ef,
+		validate: pf
 	},
 	garage: {
 		label: "Garage",
@@ -14597,7 +14634,7 @@ var rf = {
 		],
 		markup: Ld,
 		mount: Rd,
-		validate: nf
+		validate: uf
 	},
 	shade: {
 		label: "Roller shade",
@@ -14605,10 +14642,10 @@ var rf = {
 		sceneFamily: "window",
 		motionPolicy: "interpolate",
 		layouts: ["normal", "compact"],
-		markup: Gd,
-		mount: Kd,
+		markup: qd,
+		mount: Jd,
 		validate(e) {
-			of(e);
+			pf(e);
 			let t = e.shade_opacity;
 			if (t !== void 0 && (!Number.isInteger(t) || t < 0 || t > 100)) throw Error("Shade opacity must be a whole percentage from 0 to 100.");
 		}
@@ -14619,63 +14656,65 @@ var rf = {
 		sceneFamily: "window",
 		motionPolicy: "interpolate",
 		layouts: ["normal", "compact"],
-		markup: Yd,
-		mount: Xd,
+		markup: Zd,
+		mount: Qd,
 		validate(e) {
-			of(e);
+			pf(e);
 			let t = e.tilt_seconds;
 			if (t !== void 0 && (!Number.isFinite(t) || t < 0 || t > 300)) throw Error("Tilt time must be between 0 and 300 seconds.");
 		}
 	}
-}, af = (e) => rf[e].sceneFamily === "window";
-function of({ window_aspect_ratio: e, window_image: t, window_image_zoom: n, window_image_x: r, window_image_y: i, glazing_bar_width: a, glazing_bar_color: o }) {
+}, ff = (e) => df[e].sceneFamily === "window";
+function pf({ window_aspect_ratio: e, mounting_side: t, window_image: n, window_image_zoom: r, window_image_x: i, window_image_y: a, glazing_bar_width: o, glazing_bar_color: s, cover_color: c }) {
+	if (t !== void 0 && t !== "inside" && t !== "outside") throw Error("Mounting side must be inside or outside.");
 	if (e !== void 0 && ![
 		"portrait",
 		"square",
 		"landscape"
 	].includes(e)) throw Error("Window aspect ratio must be portrait, square or landscape.");
-	if (a !== void 0 && (!Number.isInteger(a) || a < 0 || a > 10)) throw Error("Glazing bar width must be a whole number from 0 to 10.");
-	if (o !== void 0 && (typeof o != "string" || !/^#[a-f\d]{6}$/i.test(o))) throw Error("Glazing bar color must be a six-digit hex color.");
-	for (let [e, t, a] of [
-		[
-			n,
-			100,
-			300
-		],
+	if (o !== void 0 && (!Number.isInteger(o) || o < 0 || o > 10)) throw Error("Glazing bar width must be a whole number from 0 to 10.");
+	if (s !== void 0 && (typeof s != "string" || !/^#[a-f\d]{6}$/i.test(s))) throw Error("Glazing bar color must be a six-digit hex color.");
+	if (c !== void 0 && (typeof c != "string" || !/^#[a-f\d]{6}$/i.test(c))) throw Error("Cover base color must be a six-digit hex color.");
+	for (let [e, t, n] of [
 		[
 			r,
-			0,
-			100
+			100,
+			300
 		],
 		[
 			i,
 			0,
 			100
+		],
+		[
+			a,
+			0,
+			100
 		]
-	]) if (e !== void 0 && (!Number.isInteger(e) || e < t || e > a)) throw Error(`Photo framing must use whole percentages from ${t} to ${a}.`);
-	if (t !== void 0 && typeof t != "string") throw Error("Window image must be an image URL or path.");
+	]) if (e !== void 0 && (!Number.isInteger(e) || e < t || e > n)) throw Error(`Photo framing must use whole percentages from ${t} to ${n}.`);
+	if (n !== void 0 && typeof n != "string") throw Error("Window image must be an image URL or path.");
 }
-function sf(e) {
-	return Object.keys(rf).find((t) => rf[t].deviceClass === e);
+function mf(e) {
+	return Object.keys(df).find((t) => df[t].deviceClass === e);
 }
 // src/cards/cover/model.ts
-function cf(e) {
+function hf(e) {
 	if (!/^cover\.[a-z0-9_]+$/.test(e?.entity)) throw Error("Select a cover entity.");
 	let t = e.travel_seconds ?? 10;
 	if (!Number.isFinite(t) || t < 1 || t > 300) throw Error("Travel time must be 1–300 seconds.");
 	let n = e.cover_type ?? "garage";
-	if (!Object.hasOwn(rf, n)) throw Error("Unknown cover type.");
-	if (!rf[n].layouts.includes(e.variant ?? "normal")) throw Error(`Unsupported layout for ${rf[n].label}.`);
-	return rf[n].validate?.(e), {
+	if (!Object.hasOwn(df, n)) throw Error("Unknown cover type.");
+	if (!df[n].layouts.includes(e.variant ?? "normal")) throw Error(`Unsupported layout for ${df[n].label}.`);
+	return df[n].validate?.(e), {
 		...e,
 		travel_seconds: t
 	};
 }
-function lf(e) {
+function gf(e) {
 	let t = e?.attributes.current_position;
 	return typeof t == "number" && Number.isFinite(t) && t >= 0 && t <= 100 ? t / 100 : void 0;
 }
-function uf(e) {
+function _f(e) {
 	return !!e && [
 		"closed",
 		"open",
@@ -14683,30 +14722,38 @@ function uf(e) {
 		"closing"
 	].includes(e.state) && !!(Number(e.attributes.supported_features) & 4);
 }
-function df(e, t, n) {
+function vf(e) {
+	return !!e && [
+		"closed",
+		"open",
+		"opening",
+		"closing"
+	].includes(e.state) && !!(Number(e.attributes.supported_features) & 8);
+}
+function yf(e, t, n) {
 	return e.callService("cover", "set_cover_position", {
 		entity_id: t,
 		position: n
 	});
 }
-function ff(e, t) {
+function bf(e, t) {
 	if (!e || e.state !== "open" && e.state !== "closed") return !1;
-	let n = Number(e?.attributes.supported_features), r = lf(e);
+	let n = Number(e?.attributes.supported_features), r = gf(e);
 	return t === "open" ? !!(n & 1) && (r === void 0 ? e.state === "closed" : r < 1) : !!(n & 2) && (r === void 0 ? e.state === "open" : r > 0);
 }
-function pf(e, t, n) {
+function xf(e, t, n) {
 	return e.callService("cover", `${n}_cover`, { entity_id: t });
 }
-function mf(e, t) {
+function Sf(e, t) {
 	let n = Math.min(1, Math.max(0, (t - e.start) / e.duration));
 	return n === 1 ? e.to : e.from + (e.to - e.from) * n;
 }
-function hf(e) {
+function Cf(e) {
 	let t = Math.floor((Date.now() - Date.parse(e ?? "")) / 6e4);
 	return !Number.isFinite(t) || t < 0 ? "" : t < 1 ? "Under 1 min" : t < 60 ? `${t} min` : `${Math.floor(t / 60)} h ${t % 60} min`;
 }
 // src/cards/cover/tilt.ts
-var gf = [
+var wf = [
 	[
 		"open_cover_tilt",
 		16,
@@ -14722,14 +14769,14 @@ var gf = [
 		64,
 		"Stop tilt"
 	]
-], _f = 128;
-function vf(e) {
+], Tf = 128;
+function Ef(e) {
 	let t = e?.attributes.current_tilt_position;
 	return typeof t == "number" && Number.isFinite(t) && t >= 0 && t <= 100 ? t / 100 : void 0;
 }
-var yf = `<div class="tilt" hidden><label hidden>Slat tilt · <span></span>
-  <input type="range" min="0" max="100" step="1"></label>${gf.map(([e, , t]) => `<button type="button" data-tilt="${e}" hidden>${t}</button>`).join("")}<small role="status"></small></div>`;
-function bf(e) {
+var Df = `<div class="tilt" hidden><label hidden>Slat tilt · <span></span>
+  <input type="range" min="0" max="100" step="1"></label>${wf.map(([e, , t]) => `<button type="button" data-tilt="${e}" hidden>${t}</button>`).join("")}<small role="status"></small></div>`;
+function Of(e) {
 	let t = e.querySelector("input"), n = e.querySelector("label"), r = [...e.querySelectorAll("button")], i = e.querySelector("small"), a, o = "", s = 0, c = 0, l = !1, u;
 	async function d(t, n, r = {}) {
 		if (!a || !o || l || !(s & n) || !e.isConnected) return;
@@ -14749,13 +14796,13 @@ function bf(e) {
 	let f = n.querySelector("span");
 	t.oninput = () => {
 		f.textContent = `Target ${t.value}%`;
-	}, t.onchange = () => void d("set_cover_tilt_position", _f, { tilt_position: t.valueAsNumber }), r.forEach((e, t) => {
-		let [n, r] = gf[t];
+	}, t.onchange = () => void d("set_cover_tilt_position", Tf, { tilt_position: t.valueAsNumber }), r.forEach((e, t) => {
+		let [n, r] = wf[t];
 		e.onclick = () => void d(n, r);
 	});
 	function p() {
-		e.hidden = !(s & 240), n.hidden = !(s & _f), t.disabled = l, t.value = String(u === void 0 ? 50 : Math.round(u * 100)), f.textContent = u === void 0 ? "Not reported" : `${t.value}%`, r.forEach((e, t) => {
-			e.hidden = !(s & gf[t][1]), e.disabled = l;
+		e.hidden = !(s & 240), n.hidden = !(s & Tf), t.disabled = l, t.value = String(u === void 0 ? 50 : Math.round(u * 100)), f.textContent = u === void 0 ? "Not reported" : `${t.value}%`, r.forEach((e, t) => {
+			e.hidden = !(s & wf[t][1]), e.disabled = l;
 		});
 	}
 	return (e, t, n) => {
@@ -14765,28 +14812,33 @@ function bf(e) {
 			"closed",
 			"opening",
 			"closing"
-		].includes(n.state) ? Number(n.attributes.supported_features) | 0 : 0, d = vf(n);
+		].includes(n.state) ? Number(n.attributes.supported_features) | 0 : 0, d = Ef(n);
 		(o !== t || s !== r || u !== d) && (o !== t && (c++, l = !1, i.textContent = ""), o = t, s = r, u = d, p());
 	};
 }
 // src/cards/cover/cover.ts
-function xf(e, t) {
+function kf(e, t) {
 	e && e.textContent !== t && (e.textContent = t);
 }
-function Sf(e, t, n) {
+function Af(e, t, n) {
 	e.getAttribute(t) !== n && e.setAttribute(t, n);
 }
-var Cf = (e, t) => `<style>${du}
+var jf = (e, t) => `<style>${du}
 :host{container-type:inline-size;min-width:0}ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
 h2{margin:0;font-size:18px;font-weight:550;overflow-wrap:anywhere}
 .scene{border:0;background:none;border-radius:12px;padding:0;width:100%;display:block}
 :host([window-cover]) .scene{position:relative;isolation:isolate}
-.shade-layer{position:absolute;inset:0;pointer-events:none;transform:translateZ(0)}
+.shade-layer{position:absolute;inset:0;pointer-events:none;transform:translateZ(0);
+  --cover-highlight:color-mix(in srgb,var(--cover-base),white 36%);
+  --cover-light:color-mix(in srgb,var(--cover-base),white 15%);
+  --cover-shadow:color-mix(in srgb,var(--cover-base),black 35%)}
+:host([curtain-opening="left_to_right"]) .gather-left,:host([curtain-opening="right_to_left"]) .gather-right{display:none}
+:host([curtain-opening="left_to_right"]) .gather-right,:host([curtain-opening="right_to_left"]) .gather-left{transform:scaleX(2)}
 svg{display:block;width:100%;height:clamp(100px,40cqi,180px)}
 .detail{min-width:0}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;min-height:40px}
 .state{font-size:16px;color:#86ecf2}.age,.hint{color:var(--gleam-muted,#8ba8c6);font-size:12px}
 ha-card[data-state=open] .state{color:#ffc27c}
-ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.slats,.shutter-curtain,.shade-rail){visibility:hidden}
+ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.panel,.interior,.spill,.air,.shade-cloth,.slats,.shutter-curtain,.curtain-panels,.shade-rail){visibility:hidden}
 .tilt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tilt label,.tilt input,.lift-slider,.lift-slider input{display:block;width:100%}
 :host{--action-width:76px;--action-height:36px}
 :host([compact]),:host([bay]){--action-width:64px;--action-height:32px}
@@ -14816,10 +14868,10 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
   :host([window-cover]) .readout{min-height:3lh}
   :host([window-cover]) .actions{justify-self:start}
 }
-</style><ha-card>${t ? "" : "<span class=\"experimental\">Experimental</span><header class=\"badge-clearance\"><h2></h2></header>"}<div class="scene">${rf[e].markup(t)}</div>
+</style><ha-card>${t ? "" : "<header><h2></h2></header>"}<div class="scene">${df[e].markup(t)}</div>
 <div class="detail"><div class="row"><div class="readout"><strong class="state" role="status"></strong><span class="age"></span></div>
-<div class="actions"><button class="extra-open" hidden>Open</button><button id="action" class="action" hidden></button></div></div><label class="lift-slider" hidden>Lift position${af(e) ? "" : " · "} <span class="lift-value"></span>
-<input type="range" aria-label="${t ? `${t} door lift position` : "Lift position"}" min="0" max="100" step="1"></label>${e === "blind" ? yf : ""}<p class="hint"></p></div></ha-card>`, wf = class extends HTMLElement {
+<div class="actions"><button class="extra-open" hidden>Open</button><button id="action" class="action" hidden></button><button class="stop" hidden>Stop</button></div></div><label class="lift-slider" hidden>${e === "curtain" ? "Opening position" : "Lift position"}${ff(e) ? "" : " · "} <span class="lift-value"></span>
+<input type="range" aria-label="${t ? `${t} door lift position` : e === "curtain" ? "Opening position" : "Lift position"}" min="0" max="100" step="1"></label>${e === "blind" ? Df : ""}<p class="hint"></p></div></ha-card>`, Mf = class extends HTMLElement {
 	root = this.attachShadow({ mode: "open" });
 	variant;
 	kind;
@@ -14829,10 +14881,10 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		return document.createElement("gleam-cover-editor");
 	}
 	static getStubConfig(e) {
-		let t = Object.keys(e?.states ?? {}).filter((e) => e.startsWith("cover.")), n = t.find((t) => sf(e?.states[t].attributes.device_class)) ?? t[0] ?? "cover.garage_door";
+		let t = Object.keys(e?.states ?? {}).filter((e) => e.startsWith("cover.")), n = t.find((t) => mf(e?.states[t].attributes.device_class)) ?? t[0] ?? "cover.garage_door";
 		return {
 			entity: n,
-			cover_type: sf(e?.states[n]?.attributes.device_class) ?? "garage"
+			cover_type: mf(e?.states[n]?.attributes.device_class) ?? "garage"
 		};
 	}
 	getCardSize() {
@@ -14846,7 +14898,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		};
 	}
 	setConfig(e) {
-		let t = cf(e), n = t.variant ?? "normal", r = t.cover_type ?? "garage";
+		let t = hf(e), n = t.variant ?? "normal", r = t.cover_type ?? "garage";
 		if (n !== this.variant || r !== this.kind) {
 			if (this.kind = r, this.variant = n, n === "double") {
 				this.root.innerHTML = `<style>${du}:host{min-width:0}ha-card{padding:12px}
@@ -14855,7 +14907,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
           .labels.flat{top:5cqi}
           .labels h3{position:relative;transform:translateX(-50%);width:62%;text-align:center;font-size:14px;line-height:1.15;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
           </style>
-          <ha-card><span class="experimental">Experimental</span><header class="badge-clearance"><h2></h2></header><div class="bays"></div></ha-card>`, this.bays = [new Tf(r, "left"), new Tf(r, "right")], this.bays.forEach((e) => e.toggleAttribute("bay", !0));
+          <ha-card><header><h2></h2></header><div class="bays"></div></ha-card>`, this.bays = [new Nf(r, "left"), new Nf(r, "right")], this.bays.forEach((e) => e.toggleAttribute("bay", !0));
 				let e = document.createElement("div");
 				e.className = "labels";
 				for (let t of ["left", "right"]) {
@@ -14864,8 +14916,8 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 				}
 				this.root.querySelector(".bays").append(e, ...this.bays);
 			} else {
-				let e = new Tf(r);
-				e.toggleAttribute("window-cover", af(r)), e.toggleAttribute("compact", n === "compact");
+				let e = new Nf(r);
+				e.toggleAttribute("window-cover", ff(r)), e.toggleAttribute("compact", n === "compact");
 				let t = document.createElement("style");
 				t.textContent = ":host{display:block;min-width:0}", this.bays = [e], this.root.replaceChildren(t, e);
 			}
@@ -14880,13 +14932,13 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 				name: t.left_label?.trim(),
 				travel_seconds: t.travel_seconds,
 				light_entity: t.light_entity,
-				light_temperature_kelvin: tf(t)
+				light_temperature_kelvin: lf(t)
 			}), this.bays[1].setConfig({
 				entity: t.right_entity,
 				name: t.right_label?.trim(),
 				travel_seconds: t.right_travel_seconds ?? t.travel_seconds,
 				light_entity: t.right_light_entity,
-				light_temperature_kelvin: tf(t)
+				light_temperature_kelvin: lf(t)
 			});
 		} else this.bays[0].setConfig(t);
 		for (let e of this.bays) e.toggleAttribute("flat-roof", t.roof_type === "flat");
@@ -14895,7 +14947,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	set hass(e) {
 		this.client = e, this.bays.forEach((t) => t.hass = e);
 	}
-}, Tf = class extends HTMLElement {
+}, Nf = class extends HTMLElement {
 	kind;
 	side;
 	root = this.attachShadow({ mode: "open" });
@@ -14909,6 +14961,9 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	tiltTravel;
 	button;
 	extraOpen;
+	stopButton;
+	stopRequest;
+	holdStoppedPosition = !1;
 	slider;
 	positionTarget;
 	nodes;
@@ -14930,7 +14985,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	error = "";
 	generation = 0;
 	constructor(e = "garage", t) {
-		super(), this.kind = e, this.side = t, this.root.innerHTML = Cf(e, t), this.nodes = {
+		super(), this.kind = e, this.side = t, this.root.innerHTML = jf(e, t), this.nodes = {
 			title: this.root.querySelector("h2"),
 			state: this.root.querySelector(".state"),
 			age: this.root.querySelector(".age"),
@@ -14939,7 +14994,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 			surface: this.root.querySelector("ha-card")
 		}, this.button = this.root.querySelector(".action"), this.slider = this.root.querySelector(".lift-slider input"), this.slider.oninput = () => {
 			this.draft = this.slider.valueAsNumber, this.refresh();
-		}, this.slider.onchange = () => void this.setPosition(), this.renderDoor = rf[e].mount(this.root.querySelector("svg")), e === "blind" && (this.updateTilt = bf(this.root.querySelector(".tilt"))), this.extraOpen = this.root.querySelector(".extra-open"), this.extraOpen.onclick = () => void this.act("open"), this.button.onclick = () => void this.act(ff(this.entity, "close") ? "close" : "open");
+		}, this.slider.onchange = () => void this.setPosition(), this.renderDoor = df[e].mount(this.root.querySelector("svg")), e === "blind" && (this.updateTilt = Of(this.root.querySelector(".tilt"))), this.extraOpen = this.root.querySelector(".extra-open"), this.extraOpen.onclick = () => void this.act("open"), this.stopButton = this.root.querySelector(".stop"), this.stopButton.onclick = () => void this.stop(), this.button.onclick = () => void this.act(bf(this.entity, "close") ? "close" : "open");
 	}
 	connectedCallback() {
 		this.observer = new IntersectionObserver(([e]) => {
@@ -14950,15 +15005,15 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		this.observer?.disconnect(), this.visible = !1, document.removeEventListener("visibilitychange", this.refresh), this.reset(), this.entity = void 0;
 	}
 	reset() {
-		cancelAnimationFrame(this.frame), clearTimeout(this.timer), this.frame = this.timer = 0, this.generation++, this.travel = void 0, this.target = void 0, this.confirmed = !1, this.command = !1, this.positionTarget = this.draft = void 0, this.tiltTarget = void 0, this.tiltTravel = void 0, this.error = "";
+		cancelAnimationFrame(this.frame), clearTimeout(this.timer), this.frame = this.timer = 0, this.generation++, this.travel = void 0, this.target = void 0, this.confirmed = !1, this.command = !1, this.stopRequest = void 0, this.holdStoppedPosition = !1, this.positionTarget = this.draft = void 0, this.tiltTarget = void 0, this.tiltTravel = void 0, this.error = "";
 	}
 	setConfig(e) {
-		let t = cf(e);
-		if (this.kind === "shade" && t.shade_opacity !== this.config?.shade_opacity && this.style.setProperty("--shade-opacity", String((t.shade_opacity ?? 100) / 100)), af(this.kind) && t.window_image !== this.config?.window_image) {
+		let t = hf(e);
+		if (this.kind === "curtain" && Af(this, "curtain-opening", t.curtain_opening ?? "center"), this.kind === "shade" && t.shade_opacity !== this.config?.shade_opacity && this.style.setProperty("--shade-opacity", String((t.shade_opacity ?? 100) / 100)), ff(this.kind) && t.window_image !== this.config?.window_image) {
 			let e = this.root.querySelector(".window-view");
 			e.hidden = !t.window_image?.trim(), e.hidden ? e.removeAttribute("src") : e.src = t.window_image.trim();
 		}
-		if (af(this.kind) && (t.window_aspect_ratio !== this.config?.window_aspect_ratio && Wd(this.root, t.window_aspect_ratio ?? "landscape"), t.glazing_bar_width !== this.config?.glazing_bar_width && this.style.setProperty("--glazing-width", String(t.glazing_bar_width ?? 3)), t.glazing_bar_color !== this.config?.glazing_bar_color && this.style.setProperty("--glazing-color", t.glazing_bar_color ?? "#30566a"), t.window_image_zoom !== this.config?.window_image_zoom && this.style.setProperty("--photo-scale", String((t.window_image_zoom ?? 100) / 100)), t.window_image_x !== this.config?.window_image_x && this.style.setProperty("--photo-x", `${t.window_image_x ?? 50}%`), t.window_image_y !== this.config?.window_image_y && this.style.setProperty("--photo-y", `${t.window_image_y ?? 50}%`)), t.entity !== this.config?.entity && (this.reset(), this.entity = void 0), t.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
+		if (ff(this.kind) && (t.mounting_side === "outside" != (this.config?.mounting_side === "outside") && Gd(this.root, t.mounting_side === "outside"), t.cover_color !== this.config?.cover_color && (t.cover_color ? this.style.setProperty("--cover-base", t.cover_color) : this.style.removeProperty("--cover-base")), t.window_aspect_ratio !== this.config?.window_aspect_ratio && Kd(this.root, t.window_aspect_ratio ?? "landscape"), t.glazing_bar_width !== this.config?.glazing_bar_width && this.style.setProperty("--glazing-width", String(t.glazing_bar_width ?? 3)), t.glazing_bar_color !== this.config?.glazing_bar_color && this.style.setProperty("--glazing-color", t.glazing_bar_color ?? "#30566a"), t.window_image_zoom !== this.config?.window_image_zoom && this.style.setProperty("--photo-scale", String((t.window_image_zoom ?? 100) / 100)), t.window_image_x !== this.config?.window_image_x && this.style.setProperty("--photo-x", `${t.window_image_x ?? 50}%`), t.window_image_y !== this.config?.window_image_y && this.style.setProperty("--photo-y", `${t.window_image_y ?? 50}%`)), t.entity !== this.config?.entity && (this.reset(), this.entity = void 0), t.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
 			let e = t.light_temperature_kelvin;
 			if (this.toggleAttribute("tinted", e !== void 0), e === void 0) this.style.removeProperty("--lamp-color");
 			else {
@@ -14973,7 +15028,7 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 	}
 	begin(e) {
 		let t = performance.now();
-		this.travel && (this.p = mf(this.travel, t));
+		this.travel && (this.p = Sf(this.travel, t));
 		let n = +(e === "open");
 		this.travel = {
 			from: this.p,
@@ -14988,10 +15043,10 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		this.toggleAttribute("lamp-off", !!t && n?.state !== "on");
 		let r = this.client?.states[this.config.entity], i = this.entity;
 		this.updateTilt?.(this.client, this.config.entity, r);
-		let a = r?.state, o = lf(r), s = this.updateTilt ? vf(r) : void 0, c = s !== this.tiltTarget;
+		let a = r?.state, o = gf(r), s = this.updateTilt ? Ef(r) : void 0, c = s !== this.tiltTarget;
 		if (!e && r === i && a === this.reportedState && o === this.reportedPosition && !c) return;
 		if (c) {
-			let e = performance.now(), t = this.tiltTravel ? mf(this.tiltTravel, e) : this.tiltTarget, n = (this.config.tilt_seconds ?? 1) * 1e3;
+			let e = performance.now(), t = this.tiltTravel ? Sf(this.tiltTravel, e) : this.tiltTarget, n = (this.config.tilt_seconds ?? 1) * 1e3;
 			this.tiltTravel = s !== void 0 && t !== void 0 && t !== s && n > 0 ? {
 				from: t,
 				to: s,
@@ -15001,15 +15056,15 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 		}
 		a !== this.reportedState && (this.error = "");
 		let l = this.reportedState, u = this.reportedPosition;
-		if (this.reportedState = a, this.reportedPosition = o, this.entity = r, this.positionTarget !== void 0) {
-			if (!uf(r)) this.positionTarget = void 0, this.travel = void 0;
+		if (this.reportedState = a, this.reportedPosition = o, this.entity = r, vf(r) || (this.stopRequest = void 0), !this.stopRequest || a !== "open" && a !== "closed" || a === l && o === u && r?.last_changed === i?.last_changed || (this.p = o ?? (a === "closed" ? 0 : this.travel ? Sf(this.travel, performance.now()) : this.p), this.holdStoppedPosition = a === "open" && o === void 0, this.stopRequest = void 0, this.command = this.confirmed = !1, this.positionTarget = this.travel = this.target = void 0, this.generation++), (a !== "open" || o !== void 0) && (this.holdStoppedPosition = !1), this.positionTarget !== void 0) {
+			if (!_f(r)) this.positionTarget = void 0, this.travel = void 0;
 			else {
 				o !== void 0 && o !== this.positionTarget && o !== u && (this.p = o, this.startPositionTravel(this.positionTarget)), this.refresh();
 				return;
 			}
 		}
 		this.command && (a === this.target || a === (this.target === "open" ? "opening" : "closing")) && (this.acknowledged = !0);
-		let d = rf[this.kind].motionPolicy === "interpolate", f = o !== void 0 && o > 0 && o < 1 && (!d || o !== u || !this.command && a === this.target);
+		let d = df[this.kind].motionPolicy === "interpolate", f = o !== void 0 && o > 0 && o < 1 && (!d || o !== u || !this.command && a === this.target);
 		if (a === "opening" || a === "closing") {
 			let e = a === "opening" ? "open" : "closed";
 			if (!i && o === void 0 && (this.p = e === "open" ? 0 : 1), this.command || this.target === e || i && a === l || this.begin(e), o !== void 0 && (!this.travel || f)) {
@@ -15022,15 +15077,16 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 					duration: Math.max(1, Math.abs(t - o) * this.config.travel_seconds * 1e3)
 				} : void 0;
 			}
-		} else a === "open" || a === "closed" ? (o !== void 0 && (!this.travel || f) && (this.travel = void 0, this.p = o), a === this.target ? (this.confirmed = !0, !this.travel && d && o === void 0 && (this.p = +(a === "open"))) : this.command || this.target && l === a || (this.travel = void 0, this.target = void 0, this.p = o ?? (a === "closed" ? 0 : 1))) : this.command || (this.reset(), this.p = 0);
+		} else a === "open" || a === "closed" ? (o !== void 0 && (!this.travel || f) && (this.travel = void 0, this.p = o), a === this.target ? (this.confirmed = !0, !this.travel && d && o === void 0 && (this.p = +(a === "open"))) : this.command || this.target && l === a || (this.travel = void 0, this.target = void 0, this.p = o ?? (a === "closed" ? 0 : this.holdStoppedPosition ? this.p : 1))) : this.command || (this.reset(), this.p = 0);
 		this.refresh();
 	}
 	async act(e) {
-		if (!this.client || !this.config || !ff(this.entity, e) || this.target || this.positionTarget !== void 0) return;
+		if (!this.client || !this.config || this.stopRequest || !bf(this.entity, e) || this.target || this.positionTarget !== void 0) return;
+		this.holdStoppedPosition = !1;
 		let t = ++this.generation;
 		this.begin(e === "open" ? "open" : "closed"), this.command = !0, this.acknowledged = !1, this.confirmBy = performance.now() + this.config.travel_seconds * 1e3 + 5e3, this.refresh();
 		try {
-			await pf(this.client, this.config.entity, e);
+			await xf(this.client, this.config.entity, e);
 		} catch {
 			if (t !== this.generation || !this.command || this.acknowledged) return;
 			this.command = !1, this.target = void 0, this.travel = void 0, this.error = "Command failed. Check the door and try again.", this.sync(!0);
@@ -15044,70 +15100,86 @@ ha-card[data-unknown] svg{opacity:.35}ha-card[data-unknown] :is(.door-skin,.pane
 			duration: Math.max(1, Math.abs(e - this.p) * this.config.travel_seconds * 1e3)
 		};
 	}
+	get stopAvailable() {
+		return vf(this.entity) && (!!this.target || this.positionTarget !== void 0 || this.entity?.state === "opening" || this.entity?.state === "closing");
+	}
+	async stop() {
+		if (!this.client || !this.config || !this.stopAvailable || this.stopRequest) return;
+		let e = this.stopRequest = { deadline: performance.now() + 5e3 };
+		this.error = "", this.refresh();
+		try {
+			await xf(this.client, this.config.entity, "stop");
+		} catch {
+			if (this.stopRequest !== e) return;
+			this.stopRequest = void 0, this.error = "Stop command failed. Try again.", this.refresh();
+		}
+	}
 	async setPosition() {
 		let e = this.slider.valueAsNumber;
-		if (this.draft = void 0, !this.client || !this.config || !uf(this.entity) || this.target || this.positionTarget !== void 0 || !Number.isInteger(e) || e < 0 || e > 100) {
+		if (this.draft = void 0, !this.client || !this.config || this.stopRequest || !_f(this.entity) || this.target || this.positionTarget !== void 0 || !Number.isInteger(e) || e < 0 || e > 100) {
 			this.refresh();
 			return;
 		}
 		let t = ++this.generation;
-		this.positionTarget = e / 100, this.error = "", this.startPositionTravel(this.positionTarget), this.confirmBy = performance.now() + this.config.travel_seconds * 1e3 + 5e3, this.refresh();
+		this.holdStoppedPosition = !1, this.positionTarget = e / 100, this.error = "", this.startPositionTravel(this.positionTarget), this.confirmBy = performance.now() + this.config.travel_seconds * 1e3 + 5e3, this.refresh();
 		try {
-			await df(this.client, this.config.entity, e);
+			await yf(this.client, this.config.entity, e);
 		} catch {
 			if (t !== this.generation || this.positionTarget === void 0) return;
 			this.positionTarget = void 0, this.travel = void 0, this.error = "Position command failed.", this.sync(!0);
 		}
 	}
 	paint = () => {
-		this.frame = 0, this.travel && (this.p = mf(this.travel, performance.now()), this.p === this.travel.to && (this.travel = void 0)), this.lastTilt = this.tiltTravel ? mf(this.tiltTravel, performance.now()) : this.tiltTarget, this.lastTilt === this.tiltTarget && (this.tiltTravel = void 0), this.renderDoor(this.p, this.lastTilt), this.lastPainted = this.p, this.travel || this.tiltTravel ? this.frame = requestAnimationFrame(this.paint) : this.refresh();
+		this.frame = 0, this.travel && (this.p = Sf(this.travel, performance.now()), this.p === this.travel.to && (this.travel = void 0)), this.lastTilt = this.tiltTravel ? Sf(this.tiltTravel, performance.now()) : this.tiltTarget, this.lastTilt === this.tiltTarget && (this.tiltTravel = void 0), this.renderDoor(this.p, this.lastTilt), this.lastPainted = this.p, this.travel || this.tiltTravel ? this.frame = requestAnimationFrame(this.paint) : this.refresh();
 	};
 	refresh = () => {
 		clearTimeout(this.timer), this.timer = 0;
 		let e = this.isConnected && this.visible && !document.hidden;
 		e || (cancelAnimationFrame(this.frame), this.frame = 0), this.travel && performance.now() >= this.travel.start + this.travel.duration && (this.p = this.travel.to, this.travel = void 0);
 		let t = performance.now(), n = this.entity?.state ?? "unavailable";
-		if (this.positionTarget !== void 0) {
-			let e = lf(this.entity) ?? (n === "closed" ? 0 : void 0);
+		if (this.stopRequest && t >= this.stopRequest.deadline && (this.stopRequest = void 0, this.error = "Stop not confirmed by Home Assistant."), this.positionTarget !== void 0) {
+			let e = gf(this.entity) ?? (n === "closed" ? 0 : void 0);
 			!this.travel && e === this.positionTarget && (n === "open" || n === "closed") ? this.positionTarget = void 0 : t >= this.confirmBy && (this.travel = void 0, this.positionTarget = void 0, this.p = e ?? +(n === "open"), this.error = "Target position not confirmed.");
 		}
 		let r = this.confirmBy - 5e3;
 		if (this.command) {
-			let e = lf(this.entity);
+			let e = gf(this.entity);
 			this.confirmed = n === this.target && (e === void 0 || e === +(this.target === "open"));
 		}
 		!this.travel && this.confirmed && (!this.command || t >= r) && (this.command = !1, this.target = void 0, this.confirmed = !1);
 		let i = this.target && (this.command ? t >= r : !this.travel && (n === "open" || n === "closed"));
-		i && performance.now() >= this.confirmBy && (this.command = !1, this.target = void 0, this.travel = void 0, this.p = lf(this.entity) ?? (n === "open" ? 1 : n === "closed" ? 0 : this.p), this.error = `Movement not confirmed. Home Assistant still reports ${n}.`);
+		i && performance.now() >= this.confirmBy && (this.command = !1, this.target = void 0, this.travel = void 0, this.p = gf(this.entity) ?? (n === "open" ? 1 : n === "closed" ? 0 : this.p), this.error = `Movement not confirmed. Home Assistant still reports ${n}.`);
 		let a = [
 			"closed",
 			"open",
 			"opening",
 			"closing"
 		].includes(n), o = a || n === "unknown" ? n : "unavailable", s = this.target ? i ? "Awaiting confirmation" : this.target === "open" ? "Opening…" : "Closing…" : "";
-		this.side || xf(this.nodes.title, this.config?.name ?? String(this.entity?.attributes.friendly_name ?? rf[this.kind].label));
-		let c = af(this.kind), l = uf(this.entity), u = c && a && !l ? lf(this.entity) : void 0;
-		xf(this.nodes.state, o[0].toUpperCase() + o.slice(1) + (u === void 0 ? "" : ` · ${Math.round(u * 100)}% open`));
-		let d = n === "closed" || n === "open" ? hf(this.entity?.last_changed) : "";
-		xf(this.nodes.age, d ? ` · ${d}` : "");
+		this.side || kf(this.nodes.title, this.config?.name ?? String(this.entity?.attributes.friendly_name ?? df[this.kind].label));
+		let c = ff(this.kind), l = _f(this.entity), u = c && a && !l ? gf(this.entity) : void 0;
+		kf(this.nodes.state, o[0].toUpperCase() + o.slice(1) + (u === void 0 ? "" : ` · ${Math.round(u * 100)}% open`));
+		let d = n === "closed" || n === "open" ? Cf(this.entity?.last_changed) : "";
+		kf(this.nodes.age, d ? ` · ${d}` : "");
 		let f = this.nodes.surface;
-		Sf(f, "data-state", n), f.toggleAttribute("data-unknown", !a);
-		let p = ff(this.entity, "open"), m = ff(this.entity, "close"), h = m ? "close" : p ? "open" : void 0;
-		this.extraOpen.toggleAttribute("hidden", !(p && m) || !!this.target), this.extraOpen.toggleAttribute("disabled", this.positionTarget !== void 0), Sf(this.extraOpen, "aria-label", this.side ? `Open ${this.config?.name || `${this.side} door`}` : "Open"), this.button.toggleAttribute("hidden", !s && !h), this.button.toggleAttribute("disabled", !!s || !h || this.positionTarget !== void 0), this.slider.parentElement.toggleAttribute("hidden", !l), this.slider.toggleAttribute("disabled", !l || !!this.target || this.positionTarget !== void 0);
-		let g = lf(this.entity), _ = this.draft ?? (this.positionTarget === void 0 ? void 0 : Math.round(this.positionTarget * 100)), v = _ ?? (g === void 0 ? n === "closed" ? 0 : 50 : Math.round(g * 100));
-		this.slider.valueAsNumber !== v && (this.slider.value = String(v));
-		let y = _ === void 0 ? g === void 0 ? "Not reported" : `${v}%${c ? "" : " open"}` : `Target ${_}%`;
-		xf(this.nodes.lift, y), Sf(this.slider, "aria-valuetext", y);
-		let b = s || (h === "open" ? "Open" : "Close");
-		if (xf(this.button, b), Sf(this.button, "aria-label", this.side ? `${b} ${this.config?.name || `${this.side} door`}` : b), xf(this.nodes.hint, this.error), !e) return;
+		Af(f, "data-state", n), f.toggleAttribute("data-unknown", !a);
+		let p = bf(this.entity, "open"), m = bf(this.entity, "close"), h = m ? "close" : p ? "open" : void 0, g = !!this.stopRequest || this.stopAvailable;
+		this.stopButton.toggleAttribute("hidden", !g), this.stopButton.toggleAttribute("disabled", !!this.stopRequest);
+		let _ = this.stopRequest ? "Stopping…" : "Stop";
+		kf(this.stopButton, _), Af(this.stopButton, "aria-label", this.side ? `${_} ${this.config?.name || `${this.side} door`}` : _), this.extraOpen.toggleAttribute("hidden", g || !(p && m) || !!this.target), this.extraOpen.toggleAttribute("disabled", this.positionTarget !== void 0), Af(this.extraOpen, "aria-label", this.side ? `Open ${this.config?.name || `${this.side} door`}` : "Open"), this.button.toggleAttribute("hidden", g || !s && !h), this.button.toggleAttribute("disabled", !!s || !h || this.positionTarget !== void 0), this.slider.parentElement.toggleAttribute("hidden", !l), this.slider.toggleAttribute("disabled", !l || !!this.stopRequest || !!this.target || this.positionTarget !== void 0);
+		let v = gf(this.entity), y = this.draft ?? (this.positionTarget === void 0 ? void 0 : Math.round(this.positionTarget * 100)), b = y ?? (v === void 0 ? n === "closed" ? 0 : 50 : Math.round(v * 100));
+		this.slider.valueAsNumber !== b && (this.slider.value = String(b));
+		let x = y === void 0 ? v === void 0 ? "Not reported" : `${b}%${c ? "" : " open"}` : `Target ${y}%`;
+		kf(this.nodes.lift, x), Af(this.slider, "aria-valuetext", x);
+		let S = s || (h === "open" ? "Open" : "Close");
+		if (kf(this.button, S), Af(this.button, "aria-label", this.side ? `${S} ${this.config?.name || `${this.side} door`}` : S), kf(this.nodes.hint, this.error), !e) return;
 		(this.travel || this.tiltTravel || this.p !== this.lastPainted || this.lastTilt !== this.tiltTarget) && !this.frame && (this.frame = requestAnimationFrame(this.paint));
-		let x = d ? 6e4 - (Date.now() - Date.parse(this.entity.last_changed)) % 6e4 : Infinity, S = this.positionTarget === void 0 ? this.command && t < r ? r : i && this.target ? this.confirmBy : Infinity : this.confirmBy, C = Math.min(x, Math.max(1, S - t));
-		Number.isFinite(C) && (this.timer = window.setTimeout(this.refresh, C));
+		let C = d ? 6e4 - (Date.now() - Date.parse(this.entity.last_changed)) % 6e4 : Infinity, w = this.positionTarget === void 0 ? this.command && t < r ? r : i && this.target ? this.confirmBy : Infinity : this.confirmBy, T = Math.min(C, Math.max(1, Math.min(w, this.stopRequest?.deadline ?? Infinity) - t));
+		Number.isFinite(T) && (this.timer = window.setTimeout(this.refresh, T));
 	};
 };
-customElements.get("gleam-cover-bay") || customElements.define("gleam-cover-bay", Tf);
+customElements.get("gleam-cover-bay") || customElements.define("gleam-cover-bay", Nf);
 // src/cards/cover/window-photo.ts
-async function Ef(e, t) {
+async function Pf(e, t) {
 	if (!e?.fetchWithAuth) throw Error("Photo upload is unavailable here. Enter an image URL instead.");
 	let n = new FormData();
 	n.append("file", t);
@@ -15122,7 +15194,7 @@ async function Ef(e, t) {
 	return `/api/image/serve/${i.id}/original`;
 }
 // src/cards/cover/editor.ts
-var Df = [
+var Ff = [
 	[
 		"window_image_zoom",
 		"Photo zoom",
@@ -15144,7 +15216,7 @@ var Df = [
 		100,
 		50
 	]
-], Of = class extends HTMLElement {
+], If = class extends HTMLElement {
 	uploadGeneration = 0;
 	root = this.attachShadow({ mode: "open" });
 	config;
@@ -15160,8 +15232,10 @@ var Df = [
        @container(min-width:440px){.pair:has([data-double]:not([hidden])),.pair[data-double]{grid-template-columns:repeat(2,minmax(0,1fr))}}
       p{margin:0;color:var(--error-color,#c62828)}p:empty{display:none}</style>
       <form><fieldset><legend>Cover setup</legend><div class="fields">
-      <label>Cover type<select id="kind">${Object.entries(rf).map(([e, t]) => `<option value="${e}">${t.label}</option>`).join("")}</select></label>
+      <label>Cover type<select id="kind">${Object.entries(df).map(([e, t]) => `<option value="${e}">${t.label}</option>`).join("")}</select></label>
       <label>Layout<select id="layout"><option value="normal">Normal</option><option value="compact">Compact</option><option value="double">Double</option></select></label>
+      <label data-curtain>Panels<select id="panels"><option value="center">Center split (two panels)</option><option value="single">Single panel</option></select></label>
+      <label data-single>Opening direction<select id="opening"><option value="left_to_right">Left to right · gathers on right</option><option value="right_to_left">Right to left · gathers on left</option></select></label>
       <datalist id="covers"></datalist><div class="fields pair"><label><span id="entity-label"></span><input id="entity" list="covers" required pattern="cover\\.[a-z0-9_]+"></label>
       <label data-double>Right door entity<input id="right-entity" list="covers" required aria-describedby="duplicate" pattern="cover\\.[a-z0-9_]+"></label></div>
       <small id="suggestion" hidden></small><p id="duplicate" role="alert"></p></div></fieldset>
@@ -15173,7 +15247,11 @@ var Df = [
         <small>Time to animate a new reported slat angle. Default 1 second; 0 is immediate.</small></label></div></details>
       <details><summary>Card appearance<small>Display name<span data-garage>, roof style and door labels</span></small></summary><div class="fields">
       <label>Display name<input id="name" placeholder="Entity name"></label>
+      <div data-window class="fields">
+        <label class="toggle"><input id="custom-cover-color" type="checkbox">Customize cover base color</label>
+        <label>Cover base color<input id="cover-color" type="color"></label></div>
       <label data-window>Window aspect ratio<select id="window-ratio"><option value="landscape">Landscape (default)</option><option value="portrait">Portrait</option><option value="square">Square</option></select></label>
+      <label data-window>Mounting side<select id="mounting-side"><option value="inside">Inside (room side)</option><option value="outside">Outside (behind the glass)</option></select></label>
       <fieldset data-window><legend>Glazing bars</legend><div class="fields">
         <label>Width · <span id="bar-reading"></span><input id="bar-width" type="range" min="0" max="10" step="1"></label>
         <label>Bar color<input id="bar-color" type="color"></label></div></fieldset>
@@ -15185,7 +15263,7 @@ var Df = [
         <input id="window-image" placeholder="/local/garden.jpg" spellcheck="false">
         <small>Enter an image URL or a /local/ path. Leave blank for the default sky.</small></label>
       <fieldset data-window><legend>Photo framing</legend><div class="fields">
-      ${Df.map(([e, t, n, r]) => `<label>${t} · <span id="${e}-value"></span><input id="${e}" type="range" min="${n}" max="${r}" step="1"></label>`).join("")}
+      ${Ff.map(([e, t, n, r]) => `<label>${t} · <span id="${e}-value"></span><input id="${e}" type="range" min="${n}" max="${r}" step="1"></label>`).join("")}
       <small>At 100% the photo fills the window. Zoom in to pan farther.</small></div></fieldset>
       <label data-shade>Fabric opacity · <span id="opacity-reading"></span>
         <input id="shade-opacity" type="range" min="0" max="100" step="1">
@@ -15200,10 +15278,10 @@ var Df = [
       <label data-double>Right door light · optional<input id="right-light" list="lights" pattern="light\\.[a-z0-9_]+"></label></div>
       <label class="toggle"><input id="custom" type="checkbox"> Customize garage light temperature</label>
       <label for="kelvin">Garage light temperature · <span id="reading"></span></label>
-      <input id="kelvin" type="range" min="${$d}" max="${ef}" step="1"></div></details>
+      <input id="kelvin" type="range" min="${sf}" max="${cf}" step="1"></div></details>
       <p id="invalid" role="status"></p></form>`, this.root.querySelector("form").addEventListener("submit", (e) => e.preventDefault()), this.root.addEventListener("input", (e) => {
 			e.target === this.input("window-image") && this.cancelPhoto(), e.target instanceof HTMLInputElement && ["entity", "right-entity"].includes(e.target.id) && this.layout(), e.target === this.input("kelvin") && this.showTemperature(), e.target === this.input("shade-opacity") && this.showOpacity(), e.target === this.input("bar-width") && this.showBarWidth();
-			for (let [t] of Df) e.target === this.input(t) && this.showFraming(t);
+			for (let [t] of Ff) e.target === this.input(t) && this.showFraming(t);
 		}), this.root.addEventListener("change", (e) => {
 			if (e.target === this.input("window-photo")) {
 				this.choosePhoto();
@@ -15223,16 +15301,18 @@ var Df = [
 				entity: this.input("entity").value.trim(),
 				travel_seconds: this.input("seconds").valueAsNumber
 			};
-			(e.target === this.root.querySelector("#kind") || this.kind !== "garage" || r.cover_type) && (r.cover_type = this.kind), this.input("name").value.trim() ? r.name = this.input("name").value.trim() : delete r.name, t === "normal" ? delete r.variant : r.variant = t, this.kind === "blind" && this.input("tilt-seconds").valueAsNumber !== 1 ? r.tilt_seconds = this.input("tilt-seconds").valueAsNumber : delete r.tilt_seconds;
-			let i = this.input("shade-opacity").valueAsNumber, a = this.root.querySelector("#window-ratio").value;
-			af(this.kind) && (a === "square" || a === "portrait") ? r.window_aspect_ratio = a : delete r.window_aspect_ratio, this.kind === "shade" && i !== 100 ? r.shade_opacity = i : delete r.shade_opacity;
-			let o = this.input("bar-width").valueAsNumber, s = this.input("bar-color").value;
-			af(this.kind) && o !== 3 ? r.glazing_bar_width = o : delete r.glazing_bar_width, af(this.kind) && s !== "#30566a" ? r.glazing_bar_color = s : delete r.glazing_bar_color;
-			let c = this.input("window-image").value.trim();
-			af(this.kind) && c ? r.window_image = c : delete r.window_image;
-			for (let [e, , , , t] of Df) {
+			(e.target === this.root.querySelector("#kind") || this.kind !== "garage" || r.cover_type) && (r.cover_type = this.kind), this.input("name").value.trim() ? r.name = this.input("name").value.trim() : delete r.name, t === "normal" ? delete r.variant : r.variant = t;
+			let i = this.select("opening").value;
+			this.kind === "curtain" && this.select("panels").value === "single" && (i === "left_to_right" || i === "right_to_left") ? r.curtain_opening = i : delete r.curtain_opening, this.kind === "blind" && this.input("tilt-seconds").valueAsNumber !== 1 ? r.tilt_seconds = this.input("tilt-seconds").valueAsNumber : delete r.tilt_seconds;
+			let a = this.input("shade-opacity").valueAsNumber, o = this.root.querySelector("#window-ratio").value;
+			ff(this.kind) && this.select("mounting-side").value === "outside" ? r.mounting_side = "outside" : delete r.mounting_side, ff(this.kind) && this.input("custom-cover-color").checked ? r.cover_color = this.input("cover-color").value : delete r.cover_color, ff(this.kind) && (o === "square" || o === "portrait") ? r.window_aspect_ratio = o : delete r.window_aspect_ratio, this.kind === "shade" && a !== 100 ? r.shade_opacity = a : delete r.shade_opacity;
+			let s = this.input("bar-width").valueAsNumber, c = this.input("bar-color").value;
+			ff(this.kind) && s !== 3 ? r.glazing_bar_width = s : delete r.glazing_bar_width, ff(this.kind) && c !== "#30566a" ? r.glazing_bar_color = c : delete r.glazing_bar_color;
+			let l = this.input("window-image").value.trim();
+			ff(this.kind) && l ? r.window_image = l : delete r.window_image;
+			for (let [e, , , , t] of Ff) {
 				let n = this.input(e).valueAsNumber;
-				af(this.kind) && n !== t ? r[e] = n : delete r[e];
+				ff(this.kind) && n !== t ? r[e] = n : delete r[e];
 			}
 			this.kind === "garage" && this.root.querySelector("#roof").value === "flat" ? r.roof_type = "flat" : delete r.roof_type, t === "double" ? (r.right_entity = this.input("right-entity").value, this.input("right-seconds").value ? r.right_travel_seconds = this.input("right-seconds").valueAsNumber : delete r.right_travel_seconds) : (delete r.right_entity, delete r.right_travel_seconds);
 			for (let e of ["left", "right"]) {
@@ -15243,7 +15323,7 @@ var Df = [
 				let n = e ? "right-" : "", i = this.kind === "garage" && (!e || t === "double"), a = e ? "right_light_entity" : "light_entity";
 				i && this.input(n + "light").value ? r[a] = this.input(n + "light").value : delete r[a];
 			}
-			delete r.right_light_temperature_kelvin, this.kind === "garage" && this.input("custom").checked ? r.light_temperature_kelvin = this.input("kelvin").valueAsNumber : delete r.light_temperature_kelvin, this.config = cf(r), this.dispatchEvent(new CustomEvent("config-changed", {
+			delete r.right_light_temperature_kelvin, this.kind === "garage" && this.input("custom").checked ? r.light_temperature_kelvin = this.input("kelvin").valueAsNumber : delete r.light_temperature_kelvin, this.config = hf(r), this.dispatchEvent(new CustomEvent("config-changed", {
 				detail: { config: r },
 				bubbles: !0,
 				composed: !0
@@ -15251,6 +15331,9 @@ var Df = [
 		});
 	}
 	input(e) {
+		return this.root.querySelector(`#${e}`);
+	}
+	select(e) {
 		return this.root.querySelector(`#${e}`);
 	}
 	cancelPhoto() {
@@ -15261,12 +15344,12 @@ var Df = [
 	}
 	async choosePhoto() {
 		let e = this.input("window-photo"), t = e.files?.[0];
-		if (!t || !af(this.kind)) return;
+		if (!t || !ff(this.kind)) return;
 		e.value = "";
 		let n = ++this.uploadGeneration, r = this.root.querySelector("#photo-status");
 		r.textContent = "Uploading photo…";
 		try {
-			let e = await Ef(this.assistant, t);
+			let e = await Pf(this.assistant, t);
 			if (n !== this.uploadGeneration) return;
 			let i = this.input("window-image");
 			i.value = e, i.dispatchEvent(new Event("change", { bubbles: !0 })), r.textContent = "Photo uploaded to Home Assistant.";
@@ -15300,14 +15383,14 @@ var Df = [
 	}
 	layout() {
 		this.updateSuggestion();
-		let e = this.root.querySelector("#layout"), t = rf[this.kind].layouts;
+		let e = this.root.querySelector("#layout"), t = df[this.kind].layouts;
 		for (let n of e.options) n.disabled = n.hidden = !t.some((e) => e === n.value);
 		e.selectedOptions[0]?.disabled && (e.value = "normal");
 		let n = e.value, r = this.kind === "garage";
-		this.root.querySelector("[data-blind]").hidden = this.input("tilt-seconds").disabled = this.kind !== "blind";
+		this.root.querySelector("[data-curtain]").hidden = this.select("panels").disabled = this.kind !== "curtain", this.root.querySelector("[data-single]").hidden = this.select("opening").disabled = this.kind !== "curtain" || this.select("panels").value !== "single", this.root.querySelector("[data-blind]").hidden = this.input("tilt-seconds").disabled = this.kind !== "blind";
 		for (let e of this.root.querySelectorAll("[data-shade]")) e.hidden = this.kind !== "shade";
-		for (let e of this.root.querySelectorAll("[data-window]")) e.hidden = !af(this.kind);
-		this.input("window-image").disabled = !af(this.kind), this.input("shade-opacity").disabled = this.kind !== "shade";
+		for (let e of this.root.querySelectorAll("[data-window]")) e.hidden = !ff(this.kind);
+		this.input("window-image").disabled = !ff(this.kind), this.select("mounting-side").disabled = !ff(this.kind), this.input("custom-cover-color").disabled = !ff(this.kind), this.input("cover-color").disabled = !ff(this.kind) || !this.input("custom-cover-color").checked, this.input("shade-opacity").disabled = this.kind !== "shade";
 		for (let e of this.root.querySelectorAll("[data-garage]")) e.hidden = !r;
 		this.input("light").disabled = this.input("custom").disabled = !r;
 		let i = n === "double";
@@ -15316,18 +15399,20 @@ var Df = [
 		let a = this.input("right-entity"), o = this.input("entity").value.trim(), s = i && o && a.value.trim() === o ? "Both doors use the same cover entity. Choose a different entity for one door." : "";
 		a.setCustomValidity(s), a.setAttribute("aria-invalid", String(!!s));
 		let c = this.root.querySelector("#duplicate");
-		c.textContent !== s && (c.textContent = s), this.root.querySelector("#entity-label").textContent = i ? "Left door entity" : `${rf[this.kind].label} entity`, this.root.querySelector("#light-label").textContent = i ? "Left door light · optional" : "Garage light · optional", this.root.querySelector("#time-label").textContent = i ? "Left door travel time (seconds)" : "Travel time (seconds)";
+		c.textContent !== s && (c.textContent = s), this.root.querySelector("#entity-label").textContent = i ? "Left door entity" : `${df[this.kind].label} entity`, this.root.querySelector("#light-label").textContent = i ? "Left door light · optional" : "Garage light · optional", this.root.querySelector("#time-label").textContent = i ? "Left door travel time (seconds)" : "Travel time (seconds)";
 		let l = this.input("seconds").value || "—";
 		this.root.querySelector("#travel-summary").textContent = i ? `Left: ${l} s · Right: ${this.input("right-seconds").value || l} s` : `${l} seconds to open or close`;
 		let u = this.invalidField();
 		return this.root.querySelector("#invalid").textContent = u?.closest("details") ? `${u.labels?.[0]?.textContent?.trim()}: ${u.validationMessage}` : "", n;
 	}
 	setConfig(e) {
-		(this.config?.entity !== e.entity || this.config?.cover_type !== e.cover_type || this.config?.window_image !== e.window_image) && this.cancelPhoto(), this.config = e, this.root.querySelector("#kind").value = e.cover_type ?? "garage", this.input("entity").value = e.entity ?? "", this.input("name").value = e.name ?? "", this.input("seconds").value = String(e.travel_seconds ?? 10), this.input("tilt-seconds").value = String(e.tilt_seconds ?? 1), this.input("shade-opacity").value = String(e.shade_opacity ?? 100), this.input("window-image").value = e.window_image ?? "", this.root.querySelector("#window-ratio").value = e.window_aspect_ratio ?? "landscape", this.input("bar-width").value = String(e.glazing_bar_width ?? 3), this.input("bar-color").value = e.glazing_bar_color ?? "#30566a", this.showBarWidth();
-		for (let [t, , , , n] of Df) this.input(t).value = String(e[t] ?? n), this.showFraming(t);
+		(this.config?.entity !== e.entity || this.config?.cover_type !== e.cover_type || this.config?.window_image !== e.window_image) && this.cancelPhoto(), this.config = e, this.root.querySelector("#kind").value = e.cover_type ?? "garage", this.input("entity").value = e.entity ?? "";
+		let t = e.curtain_opening === "right_to_left" || e.curtain_opening === "left_to_right";
+		this.select("panels").value = t ? "single" : "center", this.select("opening").value = t ? e.curtain_opening : "left_to_right", this.input("name").value = e.name ?? "", this.input("seconds").value = String(e.travel_seconds ?? 10), this.input("tilt-seconds").value = String(e.tilt_seconds ?? 1), this.input("shade-opacity").value = String(e.shade_opacity ?? 100), this.input("window-image").value = e.window_image ?? "", this.root.querySelector("#window-ratio").value = e.window_aspect_ratio ?? "landscape", this.select("mounting-side").value = e.mounting_side ?? "inside", this.input("bar-width").value = String(e.glazing_bar_width ?? 3), this.input("bar-color").value = e.glazing_bar_color ?? "#30566a", this.input("custom-cover-color").checked = e.cover_color !== void 0, this.input("cover-color").value = e.cover_color ?? "#839d94", this.showBarWidth();
+		for (let [t, , , , n] of Ff) this.input(t).value = String(e[t] ?? n), this.showFraming(t);
 		this.showOpacity(), this.root.querySelector("#layout").value = e.variant ?? "normal", this.root.querySelector("#roof").value = e.roof_type ?? "pitched", this.input("right-entity").value = e.right_entity ?? "", this.input("left-label").value = e.left_label ?? "", this.input("right-label").value = e.right_label ?? "", this.input("right-seconds").value = String(e.right_travel_seconds ?? e.travel_seconds ?? 10), this.input("light").value = e.light_entity ?? "";
-		let t = tf(e);
-		this.input("custom").checked = t !== void 0, this.input("kelvin").value = String(t ?? 2700), this.input("right-light").value = e.right_light_entity ?? "", this.layout();
+		let n = lf(e);
+		this.input("custom").checked = n !== void 0, this.input("kelvin").value = String(n ?? 2700), this.input("right-light").value = e.right_light_entity ?? "", this.layout();
 	}
 	set hass(e) {
 		this.assistant = e, this.updateSuggestion();
@@ -15338,10 +15423,10 @@ var Df = [
 		}
 	}
 	updateSuggestion() {
-		let e = sf(this.assistant?.states[this.input("entity").value]?.attributes.device_class), t = this.root.querySelector("#suggestion");
-		t.hidden = !e || e === this.kind, !t.hidden && e && (t.textContent = `This entity reports device class ${e}. Suggested cover type: ${rf[e].label}.`);
+		let e = mf(this.assistant?.states[this.input("entity").value]?.attributes.device_class), t = this.root.querySelector("#suggestion");
+		t.hidden = !e || e === this.kind, !t.hidden && e && (t.textContent = `This entity reports device class ${e}. Suggested cover type: ${df[e].label}.`);
 	}
-}, kf = [
+}, Lf = [
 	{
 		type: "gleam-energy-graph",
 		name: "Gleam Energy Graph",
@@ -15356,14 +15441,14 @@ var Df = [
 	},
 	{
 		type: "gleam-cover",
-		name: "Gleam Cover (Experimental)",
-		element: wf,
-		description: "Garage doors, roller shades, slatted blinds and roller shutters with live status and controls."
+		name: "Gleam Cover",
+		element: Mf,
+		description: "Garage doors, roller shades, slatted blinds, roller shutters and curtains with live status and controls."
 	}
 ];
-for (let { type: e, element: t, ...n } of kf) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
+for (let { type: e, element: t, ...n } of Lf) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
 	type: e,
 	...n,
 	preview: !1
 });
-customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", Ed), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", Yu), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", Of);
+customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", Ed), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", Yu), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", If);

@@ -21,8 +21,8 @@ const cards = [
     description: "Interactive energy and price timeline with power and voltage lanes." },
   { type: "gleam-thermostat", name: "Gleam Thermostat (Experimental)", element: Thermostat,
     description: "Experimental climate controls with limited real-device testing." },
-  { type: "gleam-cover", name: "Gleam Cover (Experimental)", element: Cover,
-    description: "Garage doors, roller shades, slatted blinds and roller shutters with live status and controls." },
+  { type: "gleam-cover", name: "Gleam Cover", element: Cover,
+    description: "Garage doors, roller shades, slatted blinds, roller shutters and curtains with live status and controls." },
 ];
 
 for (const { type, element, ...metadata } of cards) {
