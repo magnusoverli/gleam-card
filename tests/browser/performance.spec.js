@@ -1,5 +1,40 @@
 import { test, expect } from "@playwright/test";
 
+test("an 8×8 Light preview batches beam edits and retains its fixtures", async ({ page }) => {
+  await page.goto("/light/");
+  await page.getByLabel("Example").selectOption("dense");
+  const card = page.locator("#light");
+  await card.scrollIntoViewIfNeeded();
+  await expect(card.locator(".pools ellipse").last()).toHaveAttribute("rx", /.+/);
+  const metrics = await card.evaluate(async light => {
+    const config = { rows: 8, columns: 8, zones: [{ entity: "light.kitchen_counter" }] };
+    light.setConfig(config);
+    const editor = light.constructor.getConfigElement();
+    editor.setConfig(config);
+    document.body.append(editor);
+    const beam = editor.shadowRoot.querySelector("#beam"), fixtures = light.shadowRoot.querySelector(".fixtures");
+    const first = fixtures.firstElementChild, frame = () => new Promise(requestAnimationFrame);
+    let emissions = 0;
+    editor.addEventListener("config-changed", e => {
+      emissions++;
+      light.setConfig(e.detail.config);
+      editor.setConfig(e.detail.config);
+    });
+    const start = performance.now();
+    for (let angle = 20; angle <= 100; angle += 5) {
+      beam.value = String(angle);
+      beam.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    const inputCpuMs = performance.now() - start;
+    await frame(); await frame();
+    editor.remove();
+    return { inputCpuMs, toPreviewFrameMs: performance.now() - start, emissions,
+      retained: first === fixtures.firstElementChild, fixtures: fixtures.childElementCount };
+  });
+  expect(metrics).toMatchObject({ emissions: 1, retained: true, fixtures: 64 });
+  console.log("Light editor preview (retained SVG)", metrics);
+});
+
 test("curtain batches reports on retained fabric and suspends off-screen",async({page})=>{
   await page.goto("/cover/");
   await page.getByLabel("Example").selectOption("cover.demo_curtain:center");

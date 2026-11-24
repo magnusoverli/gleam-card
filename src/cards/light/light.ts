@@ -78,6 +78,7 @@ export class GleamLight extends HTMLElement {
   private client?: HomeAssistant;
   private zones: Zone[] = [];
   private spots: Spot[] = [];
+  private layoutDirty = true;
   private scene?: LightScene;
   private highlight?: number;
   private renderer: ReturnType<typeof mountScene>;
@@ -103,7 +104,7 @@ export class GleamLight extends HTMLElement {
     // Tapping the picture toggles the zone of the nearest spot; hovering previews which one.
     this.svg.addEventListener("click", event => {
       const zone = this.zoneAt(event);
-      if (zone >= 0) this.toggle(zone);
+      if (zone >= 0) this.toggle(this.zones[zone]);
     });
     this.svg.addEventListener("pointermove", event => { if (event.pointerType === "mouse") this.setHighlight(this.zoneAt(event)); });
     this.svg.addEventListener("pointerleave", () => this.setHighlight(undefined));
@@ -119,15 +120,20 @@ export class GleamLight extends HTMLElement {
   }
 
   setConfig(value: LightConfig) {
-    const config = settings(value);
-    const rebuild = !this.config || config.zones.length !== this.zones.length || config.zones.some((z, i) => z.entity !== this.zones[i].id);
-    this.config = config;
+    const config = settings(value), previous = this.config;
+    const countChanged = config.zones.length !== this.zones.length;
+    const zonesChanged = countChanged || config.zones.some((z, i) => z.entity !== this.zones[i].id);
+    const layoutChanged = !previous || countChanged || config.rows !== previous.rows || config.columns !== previous.columns ||
+      config.walls_only !== previous.walls_only || config.zone_map.length !== previous.zone_map.length ||
+      config.zone_map.some((row, i) => row !== previous.zone_map[i]);
+    this.config = { ...config, zone_map: layoutChanged ? [...config.zone_map] : previous.zone_map };
+    this.layoutDirty ||= layoutChanged;
+    put(this.root.querySelector("h2")!, config.name ?? "Spots");
     this.toggleAttribute("compact", config.variant === "compact");
-    if (rebuild) this.buildZones();
-    config.zones.forEach((z, i) => { this.zones[i].name = this.zoneName(i); });
-    this.spots = layoutSpots(config.rows, config.columns, config.walls_only, config.zone_map, config.zones.length);
-    this.renderer.layout(this.spots.length);
-    this.sync(true);
+    if (zonesChanged) this.reconcileZones();
+    this.zones.forEach((zone, i) => this.updateName(zone, i));
+    if (zonesChanged) this.sync(true);
+    else if (layoutChanged || config.beam_angle !== previous?.beam_angle) this.schedule();
   }
   set hass(value: HomeAssistant) { this.client = value; this.sync(false); }
 
@@ -143,28 +149,50 @@ export class GleamLight extends HTMLElement {
     cancelAnimationFrame(this.frame); clearTimeout(this.timer); this.frame = this.timer = 0;
   }
 
-  private zoneName(i: number) {
-    const zone = this.config!.zones[i];
-    return zone.name?.trim() || String(this.zones[i]?.entity?.attributes.friendly_name ?? `Zone ${i + 1}`);
+  private updateName(zone: Zone, i: number) {
+    const name = this.config!.zones[i].name?.trim() || String(zone.entity?.attributes.friendly_name ?? `Zone ${i + 1}`);
+    if (zone.name === name) return;
+    zone.name = name;
+    put(zone.el.querySelector(".name")!, name);
+    put(zone.temperature.querySelector(".label")!, name);
+    attribute(zone.el.querySelector("input")!, "aria-label", `${name} brightness`);
+    attribute(zone.temperature.querySelector("input")!, "aria-label", `${name} colour temperature`);
+    const action = zone.el.querySelector("button")!;
+    attribute(action, "aria-label", `${action.textContent} ${name}`);
   }
-  private buildZones() {
-    const controls = this.root.querySelector(".controls")!, temperatures = this.root.querySelector(".temperatures")!;
-    this.zones = this.config!.zones.map((z, i) => {
-      const el = document.createElement("div");
-      el.className = "zone"; el.dataset.zone = String(i); el.innerHTML = zoneMarkup;
-      el.querySelector("button")!.addEventListener("click", () => this.toggle(i));
-      const brightness = el.querySelector("input")!;
-      brightness.addEventListener("input", () => { this.zones[i].draftBrightness = brightness.valueAsNumber; this.refresh(); });
-      brightness.addEventListener("change", () => this.setLevel(i, "brightness", brightness.valueAsNumber));
-      const temperature = document.createElement("label");
-      temperature.className = "level kelvin"; temperature.dataset.zone = String(i); temperature.innerHTML = temperatureMarkup;
-      const kelvin = temperature.querySelector("input")!;
-      kelvin.addEventListener("input", () => { this.zones[i].draftKelvin = kelvin.valueAsNumber; this.refresh(); });
-      kelvin.addEventListener("change", () => this.setLevel(i, "kelvin", kelvin.valueAsNumber));
-      return { id: z.entity, name: "", error: "", remembered: {}, el, temperature };
+  private createZone(id: string): Zone {
+    const el = document.createElement("div"), temperature = document.createElement("label");
+    el.className = "zone"; el.innerHTML = zoneMarkup;
+    temperature.className = "level kelvin"; temperature.innerHTML = temperatureMarkup;
+    const zone: Zone = { id, name: "", error: "", remembered: {}, el, temperature };
+    el.querySelector("button")!.addEventListener("click", () => this.toggle(zone));
+    const brightness = el.querySelector("input")!, kelvin = temperature.querySelector("input")!;
+    brightness.addEventListener("input", () => { zone.draftBrightness = brightness.valueAsNumber; this.refresh(); });
+    brightness.addEventListener("change", () => this.setLevel(zone, "brightness", brightness.valueAsNumber));
+    kelvin.addEventListener("input", () => { zone.draftKelvin = kelvin.valueAsNumber; this.refresh(); });
+    kelvin.addEventListener("change", () => this.setLevel(zone, "kelvin", kelvin.valueAsNumber));
+    return zone;
+  }
+  private reconcileZones() {
+    const existing = new Map(this.zones.map(zone => [zone.id, zone]));
+    const highlighted = this.highlight === undefined ? undefined : this.zones[this.highlight];
+    this.zones = this.config!.zones.map(({ entity }) => {
+      const zone = existing.get(entity) ?? this.createZone(entity);
+      existing.delete(entity);
+      return zone;
     });
-    controls.replaceChildren(...this.zones.map(z => z.el));
-    temperatures.replaceChildren(...this.zones.map(z => z.temperature));
+    for (const zone of existing.values()) { zone.el.remove(); zone.temperature.remove(); }
+    const controls = this.root.querySelector(".controls")!, temperatures = this.root.querySelector(".temperatures")!;
+    this.zones.forEach(({ el, temperature }, i) => {
+      for (const [parent, node] of [[controls, el], [temperatures, temperature]] as const) {
+        attribute(node, "data-zone", String(i));
+        const before = parent.children.item(i);
+        if (node === before) continue;
+        if (node.parentElement === parent && parent.moveBefore) parent.moveBefore(node, before);
+        else parent.insertBefore(node, before);
+      }
+    });
+    this.highlight = highlighted && !existing.has(highlighted.id) ? this.zones.indexOf(highlighted) : undefined;
     this.style.setProperty("--zones", String(this.zones.length));
   }
 
@@ -178,7 +206,7 @@ export class GleamLight extends HTMLElement {
       const light = readLight(next);
       if (light.brightness !== undefined) zone.remembered.brightness = light.brightness;
       if (light.kelvin !== undefined) zone.remembered.kelvin = light.kelvin;
-      zone.name = this.zoneName(i);
+      this.updateName(zone, i);
       const r = zone.request;
       // Only a new report for this zone can confirm a request, not a UI refresh.
       if (r && light.available && (r.on === undefined || light.on === r.on) &&
@@ -211,15 +239,15 @@ export class GleamLight extends HTMLElement {
       this.refresh();
     }
   }
-  private toggle(i: number) {
-    const zone = this.zones[i], client = this.client;
+  private toggle(zone?: Zone) {
+    const client = this.client;
     if (!zone || !client) return;
     const { light, on } = this.view(zone);
     if (!light.available) return;
     void this.send(zone, { on: !on }, false, () => sendPower(client, zone.id, !on));
   }
-  private setLevel(i: number, key: "brightness" | "kelvin", value: number) {
-    const zone = this.zones[i], client = this.client;
+  private setLevel(zone: Zone, key: "brightness" | "kelvin", value: number) {
+    const client = this.client;
     zone.draftBrightness = zone.draftKelvin = undefined;
     if (!client || !readLight(zone.entity).available || !Number.isFinite(value)) { this.refresh(); return; }
     void this.send(zone, { on: true, [key]: value }, true, () =>
@@ -244,7 +272,6 @@ export class GleamLight extends HTMLElement {
     clearTimeout(this.timer); this.timer = 0;
     if (!this.config) return;
     const now = performance.now();
-    put(this.root.querySelector("h2")!, this.config.name ?? "Spots");
     let tunable = false, wake = Infinity;
     this.zones.forEach(zone => {
       if (zone.request && now >= zone.request.deadline) {
@@ -254,7 +281,6 @@ export class GleamLight extends HTMLElement {
       const { light, on, brightness, kelvin } = this.view(zone), el = zone.el;
       const available = light.available, name = zone.name;
       attribute(el, "data-state", available ? (on ? "on" : "off") : "unavailable");
-      put(el.querySelector(".name")!, name);
       put(el.querySelector(".state")!, available ? (on ? "On" : "Off") : "Unavailable");
       const r = zone.request;
       const pending = !r ? "" : r.on === false ? "Turning off…" :
@@ -270,16 +296,15 @@ export class GleamLight extends HTMLElement {
       if (zone.draftBrightness === undefined && slider.valueAsNumber !== brightness) slider.value = String(brightness);
       const bText = !available ? "—" : on ? `${brightness}%` : "Off";
       put(level.querySelector(".value")!, bText);
-      attribute(slider, "aria-label", `${name} brightness`); attribute(slider, "aria-valuetext", bText);
+      attribute(slider, "aria-valuetext", bText);
       const t = zone.temperature, k = t.querySelector("input")!;
       t.hidden = available && !light.tunable;
       tunable ||= !t.hidden;
       k.min = String(light.minKelvin); k.max = String(light.maxKelvin); k.disabled = !available;
       if (zone.draftKelvin === undefined && k.valueAsNumber !== kelvin) k.value = String(kelvin);
-      put(t.querySelector(".label")!, name);
       const kText = available ? `${kelvin} K` : "—";
       put(t.querySelector(".value")!, kText);
-      attribute(k, "aria-label", `${name} colour temperature`); attribute(k, "aria-valuetext", kText);
+      attribute(k, "aria-valuetext", kText);
       k.style.accentColor = available ? css(kelvinRgb(kelvin)) : "#6b7d90";
       if (zone.request) wake = Math.min(wake, zone.request.deadline - now);
       else if (age && zone.entity?.last_changed) wake = Math.min(wake, 60000 - (Date.now() - Date.parse(zone.entity.last_changed)) % 60000);
@@ -295,7 +320,12 @@ export class GleamLight extends HTMLElement {
   };
   private draw = () => {
     this.frame = 0;
+    if (!this.isConnected || !this.visible || document.hidden) return;
     const config = this.config!;
+    if (this.layoutDirty) {
+      this.spots = layoutSpots(config.rows, config.columns, config.walls_only, config.zone_map, this.zones.length);
+      this.layoutDirty = false;
+    }
     this.scene = lightScene(this.spots, this.zones.map(zone => {
       const { light, on, brightness, color } = this.view(zone);
       return { on, brightness: light.dimmable ? brightness : 100, color, unavailable: !light.available };

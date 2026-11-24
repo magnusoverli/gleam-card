@@ -4,7 +4,7 @@ import { graphTemplate } from "./template";
 import { BAR_WORLD_DEPTH, BAR_CENTER_Z, ChartScene } from "./chart-scene";
 import { CAMERA_OFFSETS, fitCamera, setCameraSpan } from "./camera";
 import { readStatistics, readHistory } from "./recorder";
-import { ENERGY_DEFAULTS, SERIES, SHIFT_FIELDS, hasEnergySource, resolveEnergyConfig } from "./config";
+import { ENERGY_DEFAULTS, SERIES, hasEnergySource, resolveEnergyConfig } from "./config";
 import {
   GRAPH_HEIGHT, HOUR, numeric, energyFromStatistics, withLiveEnergy, normalizeHistory,
   priceSegments, sampledHistory, scaleFor, mergeHistory, timestamp,
@@ -52,20 +52,22 @@ export class GleamEnergyGraph extends HTMLElement {
       }
     }
     this._applyLayout();
-    if (!previous || ["current_hour_label","price_label","show_current_hour_label","show_price_label"].some(key => merged[key] !== previous[key]))
+    const liveChanged = previous?.current_hour_entity !== merged.current_hour_entity;
+    if (!previous || liveChanged || ["current_hour_label","price_label","show_current_hour_label","show_price_label"].some(key => merged[key] !== previous[key]))
       this._updateReadings();
     if (previous?.starting_view !== merged.starting_view) {
       this._cameraPreset = merged.starting_view;
       if (this._renderer) this._setCameraPreset(merged.starting_view);
     }
-    // Appearance-only edits keep fetched history and the existing GPU resources.
-    if (previous && Object.keys(ENERGY_DEFAULTS)
-      .every(key => ["title","starting_view","lock_navigation","dataset_spacing","point_light_intensity","separate_readout_sizes","use_server_time"].includes(key) || /^(show_|start_)/.test(key) || /_(shift_minutes|color|opacity|label|value_size|line_width)$/.test(key) || previous[key] === merged[key])) {
-      if (previous.use_server_time !== merged.use_server_time) this._scheduleBuild();
-      if (visibilityChanged) { this._scheduleBuild(); void this._refresh(); }
-      if (previous.dataset_spacing !== merged.dataset_spacing || previous.now_marker_color !== merged.now_marker_color || SHIFT_FIELDS.some(([key]) => previous[key] !== merged[key]) || SERIES.some(name =>
-        previous[`${name}_color`] !== merged[`${name}_color`] || previous[`${name}_opacity`] !== merged[`${name}_opacity`]
-        || previous[`${name}_line_width`] !== merged[`${name}_line_width`])) this._scheduleBuild();
+    // The current-hour sensor comes from hass.states, not Recorder.
+    if (previous && previous.hours_to_show === merged.hours_to_show && previous.future_hours === merged.future_hours
+      && SERIES.every(name => previous[`${name}_entity`] === merged[`${name}_entity`])) {
+      if (this.isConnected && previous.refresh_interval !== merged.refresh_interval) this._startRefreshTimer();
+      if (visibilityChanged) void this._refresh();
+      if (visibilityChanged || (liveChanged && this._enabled.energy) || previous.use_server_time !== merged.use_server_time
+        || previous.dataset_spacing !== merged.dataset_spacing || previous.now_marker_color !== merged.now_marker_color
+        || SERIES.some(name => this._enabled[name] && ["shift_minutes", "color", "opacity", "line_width"].some(
+          field => previous[`${name}_${field}`] !== merged[`${name}_${field}`]))) this._scheduleBuild();
       return;
     }
     this._epoch++;
@@ -243,11 +245,6 @@ export class GleamEnergyGraph extends HTMLElement {
     this._camera.aspect = width / height;
     const span = this._framingSpan || Math.max(9.5, 25 / this._camera.aspect);
     setCameraSpan(this._camera, this._camera.aspect, span);
-    if (!this._sized || (width < 650) !== this._narrow) {
-      this._narrow = width < 650;
-      this._sized = true;
-      this._setCameraPreset(this._cameraPreset || this._config.starting_view);
-    }
     if (this._defaultCamera) this._fitCamera();
     this._renderFrame();
   }

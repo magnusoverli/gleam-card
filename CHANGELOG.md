@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Live visual editor previews
+
+- Preview names, colours, and appearance values while typing or dragging in all four cards. Entity IDs, image URLs, and history settings still wait until you finish editing. Previewing does not operate devices or save the dashboard.
+
 ### 💡 New: Gleam Light · In-roof spots
 
 - Choose **Gleam Light** in the card picker to show recessed ceiling spots in rows and columns (up to 8 × 8), or only along the walls.

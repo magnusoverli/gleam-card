@@ -1,5 +1,6 @@
 import type { HomeAssistant, LightConfig } from "../../types";
 import { editorPanelStyles } from "../../shared/editor-styles";
+import { EditorPreview } from "../../shared/editor-preview";
 import { settings } from "./model";
 import { MAX_GRID, MAX_ZONES, defaultZone, onRing, planPosition } from "./spots";
 
@@ -9,6 +10,7 @@ export class GleamLightEditor extends HTMLElement {
   private root = this.attachShadow({ mode: "open" });
   private config?: LightConfig;
   private choices = "";
+  private preview = new EditorPreview<LightConfig>(this);
 
   constructor() {
     super();
@@ -74,19 +76,17 @@ export class GleamLightEditor extends HTMLElement {
     this.root.addEventListener("change", event => {
       const target = event.target as HTMLInputElement;
       if (!this.config) return;
-      if (target.dataset.field) {
-        const i = Number(target.dataset.index), zones = this.config.zones.map(z => ({ ...z }));
-        const value = target.value.trim();
-        if (target.dataset.field === "name") { if (value) zones[i].name = value; else delete zones[i].name; }
-        else zones[i].entity = value;
+      if (this.appearance(target, false)) return;
+      if (target.dataset.field === "entity") {
+        const zones = this.config.zones.map(z => ({ ...z }));
+        zones[Number(target.dataset.index)].entity = target.value.trim();
         this.update({ zones });
-      } else if (target.id === "name") this.update({ name: target.value.trim() || undefined });
-      else if (target.id === "layout") this.update({ variant: target.value === "compact" ? "compact" : undefined });
+      } else if (target.id === "layout") this.update({ variant: target.value === "compact" ? "compact" : undefined });
       else if (target.id === "walls") this.update({ walls_only: target.checked || undefined });
-      else if (target.id === "beam") this.update({ beam_angle: target.valueAsNumber === 40 ? undefined : target.valueAsNumber });
     });
     this.root.addEventListener("input", event => {
-      if ((event.target as Element).id === "beam") this.showBeam();
+      if (this.config && event.target instanceof HTMLInputElement && !(event as InputEvent).isComposing)
+        this.appearance(event.target, true);
     });
     this.root.addEventListener("click", event => {
       const button = (event.target as Element).closest("button");
@@ -105,10 +105,12 @@ export class GleamLightEditor extends HTMLElement {
   }
 
   setConfig(config: LightConfig) {
+    if (this.preview.isEcho(config)) return;
     this.config = config;
     this.validate(config);
-    this.render();
+    this.render(true);
   }
+  disconnectedCallback() { this.preview.cancel(); }
   set hass(value: HomeAssistant) {
     const ids = Object.keys(value.states).filter(id => id.startsWith("light.")).sort(), key = ids.join("|");
     if (key === this.choices) return;
@@ -150,13 +152,28 @@ export class GleamLightEditor extends HTMLElement {
       return false;
     }
   }
-  private update(patch: Partial<LightConfig>) {
+  private appearance(target: HTMLInputElement, live: boolean) {
+    if (target.id === "beam") {
+      this.showBeam();
+      this.update({ beam_angle: target.valueAsNumber === 40 ? undefined : target.valueAsNumber }, live);
+    } else if (target.id === "name") this.update({ name: target.value.trim() || undefined }, live);
+    else if (target.dataset.field === "name") {
+      const zones = this.config!.zones.map(z => ({ ...z })), zone = zones[Number(target.dataset.index)];
+      if (target.value.trim()) zone.name = target.value.trim(); else delete zone.name;
+      this.update({ zones }, live);
+    } else return false;
+    return true;
+  }
+  private update(patch: Partial<LightConfig>, live = false) {
     const next: LightConfig = { ...this.config!, ...patch };
     for (const key of Object.keys(patch) as (keyof LightConfig)[]) if (patch[key] === undefined) delete next[key];
     this.config = next;
     const valid = this.validate(next);
-    this.render();
-    if (valid) this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
+    // While typing or dragging, leave the active input and the spot-plan DOM alone.
+    if (!live) this.render();
+    if (!valid) this.preview.cancel();
+    else if (live) this.preview.queue(next);
+    else this.preview.emit(next);
   }
   private addZone() {
     const zones = this.config!.zones ?? [];
@@ -195,12 +212,12 @@ export class GleamLightEditor extends HTMLElement {
     this.root.querySelector("#beam-reading")!.textContent = `${beam.value}°`;
     beam.setAttribute("aria-valuetext", `${beam.value} degrees`);
   }
-  private render() {
+  private render(external = false) {
     const c = this.config!, { rows, columns, walls, zones: zoneCount } = this.grid;
     const field = <T extends HTMLElement>(id: string) => this.root.querySelector<T>(`#${id}`)!;
     field<HTMLSelectElement>("layout").value = c.variant ?? "normal";
     const name = field<HTMLInputElement>("name");
-    if (this.root.activeElement !== name) name.value = c.name ?? "";
+    if (external || this.root.activeElement !== name) name.value = c.name ?? "";
     field("rows").textContent = String(rows);
     field("columns").textContent = String(columns);
     field<HTMLInputElement>("walls").checked = walls;
@@ -214,7 +231,7 @@ export class GleamLightEditor extends HTMLElement {
 
     const zones = c.zones ?? [];
     const list = field("zones");
-    if (list.childElementCount !== zones.length || this.root.activeElement?.closest?.(".zone") == null) {
+    if (external || list.childElementCount !== zones.length || this.root.activeElement?.closest?.(".zone") == null) {
       list.replaceChildren(...zones.map((zone, i) => {
         const row = document.createElement("div");
         row.className = "zone";

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { foundationStyles } from "../../shared/theme";
+import { EditorPreview } from "../../shared/editor-preview";
 import { DialScene } from "./dial-scene";
 import { dialFraction } from "./dial-angle";
 import { CommandState } from "./command-state";
@@ -26,11 +27,15 @@ export class GleamThermostat extends HTMLElement {
   /** @param {import("../../types").ThermostatConfig} config */
   setConfig(config) {
     const resolved = resolveThermostatConfig(config);
-    if (this._config && this._config.entity !== config.entity) {
+    const previous = this._config;
+    if (previous && previous.entity !== resolved.entity) {
       this._command.reset(); this._draft = null; this._drag = null;
     }
     this._config = resolved;
-    if (this.shadowRoot.querySelector("details")) this.shadowRoot.querySelector("details").open = this._config.advanced_open;
+    if (previous && previous.advanced_open !== resolved.advanced_open) {
+      const details = this.shadowRoot.querySelector("details");
+      if (details) details.open = resolved.advanced_open;
+    }
     if (this.isConnected) { this._mount(); this._applyConfig(); this._update(); }
   }
   /** @param {import("../../types").HomeAssistant} hass */
@@ -375,10 +380,14 @@ export class GleamThermostat extends HTMLElement {
   }
 }
 export class GleamThermostatEditor extends HTMLElement {
-  constructor() { super(); this.attachShadow({ mode: "open" }); }
-  setConfig(config) { this._config = { ...config }; this._render(); }
+  constructor() { super(); this.attachShadow({ mode: "open" }); this._preview = new EditorPreview(this); }
+  setConfig(config) {
+    if (this._preview.isEcho(config)) return;
+    this._config = { ...config }; this._render();
+  }
   set hass(hass) { this._hass = hass; this._entities(); }
   connectedCallback() { this._render(); }
+  disconnectedCallback() { this._preview.cancel(); }
   _entities() {
     const list = this.shadowRoot.querySelector("datalist");
     if (!list || !this._hass) return;
@@ -389,13 +398,6 @@ export class GleamThermostatEditor extends HTMLElement {
       const option = document.createElement("option"); option.value = id;
       option.label = this._hass.states[id].attributes.friendly_name || id; list.append(option);
     }
-  }
-  _change(key, value) {
-    const config = { ...this._config };
-    if (value === undefined) delete config[key]; else config[key] = value;
-    resolveThermostatConfig(config);
-    this._config = config;
-    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config }, bubbles: true, composed: true }));
   }
   _render() {
     if (!this._config) return;
@@ -459,21 +461,35 @@ export class GleamThermostatEditor extends HTMLElement {
       const reset = document.createElement("button"); reset.type = "button"; reset.textContent = "Reset display & control options to defaults";
       reset.addEventListener("click", () => {
         const config = { ...this._config }; for (const key of Object.keys(DEFAULTS)) delete config[key];
-        this._config = config; this._render();
-        this.dispatchEvent(new CustomEvent("config-changed", { detail: { config }, bubbles: true, composed: true }));
+        try {
+          resolveThermostatConfig(config);
+          this._config = config; this._render(); this._preview.emit(config);
+        } catch (invalid) { error.textContent = invalid.message; }
       }); form.append(reset);
-      form.addEventListener("change", event => {
+      const update = event => {
         const input = event.target, key = input.dataset.key; if (!key) return;
+        const live = event.type === "input", numeric = input.type === "number";
+        if (live && key !== "name" && input.type !== "color" && !(numeric && key !== "confirmation_timeout")) return;
         if (!input.checkValidity()) {
           error.textContent = "Choose a valid climate entity or a value within the displayed limits."; return;
         }
         error.textContent = "";
+        if (live && numeric && input.value === "") return;
+        const config = { ...this._config };
+        if (numeric && input.value === "") delete config[key];
+        else config[key] = numeric ? input.valueAsNumber : input.type === "checkbox" ? input.checked : input.value;
         try {
-          this._change(key, input.type === "checkbox" ? input.checked : input.type === "number"
-            ? (input.value === "" ? undefined : Number(input.value)) : input.value);
+          resolveThermostatConfig(config);
+          this._config = config;
+          if (numeric && input.value === "") input.value = DEFAULTS[key];
+          if (live && key !== "name") this._preview.queue(config);
+          else if (live) this._preview.live(config);
+          else this._preview.emit(config);
         } catch (invalid) { error.textContent = invalid.message; }
-      });
+      };
+      form.addEventListener("input", update); form.addEventListener("change", update);
     }
+    this.shadowRoot.querySelector(".error").textContent = "";
     for (const input of this.shadowRoot.querySelectorAll("[data-key]")) {
       const value = this._config[input.dataset.key] ?? DEFAULTS[input.dataset.key] ?? (input.dataset.key === "name" ? DEFAULT_NAME : "");
       if (input.type === "checkbox") input.checked = value; else if (input.value !== String(value)) input.value = value;

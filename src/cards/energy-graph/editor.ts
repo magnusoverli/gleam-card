@@ -1,4 +1,5 @@
 import type { EnergyConfig, HomeAssistant } from "../../types";
+import { EditorPreview } from "../../shared/editor-preview";
 import { editorPanelStyles } from "../../shared/editor-styles";
 import { ENERGY_DEFAULTS, ENERGY_ENTITIES, SERIES, SHIFT_FIELDS, EnergyFieldError, hasEnergySource, isCompatibleEnergyUnit, resolveEnergyConfig } from "./config";
 import type { EnergyEntityField } from "./config";
@@ -15,6 +16,7 @@ const NUMBER_FIELDS = [
   ["price_value_size", "Price (%)", "", "50", "200", "#sizes"],
 ] as const;
 type Field = keyof typeof ENERGY_DEFAULTS;
+const timeWindow = (key: Field) => key === "hours_to_show" || key === "future_hours";
 const SWITCHES = [
   ["use_server_time", "Use Home Assistant server time"],
   ["separate_readout_sizes", "Use separate sizes"],
@@ -33,6 +35,7 @@ const SHIFT_SOURCES: Record<typeof SHIFT_FIELDS[number][0], readonly EnergyEntit
 
 export class GleamEnergyGraphEditor extends HTMLElement {
   private config: EnergyConfig = {};
+  private readonly preview = new EditorPreview<EnergyConfig>(this);
   private assistant?: HomeAssistant;
   private inputs = new Map<Field, HTMLInputElement>();
   private suggestions = new Map<EnergyEntityField, { list: HTMLDataListElement; key: string }>();
@@ -46,6 +49,8 @@ export class GleamEnergyGraphEditor extends HTMLElement {
   }
 
   setConfig(config: EnergyConfig) {
+    if (this.preview.isEcho(config)) return;
+    this.preview.cancel();
     this.config = { ...config };
     this.render();
     const values = { ...ENERGY_DEFAULTS, ...config };
@@ -54,7 +59,7 @@ export class GleamEnergyGraphEditor extends HTMLElement {
       else input.value = String(values[key]);
     }
     this.view.value = values.starting_view;
-    this.validate(config, false);
+    this.validate(config, "load");
     this.updateTimeSummary();
     this.updateMissing();
   }
@@ -65,6 +70,7 @@ export class GleamEnergyGraphEditor extends HTMLElement {
   }
 
   connectedCallback() { this.render(); }
+  disconnectedCallback() { this.preview.cancel(); }
 
   private render() {
     if (this.inputs.size) return;
@@ -155,6 +161,7 @@ export class GleamEnergyGraphEditor extends HTMLElement {
     const viewLabel = document.createElement("label");
     viewLabel.textContent = "Starting view";
     this.view = document.createElement("select");
+    this.view.dataset.key = "starting_view";
     for (const name of ["isometric", "front", "top"]) this.view.add(new Option(name[0].toUpperCase() + name.slice(1), name));
     viewLabel.append(this.view); root.querySelector("#layout")!.append(viewLabel);
     for (const name of SERIES) {
@@ -173,52 +180,62 @@ export class GleamEnergyGraphEditor extends HTMLElement {
     this.missing = root.querySelector<HTMLParagraphElement>(".missing")!;
     const form = root.querySelector("form")!;
     form.addEventListener("submit", event => event.preventDefault());
-    form.addEventListener("change", () => this.change());
+    form.addEventListener("change", event => this.change(event.target, true));
     form.addEventListener("input", event => {
-      if (event.target instanceof HTMLInputElement && event.target.dataset.key?.endsWith("_entity")) this.updateMissing();
+      const input = event.target;
+      if (!(input instanceof HTMLInputElement)) return;
+      const key = input.dataset.key as Field;
+      if (key.endsWith("_entity")) this.updateMissing();
+      else if (input.type !== "checkbox" && !timeWindow(key) && key !== "refresh_interval") this.change(input, false);
     });
     this.updateTimeSummary();
     this.updateEntities();
   }
 
-  private change() {
-    const next: EnergyConfig = { ...this.config, type: "custom:gleam-energy-graph" };
-    next.title = this.inputs.get("title")!.value;
-    next.now_marker_color = this.inputs.get("now_marker_color")!.value;
-    for (const key of ["current_hour_label", "price_label"] as const) next[key] = this.inputs.get(key)!.value;
-    next.starting_view = this.view.value as EnergyConfig["starting_view"];
-    for (const [key] of SWITCHES) next[key] = this.inputs.get(key)!.checked;
-    for (const [key] of ENERGY_ENTITIES) next[key] = this.inputs.get(key)!.value.trim();
-    for (const [key] of NUMBER_FIELDS) next[key] = this.inputs.get(key)!.valueAsNumber;
-    for (const name of SERIES) {
-      next[`${name}_color`] = this.inputs.get(`${name}_color`)!.value;
-      next[`${name}_opacity`] = this.inputs.get(`${name}_opacity`)!.valueAsNumber;
-      if (name !== "energy") next[`${name}_line_width`] = this.inputs.get(`${name}_line_width`)!.valueAsNumber;
+  private change(input: EventTarget | null, commit: boolean) {
+    if (!(input instanceof HTMLInputElement || input instanceof HTMLSelectElement)) return;
+    const key = input.dataset.key as Field;
+    const value = input instanceof HTMLInputElement && input.type === "number" ? input.valueAsNumber
+      : input instanceof HTMLInputElement && input.type === "checkbox" ? input.checked
+      : key.endsWith("_entity") ? input.value.trim() : input.value;
+    let next = this.config;
+    const changed = (field: Field, v: unknown) => v !== (this.config[field] ?? ENERGY_DEFAULTS[field]);
+    if (timeWindow(key)) {
+      // The two bounds validate together; either commit can complete the window.
+      const hours = this.inputs.get("hours_to_show")!.valueAsNumber;
+      const future = this.inputs.get("future_hours")!.valueAsNumber;
+      if (changed("hours_to_show", hours) || changed("future_hours", future))
+        next = { ...next, type: "custom:gleam-energy-graph", hours_to_show: hours, future_hours: future };
+    } else if (changed(key, value)) {
+      next = { ...next, type: "custom:gleam-energy-graph", [key]: value };
     }
-    if (!this.validate(next)) return;
-    const previous = { ...ENERGY_DEFAULTS, ...this.config };
-    if (next.starting_view === previous.starting_view && [...this.inputs.keys()].every(key => next[key] === previous[key])) return;
+    if (!this.validate(next, commit ? "commit" : "preview", key)) return;
     this.config = next;
-    this.updateTimeSummary();
-    this.updateMissing();
-    this.dispatchEvent(new CustomEvent("config-changed", {
-      detail: { config: { ...next } }, bubbles: true, composed: true,
-    }));
+    if (commit && (timeWindow(key) || key === "refresh_interval")) this.updateTimeSummary();
+    if (commit && (key.endsWith("_entity") || input.type === "checkbox")) this.updateMissing();
+    if (input.type === "color" && !commit) this.preview.queue(next);
+    else if (!commit) this.preview.live(next);
+    else this.preview.emit(next);
   }
 
-  private validate(config: EnergyConfig, reveal = true) {
-    this.view.removeAttribute("aria-invalid");
-    for (const input of this.inputs.values()) input.removeAttribute("aria-invalid");
+  private validate(config: EnergyConfig, mode: "load" | "preview" | "commit", key?: Field) {
+    const invalid = this.shadowRoot!.querySelector<HTMLInputElement | HTMLSelectElement>("[aria-invalid=true]");
     try {
       resolveEnergyConfig(config);
-      this.error!.textContent = "";
+      const field = invalid?.dataset.key as Field | undefined;
+      if (!key || !field || key === field || (timeWindow(key) && timeWindow(field))) {
+        invalid?.removeAttribute("aria-invalid");
+        if (this.error!.textContent) this.error!.textContent = "";
+      }
       return true;
     } catch (error) {
+      if (mode === "preview") return false;
+      invalid?.removeAttribute("aria-invalid");
       if (error instanceof EnergyFieldError) {
         const input = error.field === "starting_view" ? this.view : this.inputs.get(error.field)!;
         input.setAttribute("aria-invalid", "true");
         const section = input.closest("details");
-        if (section && reveal) section.open = true;
+        if (section && mode === "commit") section.open = true;
       }
       this.error!.textContent = error instanceof Error ? error.message : "Invalid configuration.";
       return false;

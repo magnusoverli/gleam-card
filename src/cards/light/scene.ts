@@ -1,7 +1,6 @@
 import type { LightScene } from "./spots";
 
-// Retained SVG for the room. Static faces are drawn once; spot elements are rebuilt only when
-// the layout changes, and each update writes only the attributes that differ.
+// Retained SVG for the room. Resize the spot layers and paint their geometry in the same frame.
 const ROOM_FLOOR = "M86 124H258L320 153.6V174H0V150.2Z";
 const LEFT_WALL = "M0 14H20L86 44V124L0 150.2Z", RIGHT_WALL = "M320 14H300L258 44V124L320 153.6Z";
 const PLANKS = "M107.5 124L-23.0 174 M129.0 124L32.1 174 M150.5 124L87.2 174 M172.0 124L142.3 174 M193.5 124L197.4 174 M215.0 124L252.5 174 M236.5 124L307.6 174";
@@ -70,28 +69,32 @@ export function mountScene(svg: SVGSVGElement) {
   const washes = [...svg.querySelectorAll(".wash")], washPaths = washes.map(g => g.firstElementChild!);
   const sides = [layer("side-left"), layer("side-right")];
   const beamMid = [...svg.querySelectorAll(".beam-mid")], beamEnd = [...svg.querySelectorAll(".beam-end")];
-  let nodes: SpotNodes[] = [];
+  const nodes: SpotNodes[] = [];
+  const glows = layer("glows"), pools = layer("pools"), cones = layer("cones"), fixtures = layer("fixtures");
   const colours = new Map<string, string>();
 
   function layout(count: number) {
-    if (count === nodes.length) return;
-    for (const name of ["glows", "pools", "cones", "fixtures"]) layer(name).replaceChildren();
-    nodes = Array.from({ length: count }, () => {
-      const fixture = element(layer("fixtures"), "g", {});
+    while (nodes.length > count) {
+      const { glow, pool, cone, fixture } = nodes.pop()!;
+      glow.remove(); pool.remove(); cone.remove(); fixture.remove();
+    }
+    while (nodes.length < count) {
+      const fixture = element(fixtures, "g", {});
       const halo = element(fixture, "ellipse", {});
       const lamp = element(fixture, "g", {});
-      return {
-        glow: element(layer("glows"), "ellipse", { cy: 124, ry: 60, "clip-path": "url(#back-clip)" }),
-        pool: element(layer("pools"), "ellipse", {}),
-        cone: element(layer("cones"), "polygon", {}),
+      nodes.push({
+        glow: element(glows, "ellipse", { cy: 124, ry: 60, "clip-path": "url(#back-clip)" }),
+        pool: element(pools, "ellipse", {}),
+        cone: element(cones, "polygon", {}),
         fixture, halo,
         trim: element(lamp, "ellipse", { fill: "#0a1422" }),
         lens: element(lamp, "ellipse", {}),
-      };
-    });
+      });
+    }
   }
 
   function draw(scene: LightScene) {
+    layout(scene.spots.length);
     scene.zones.forEach((z, i) => {
       for (const [name, value] of [[`--lamp-${i}`, z.lamp], [`--mix-a-${i}`, z.mixA], [`--mix-b-${i}`, z.mixB], [`--mix-c-${i}`, z.mixC]]) {
         if (colours.get(name) !== value) { colours.set(name, value); svg.style.setProperty(name, value); }
@@ -122,5 +125,5 @@ export function mountScene(svg: SVGSVGElement) {
       set(n.trim.parentElement!, "opacity", s.dim);
     });
   }
-  return { layout, draw };
+  return { draw };
 }

@@ -81,9 +81,8 @@ export class GleamCover extends HTMLElement {
   setConfig(value: CoverConfig) {
     const config = settings(value), variant = config.variant ?? "normal";
     const kind = config.cover_type ?? "garage";
-    if (variant !== this.variant || kind !== this.kind) {
+    if (kind !== this.kind || (variant === "double") !== (this.variant === "double")) {
       this.kind = kind;
-      this.variant = variant;
       if (variant === "double") {
         this.root.innerHTML = `<style>${foundationStyles}:host{min-width:0}ha-card{padding:12px}
           h2{font-size:18px;margin:0 0 8px;overflow-wrap:anywhere}.bays{position:relative;container-type:inline-size;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:560px;margin-inline:auto}
@@ -106,29 +105,32 @@ export class GleamCover extends HTMLElement {
       } else {
         const bay = new CoverBay(kind);
         bay.toggleAttribute("window-cover",isWindowCover(kind));
-        bay.toggleAttribute("compact",variant === "compact");
         const style = document.createElement("style");
         style.textContent = ":host{display:block;min-width:0}";
         this.bays = [bay]; this.root.replaceChildren(style,bay);
       }
+      if (this.client) for (const bay of this.bays) bay.hass = this.client;
     }
+    this.variant = variant;
     if (variant === "double") {
-      this.root.querySelector("h2")!.textContent = config.name ?? "Garage";
+      put(this.root.querySelector("h2"),config.name ?? "Garage");
       const labels = this.root.querySelector<HTMLElement>(".labels")!;
       const names = [config.left_label?.trim(),config.right_label?.trim()];
       labels.hidden = !names.some(Boolean);
       labels.classList.toggle("flat",config.roof_type === "flat");
       labels.querySelectorAll("h3").forEach((heading,i) => {
-        heading.textContent = names[i] ?? "";
+        put(heading,names[i] ?? "");
         heading.hidden = !names[i];
       });
       this.bays[0].setConfig({entity:config.entity,name:config.left_label?.trim(),travel_seconds:config.travel_seconds,
         light_entity:config.light_entity,light_temperature_kelvin:sharedTemperature(config)});
       this.bays[1].setConfig({entity:config.right_entity!,name:config.right_label?.trim(),travel_seconds:config.right_travel_seconds ?? config.travel_seconds,
         light_entity:config.right_light_entity,light_temperature_kelvin:sharedTemperature(config)});
-    } else this.bays[0].setConfig(config);
+    } else {
+      this.bays[0].toggleAttribute("compact",variant === "compact");
+      this.bays[0].setConfig(config);
+    }
     for (const bay of this.bays) bay.toggleAttribute("flat-roof", config.roof_type === "flat");
-    if (this.client) this.hass = this.client;
   }
   set hass(value: HomeAssistant) { this.client = value; this.bays.forEach(b => b.hass = value); }
 }
@@ -191,7 +193,7 @@ class CoverBay extends HTMLElement {
     this.observer = new IntersectionObserver(([entry]) => { this.visible = entry.isIntersecting; this.refresh(); });
     this.observer.observe(this);
     document.addEventListener("visibilitychange", this.refresh);
-    this.sync(true);
+    this.sync("reset");
   }
   disconnectedCallback() {
     this.observer?.disconnect(); this.visible = false;
@@ -233,7 +235,8 @@ class CoverBay extends HTMLElement {
       if (config.window_image_x !== this.config?.window_image_x) this.style.setProperty("--photo-x",`${config.window_image_x ?? 50}%`);
       if (config.window_image_y !== this.config?.window_image_y) this.style.setProperty("--photo-y",`${config.window_image_y ?? 50}%`);
     }
-    if (config.entity !== this.config?.entity) { this.reset(); this.entity = undefined; }
+    const entityChanged = config.entity !== this.config?.entity;
+    if (entityChanged) { this.reset(); this.entity = undefined; }
     if (config.light_temperature_kelvin !== this.config?.light_temperature_kelvin) {
       const k = config.light_temperature_kelvin;
       this.toggleAttribute("tinted", k !== undefined);
@@ -244,9 +247,9 @@ class CoverBay extends HTMLElement {
         this.style.setProperty("--lamp-color",`rgb(${Math.round(255-35*t)} ${Math.round(168+68*t)} ${Math.round(86+169*t)})`);
       }
     }
-    this.config = config; this.sync(true);
+    this.config = config; this.sync(entityChanged ? "reset" : "config");
   }
-  set hass(value: HomeAssistant) { this.client = value; this.sync(false); }
+  set hass(value: HomeAssistant) { this.client = value; this.sync("state"); }
   private begin(target: "open" | "closed") {
     const now = performance.now();
     if (this.travel) this.p = fraction(this.travel, now);
@@ -255,7 +258,7 @@ class CoverBay extends HTMLElement {
     this.target = target; this.confirmed = false; this.error = "";
     this.confirmBy = now + this.travel.duration + 5000;
   }
-  private sync(force: boolean) {
+  private sync(reason: "state" | "config" | "reset") {
     if (!this.config || !this.isConnected) return;
     const id = this.kind === "garage" && this.config.light_entity, lamp = id ? this.client?.states[id] : undefined;
     this.toggleAttribute("lamp-off", !!id && lamp?.state !== "on");
@@ -264,8 +267,11 @@ class CoverBay extends HTMLElement {
     const state = next?.state, pos = position(next);
     const tilt = this.updateTilt ? tiltPosition(next) : undefined;
     const tiltChanged = tilt !== this.tiltTarget;
-    if (!force && next === prev && state === this.reportedState && pos === this.reportedPosition &&
-      !tiltChanged) return;
+    if (reason !== "reset" && next === prev && state === this.reportedState && pos === this.reportedPosition && !tiltChanged) {
+      // A preview can change labels and controls without supplying a new motion sample.
+      if (reason === "config") this.refresh();
+      return;
+    }
     if (tiltChanged) {
       const now = performance.now();
       const from = this.tiltTravel ? fraction(this.tiltTravel,now) : this.tiltTarget;
@@ -347,7 +353,7 @@ class CoverBay extends HTMLElement {
     catch {
       if (seq !== this.generation || !this.command || this.acknowledged) return;
       this.command = false; this.target = undefined; this.travel = undefined; this.error = "Command failed. Check the door and try again.";
-      this.sync(true);
+      this.sync("reset");
     }
   }
   private startPositionTravel(to:number) {
@@ -385,7 +391,7 @@ class CoverBay extends HTMLElement {
     catch {
       if (seq!==this.generation || this.positionTarget===undefined) return;
       this.positionTarget=undefined; this.travel=undefined; this.error="Position command failed.";
-      this.sync(true);
+      this.sync("reset");
     }
   }
   private paint = () => {

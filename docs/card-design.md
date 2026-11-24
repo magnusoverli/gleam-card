@@ -35,6 +35,15 @@ copying the graph template or introducing a shared controller.
 
 ## Make interaction immediate
 
+- In visual editors, preview valid appearance changes while the user types or drags.
+  Use `EditorPreview` for the Home Assistant `config-changed` event: coalesce continuous input,
+  flush on commit, ignore host echoes, and cancel queued work when disconnected. Keep incomplete
+  numbers and text selection in the form. Commit entity IDs, image URLs, uploads, and settings
+  that reload history only when the user finishes. Preview never sends a device command or saves the dashboard.
+- Home Assistant may replace a preview card for every `config-changed` event. During continuous
+  edits, update only a positively identified Gleam preview in the same card editor dialog; never
+  target the dashboard. Publish the final config on commit and fall back to host events if the
+  preview layout is unknown. Exercise a replacement-style host as well as a retained-card test.
 - Reflect input in HTML immediately. For device actions, distinguish a requested
   value from confirmed device state; don't send commands while rendering.
 - Ignore unrelated entity updates. For graphics, batch pending work into one
