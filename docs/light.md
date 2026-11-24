@@ -20,8 +20,8 @@ long ago it changed, a **Turn on/off** button and a **Brightness** slider.
 **Colour temperature** opens one slider per zone; it is hidden when no zone
 supports it. Pointing at, or focusing, a zone’s controls outlines its spots.
 
-**Tap the room** to switch the zone whose spot is nearest the tap, mostly by
-side-to-side position. Hovering the room previews that zone. Keyboard and
+**Tap a ceiling fixture** to switch its zone. Elsewhere in the room, the card
+chooses the nearest beam, mostly by side-to-side position. Hovering previews that zone. Keyboard and
 screen-reader users use the zone buttons instead.
 
 Buttons and sliders update the card straight away and send
@@ -58,7 +58,8 @@ a spot to move it to the next zone; after the last zone it becomes **no spot**
 **Walls | centre** split the grid in one step.
 
 In YAML, `zone_map` has one string per row, back wall first, with one character
-per column: a zone number, or `.` for no spot. Without `zone_map` the columns
+per column: a zone number, or `.` for no spot. Quote rows such as `"1122"` so
+YAML reads them as text rather than numbers. Without `zone_map` the columns
 are split evenly between the zones, left to right.
 
 ```yaml

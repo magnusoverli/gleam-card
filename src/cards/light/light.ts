@@ -179,23 +179,15 @@ export class GleamLight extends HTMLElement {
       if (light.brightness !== undefined) zone.remembered.brightness = light.brightness;
       if (light.kelvin !== undefined) zone.remembered.kelvin = light.kelvin;
       zone.name = this.zoneName(i);
-      this.settle(zone);
+      const r = zone.request;
+      // Only a new report for this zone can confirm a request, not a UI refresh.
+      if (r && light.available && (r.on === undefined || light.on === r.on) &&
+        (r.brightness === undefined || (light.brightness !== undefined && Math.abs(light.brightness - r.brightness) <= 1)) &&
+        (r.kelvin === undefined || (light.kelvin !== undefined && Math.abs(light.kelvin - r.kelvin) <= 60))) {
+        zone.request = undefined;
+      }
     });
     if (changed) this.refresh();
-  }
-  /** Clear a request once Home Assistant reports it; time it out otherwise. */
-  private settle(zone: Zone) {
-    const r = zone.request;
-    if (!r) return;
-    const light = readLight(zone.entity);
-    const done = light.available && (r.on === undefined || light.on === r.on) &&
-      (r.brightness === undefined || Math.abs((light.brightness ?? -9) - r.brightness) <= 1) &&
-      (r.kelvin === undefined || Math.abs((light.kelvin ?? -999) - r.kelvin) <= 60);
-    if (done) zone.request = undefined;
-    else if (performance.now() >= r.deadline) {
-      zone.request = undefined;
-      zone.error = `${zone.name}: change not confirmed. Home Assistant still reports ${light.available ? (light.on ? "on" : "off") : "unavailable"}.`;
-    }
   }
 
   private view(zone: Zone) {
@@ -255,13 +247,18 @@ export class GleamLight extends HTMLElement {
     put(this.root.querySelector("h2")!, this.config.name ?? "Spots");
     let tunable = false, wake = Infinity;
     this.zones.forEach(zone => {
-      this.settle(zone);
+      if (zone.request && now >= zone.request.deadline) {
+        zone.request = undefined;
+        zone.error = `${zone.name}: change not confirmed within five seconds.`;
+      }
       const { light, on, brightness, kelvin } = this.view(zone), el = zone.el;
       const available = light.available, name = zone.name;
       attribute(el, "data-state", available ? (on ? "on" : "off") : "unavailable");
       put(el.querySelector(".name")!, name);
       put(el.querySelector(".state")!, available ? (on ? "On" : "Off") : "Unavailable");
-      const pending = zone.request ? (zone.request.on === false ? "Turning off…" : zone.request.on && !light.on ? "Turning on…" : "Adjusting…") : "";
+      const r = zone.request;
+      const pending = !r ? "" : r.on === false ? "Turning off…" :
+        !light.on || (r.brightness === undefined && r.kelvin === undefined) ? "Turning on…" : "Adjusting…";
       const age = !available ? "" : pending || elapsed(zone.entity?.last_changed);
       put(el.querySelector(".age")!, age ? `· ${age}` : "");
       const action = el.querySelector("button")!, caption = on ? "Turn off" : "Turn on";

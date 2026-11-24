@@ -15538,6 +15538,10 @@ function ip(e, t, n) {
 	};
 }
 function ap(e, t, n) {
+	for (let r = e.spots.length - 1; r >= 0; r--) {
+		let i = e.spots[r], a = (t - i.x) / i.trimRx, o = (n - i.trimY) / i.trimRy;
+		if (a * a + o * o <= 1) return i.zone;
+	}
 	let r = -1, i = Infinity;
 	for (let a of e.spots) {
 		let e = a.hitX - t, o = (a.hitY - n) * .35, s = e * e + o * o;
@@ -15864,14 +15868,10 @@ var Op = class extends HTMLElement {
 			if (r === e.entity) return;
 			e.entity = r, t = !0;
 			let i = lp(r);
-			i.brightness !== void 0 && (e.remembered.brightness = i.brightness), i.kelvin !== void 0 && (e.remembered.kelvin = i.kelvin), e.name = this.zoneName(n), this.settle(e);
+			i.brightness !== void 0 && (e.remembered.brightness = i.brightness), i.kelvin !== void 0 && (e.remembered.kelvin = i.kelvin), e.name = this.zoneName(n);
+			let a = e.request;
+			a && i.available && (a.on === void 0 || i.on === a.on) && (a.brightness === void 0 || i.brightness !== void 0 && Math.abs(i.brightness - a.brightness) <= 1) && (a.kelvin === void 0 || i.kelvin !== void 0 && Math.abs(i.kelvin - a.kelvin) <= 60) && (e.request = void 0);
 		}), t && this.refresh();
-	}
-	settle(e) {
-		let t = e.request;
-		if (!t) return;
-		let n = lp(e.entity);
-		n.available && (t.on === void 0 || n.on === t.on) && (t.brightness === void 0 || Math.abs((n.brightness ?? -9) - t.brightness) <= 1) && (t.kelvin === void 0 || Math.abs((n.kelvin ?? -999) - t.kelvin) <= 60) ? e.request = void 0 : performance.now() >= t.deadline && (e.request = void 0, e.error = `${e.name}: change not confirmed. Home Assistant still reports ${n.available ? n.on ? "on" : "off" : "unavailable"}.`);
 	}
 	view(e) {
 		let t = lp(e.entity), n = e.request, r = t.available && (n?.on ?? t.on), i = e.draftBrightness ?? n?.brightness ?? t.brightness ?? e.remembered.brightness ?? 100, a = e.draftKelvin ?? n?.kelvin, o = a ?? t.kelvin ?? e.remembered.kelvin ?? 2700;
@@ -15926,21 +15926,21 @@ var Op = class extends HTMLElement {
 		Ep(this.root.querySelector("h2"), this.config.name ?? "Spots");
 		let t = !1, n = Infinity;
 		this.zones.forEach((r) => {
-			this.settle(r);
+			r.request && e >= r.request.deadline && (r.request = void 0, r.error = `${r.name}: change not confirmed within five seconds.`);
 			let { light: i, on: a, brightness: o, kelvin: s } = this.view(r), c = r.el, l = i.available, u = r.name;
 			Dp(c, "data-state", l ? a ? "on" : "off" : "unavailable"), Ep(c.querySelector(".name"), u), Ep(c.querySelector(".state"), l ? a ? "On" : "Off" : "Unavailable");
-			let d = r.request ? r.request.on === !1 ? "Turning off…" : r.request.on && !i.on ? "Turning on…" : "Adjusting…" : "", f = l ? d || wf(r.entity?.last_changed) : "";
-			Ep(c.querySelector(".age"), f ? `· ${f}` : "");
-			let p = c.querySelector("button"), m = a ? "Turn off" : "Turn on";
-			Ep(p, m), Dp(p, "aria-label", `${m} ${u}`), p.disabled = !l;
-			let h = c.querySelector(".brightness"), g = h.querySelector("input");
-			h.hidden = l && !i.dimmable, g.disabled = !l, r.draftBrightness === void 0 && g.valueAsNumber !== o && (g.value = String(o));
-			let _ = l ? a ? `${o}%` : "Off" : "—";
-			Ep(h.querySelector(".value"), _), Dp(g, "aria-label", `${u} brightness`), Dp(g, "aria-valuetext", _);
-			let v = r.temperature, y = v.querySelector("input");
-			v.hidden = l && !i.tunable, t ||= !v.hidden, y.min = String(i.minKelvin), y.max = String(i.maxKelvin), y.disabled = !l, r.draftKelvin === void 0 && y.valueAsNumber !== s && (y.value = String(s)), Ep(v.querySelector(".label"), u);
-			let b = l ? `${s} K` : "—";
-			Ep(v.querySelector(".value"), b), Dp(y, "aria-label", `${u} colour temperature`), Dp(y, "aria-valuetext", b), y.style.accentColor = l ? np(tp(s)) : "#6b7d90", r.request ? n = Math.min(n, r.request.deadline - e) : f && r.entity?.last_changed && (n = Math.min(n, 6e4 - (Date.now() - Date.parse(r.entity.last_changed)) % 6e4));
+			let d = r.request, f = d ? d.on === !1 ? "Turning off…" : !i.on || d.brightness === void 0 && d.kelvin === void 0 ? "Turning on…" : "Adjusting…" : "", p = l ? f || wf(r.entity?.last_changed) : "";
+			Ep(c.querySelector(".age"), p ? `· ${p}` : "");
+			let m = c.querySelector("button"), h = a ? "Turn off" : "Turn on";
+			Ep(m, h), Dp(m, "aria-label", `${h} ${u}`), m.disabled = !l;
+			let g = c.querySelector(".brightness"), _ = g.querySelector("input");
+			g.hidden = l && !i.dimmable, _.disabled = !l, r.draftBrightness === void 0 && _.valueAsNumber !== o && (_.value = String(o));
+			let v = l ? a ? `${o}%` : "Off" : "—";
+			Ep(g.querySelector(".value"), v), Dp(_, "aria-label", `${u} brightness`), Dp(_, "aria-valuetext", v);
+			let y = r.temperature, b = y.querySelector("input");
+			y.hidden = l && !i.tunable, t ||= !y.hidden, b.min = String(i.minKelvin), b.max = String(i.maxKelvin), b.disabled = !l, r.draftKelvin === void 0 && b.valueAsNumber !== s && (b.value = String(s)), Ep(y.querySelector(".label"), u);
+			let x = l ? `${s} K` : "—";
+			Ep(y.querySelector(".value"), x), Dp(b, "aria-label", `${u} colour temperature`), Dp(b, "aria-valuetext", x), b.style.accentColor = l ? np(tp(s)) : "#6b7d90", r.request ? n = Math.min(n, r.request.deadline - e) : p && r.entity?.last_changed && (n = Math.min(n, 6e4 - (Date.now() - Date.parse(r.entity.last_changed)) % 6e4));
 		}), this.root.querySelector("details").hidden = !t, Ep(this.root.querySelector(".hint"), this.zones.map((e) => e.error).filter(Boolean).join(" ")), Number.isFinite(n) && this.isConnected && (this.timer = window.setTimeout(this.refresh, Math.max(1, n))), this.schedule();
 	};
 	schedule = () => {
@@ -16057,7 +16057,7 @@ var Op = class extends HTMLElement {
 		});
 	}
 	setConfig(e) {
-		this.config = e, this.render();
+		this.config = e, this.validate(e), this.render();
 	}
 	set hass(e) {
 		let t = Object.keys(e.states).filter((e) => e.startsWith("light.")).sort(), n = t.join("|");
@@ -16074,15 +16074,27 @@ var Op = class extends HTMLElement {
 	}
 	cells(e = this.grid.rows, t = this.grid.columns, n = this.grid.zones) {
 		let r = this.config.zone_map;
-		return Array.from({ length: e }, (e, i) => Array.from({ length: t }, (e, a) => {
-			let o = r?.[i]?.charAt(a);
-			if (o === ".") return 0;
-			let s = Number(o);
-			return s >= 1 ? Math.min(n, s) : Zf(a, t, n) + 1;
-		}));
+		return Array.from({ length: e }, (e, i) => {
+			let a = Array.isArray(r) ? r[i] : void 0, o = typeof a == "string" || typeof a == "number" && Number.isSafeInteger(a) && a > 0 ? String(a) : "";
+			return Array.from({ length: t }, (e, r) => {
+				if (o[r] === ".") return 0;
+				let i = Number(o[r]);
+				return i >= 1 ? Math.min(n, i) : Zf(r, t, n) + 1;
+			});
+		});
 	}
 	mapOf(e) {
 		return e.map((e) => e.map((e) => e ? String(e) : ".").join(""));
+	}
+	validate(e) {
+		let t = this.root.querySelector("#invalid");
+		try {
+			let n = e.zone_map;
+			if (n != null && (!Array.isArray(n) || n.some((e) => typeof e != "string"))) throw Error("Quote each zone_map row in YAML, for example [\"1111\", \"2222\"]. To repair it here, edit the spot plan or choose a quick split.");
+			return cp(e), t.textContent = "", !0;
+		} catch (e) {
+			return t.textContent = e instanceof Error ? e.message : "Invalid configuration.", !1;
+		}
 	}
 	update(e) {
 		let t = {
@@ -16090,15 +16102,9 @@ var Op = class extends HTMLElement {
 			...e
 		};
 		for (let n of Object.keys(e)) e[n] === void 0 && delete t[n];
-		this.config = t, this.render();
-		let n = this.root.querySelector("#invalid");
-		try {
-			cp(t), n.textContent = "";
-		} catch (e) {
-			n.textContent = e instanceof Error ? e.message : "Invalid configuration.";
-			return;
-		}
-		this.dispatchEvent(new CustomEvent("config-changed", {
+		this.config = t;
+		let n = this.validate(t);
+		this.render(), n && this.dispatchEvent(new CustomEvent("config-changed", {
 			detail: { config: t },
 			bubbles: !0,
 			composed: !0
@@ -16183,7 +16189,9 @@ var Op = class extends HTMLElement {
 			l.type = "button", l.dataset.cell = `${i},${a}`, l.className = e ? "" : "none", l.textContent = e ? String(e) : "", l.setAttribute("style", `${c};width:${d}px;height:${d}px${e ? `;background:${kp[e - 1]};border:2px solid var(--card-background-color,#1c1c1c);box-shadow:0 0 0 1px ${kp[e - 1]}` : ""}`);
 			let f = e ? `${s[e - 1]?.name || `Zone ${e}`} (zone ${e})` : "no spot";
 			l.setAttribute("aria-label", `Row ${i + 1} from the back wall, column ${a + 1}: ${f}. Activate to change.`), p.push(l);
-		})), f.replaceChildren(...p), this.root.querySelector(".legend").replaceChildren(...s.map((e, t) => {
+		}));
+		let m = this.root.activeElement instanceof HTMLButtonElement ? this.root.activeElement.dataset.cell : void 0;
+		f.replaceChildren(...p), m && f.querySelector(`[data-cell="${m}"]`)?.focus({ preventScroll: !0 }), this.root.querySelector(".legend").replaceChildren(...s.map((e, t) => {
 			let n = document.createElement("span");
 			return n.innerHTML = `<i style="background:${kp[t]}"></i>`, n.append(`${t + 1} · ${e.name || e.entity || `Zone ${t + 1}`} (${u[t]})`), n;
 		}), Object.assign(document.createElement("span"), { innerHTML: "<i style=\"border:1px dashed currentColor\"></i>No spot" }));
