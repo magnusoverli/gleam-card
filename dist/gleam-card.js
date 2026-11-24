@@ -15808,26 +15808,90 @@ function Np(e, t, n, r) {
 	];
 }
 function Pp(e, t) {
-	let n = e.length, r = (e) => e.toFixed(2), i = "";
-	return e.forEach((a, o) => {
-		let s = e[(o + n - 1) % n], c = e[(o + 1) % n], l = (e) => {
-			let n = e[0] - a[0], r = e[1] - a[1], i = Math.hypot(n, r) || 1, o = Math.min(t, i * .45);
-			return [a[0] + n / i * o, a[1] + r / i * o];
-		}, u = l(s), d = l(c);
-		i += `${o ? "L" : "M"}${r(u[0])} ${r(u[1])}Q${r(a[0])} ${r(a[1])} ${r(d[0])} ${r(d[1])}`;
-	}), i + "Z";
+	let n = (e) => e.toFixed(2), r = e.length, i = (e, t, n) => {
+		let r = Math.min(.5, n / (Math.hypot(t[0] - e[0], t[1] - e[1], t[2] - e[2]) || 1));
+		return [
+			e[0] + (t[0] - e[0]) * r,
+			e[1] + (t[1] - e[1]) * r,
+			e[2] + (t[2] - e[2]) * r
+		];
+	}, a = "";
+	return e.forEach((o, s) => {
+		let c = Mp(i(o, e[(s + r - 1) % r], t[s])), l = Mp(i(o, e[(s + 1) % r], t[s])), u = Mp(o);
+		a += `${s ? "L" : "M"}${n(c[0])} ${n(c[1])}Q${n(u[0])} ${n(u[1])} ${n(l[0])} ${n(l[1])}`;
+	}), a + "Z";
 }
-var Fp = {
+function Fp(e, t, n) {
+	let r = e.length, i = (e) => e.toFixed(2), a = e.reduce((e, t) => e + t[0], 0) / r, o = e.reduce((e, t) => e + t[1], 0) / r, s = Math.min(...e.map((t, n) => Math.hypot(e[(n + 1) % r][0] - t[0], e[(n + 1) % r][1] - t[1]))), c = (e, t, n) => {
+		let r = Math.hypot(t[0] - e[0], t[1] - e[1]) || 1;
+		return [e[0] + (t[0] - e[0]) / r * n, e[1] + (t[1] - e[1]) / r * n];
+	}, l = "";
+	return e.forEach((u, d) => {
+		let f = e[(d + 1) % r], p = Math.hypot(f[0] - u[0], f[1] - u[1]), m = c(u, f, s * n[d]), h = c(f, u, s * n[(d + 1) % r]), g = (u[0] + f[0]) / 2, _ = (u[1] + f[1]) / 2, v = -(f[1] - u[1]) / (p || 1), y = (f[0] - u[0]) / (p || 1);
+		v * (g - a) + y * (_ - o) < 0 && (v = -v, y = -y);
+		let b = p * t[d];
+		d || (l += `M${i(m[0])} ${i(m[1])}`), l += `Q${i(g + v * b * 2)} ${i(_ + y * b * 2)} ${i(h[0])} ${i(h[1])}`;
+		let x = e[(d + 2) % r], S = c(f, x, s * n[(d + 1) % r]);
+		l += `Q${i(f[0])} ${i(f[1])} ${i(S[0])} ${i(S[1])}`;
+	}), l + "Z";
+}
+function Ip([e, t, n, r]) {
+	let i = (e) => e.toFixed(2), a = (e, t, n) => [e[0] + (t[0] - e[0]) * n, e[1] + (t[1] - e[1]) * n], o = Math.hypot(t[0] - e[0], t[1] - e[1]), s = Math.hypot(r[0] - e[0], r[1] - e[1]), c = Math.min(o, s) * .1, l = .06 * Math.min(1, o / s / 1.2), u = .24, d = a(n, t, u), f = a(r, e, u), p = a(n, t, -l), m = a(r, e, -l), h = a(e, t, c / o), g = a(t, e, c / o), _ = a(t, n, c / s), v = a(e, r, c / s);
+	return `M${i(h[0])} ${i(h[1])}L${i(g[0])} ${i(g[1])}Q${i(t[0])} ${i(t[1])} ${i(_[0])} ${i(_[1])}L${i(d[0])} ${i(d[1])}C${i(p[0])} ${i(p[1])} ${i(m[0])} ${i(m[1])} ${i(f[0])} ${i(f[1])}L${i(v[0])} ${i(v[1])}Q${i(e[0])} ${i(e[1])} ${i(h[0])} ${i(h[1])}Z`;
+}
+var Lp = .1, Rp = {
+	front: {
+		front: [
+			.015,
+			.015,
+			Lp,
+			Lp
+		],
+		top: [
+			0,
+			0,
+			Lp,
+			Lp
+		],
+		end: [
+			.015,
+			.015,
+			Lp,
+			0
+		]
+	},
+	back: {
+		front: [
+			0,
+			0,
+			0,
+			0
+		],
+		top: [
+			Lp,
+			Lp,
+			0,
+			0
+		],
+		end: [
+			.015,
+			0,
+			0,
+			Lp
+		]
+	}
+}, zp = {
+	armTop: "#4a6575",
 	top: "#4f6c7c",
 	seat: "#56737f",
 	end: "#30475a",
 	front: "url(#couch-front)",
 	wood: "#0a121b"
-}, Ip = {
+}, Bp = {
 	top: .6,
 	front: .34,
 	end: .22
-}, Lp = (e, t, n, r, i, a, o = Fp.top) => ({
+}, Vp = (e, t, n, r, i, a, o = zp.top) => ({
 	box: [
 		e,
 		t,
@@ -15837,38 +15901,54 @@ var Fp = {
 		a
 	],
 	top: o,
-	radius: 1.1,
+	radius: .03,
 	lit: !0
-}), Rp = .22, zp = .42, Bp = .24, Vp = .72, Hp = .56, Up = [
-	...[[.04, .09], [2.21, 2.26]].flatMap(([e, t]) => [[.06, .11], [.84, .8899999999999999]].map(([n, r]) => ({
+}), Hp = .24, Up = .07, Wp = .26, Gp = .45, Kp = .8, qp = .62, Jp = .38, Yp = 3, Xp = (Op - 2 * Hp) / Yp, Zp = Array.from({ length: Yp }, (e, t) => [Hp + t * Xp + .008, Hp + (t + 1) * Xp - .008]), Qp = [
+	...[[.05, .1], [2.1999999999999997, 2.25]].flatMap(([e, t]) => [[.07, .12], [.83, .8799999999999999]].map(([n, r]) => ({
 		box: [
 			e,
 			t,
 			n,
 			r,
 			0,
-			.1
+			Up
 		],
-		top: Fp.wood,
-		radius: .3,
+		top: zp.wood,
+		radius: .01,
 		lit: !1
 	}))),
-	Lp(Rp, 2.0799999999999996, .02, .9299999999999999, .1, Bp, Fp.end),
-	Lp(.23, 1.14, .02, .4, Bp, Vp),
-	Lp(1.16, 2.07, .02, .4, Bp, Vp),
-	Lp(.23, 1.14, .4, .9299999999999999, Bp, zp, Fp.seat),
-	Lp(1.16, 2.07, .4, .9299999999999999, Bp, zp, Fp.seat),
-	...[[0, Rp], [2.0799999999999996, Op]].flatMap(([e, t]) => [Lp(e, t, 0, .4, .1, Hp), Lp(e, t, .4, kp, .1, Hp)])
+	Vp(Hp, 2.0599999999999996, .02, .9199999999999999, Up, Wp, zp.end),
+	...Zp.map(([e, t]) => ({
+		...Vp(e, t, .02, Jp, Wp, Kp),
+		pillow: !0
+	})),
+	...Zp.map(([e, t]) => ({
+		...Vp(e, t, Jp, .9299999999999999, Wp, Gp, zp.seat),
+		seat: !0
+	})),
+	...[[0, Hp], [2.0599999999999996, Op]].flatMap(([e, t]) => [{
+		...Vp(e, t, 0, .41000000000000003, Up, qp, zp.armTop),
+		radius: 0,
+		arm: "back"
+	}, {
+		...Vp(e, t, Jp, kp, Up, qp, zp.armTop),
+		arm: "front"
+	}])
 ];
-function Wp(e) {
-	let t = (e) => Math.hypot(e[0] - Dp[0], e[1] - Dp[1], e[2] - Dp[2]), n = Up.map((n) => {
+function $p(e) {
+	let t = (e) => Math.hypot(e[0] - Dp[0], e[1] - Dp[1], e[2] - Dp[2]), n = Qp.map((n) => {
 		let [r, i, a, o, s, c] = n.box;
 		return {
 			part: n,
 			far: t(Np(e, (r + i) / 2, (a + o) / 2, (s + c) / 2))
 		};
 	}).sort((e, t) => t.far - e.far), r = (e) => `style="fill:var(--couch-glow,#000);opacity:calc(var(--couch-lit,0) * ${e})"`, i = n.map(({ part: t }) => {
-		let [n, i, a, o, s, c] = t.box, l = (t, n, r) => Np(e, t, n, r);
+		let [n, i, a, o, s, c] = t.box, l = (n, r, i) => Np(e, n, t.pillow && i === c ? Math.min(r, o - .09) : r, i), u = (e) => t.arm !== void 0 && (e === 0 || e === Op), d = (e) => u(e) && t.arm === "front" ? 0 : a, f = (e) => u(e) && t.arm === "front" ? kp : o, p = (e) => [
+			l(e, d(e), s),
+			l(e, f(e), s),
+			l(e, f(e), c),
+			l(e, d(e), c)
+		];
 		return [
 			[
 				"top",
@@ -15900,34 +15980,26 @@ function Wp(e) {
 			],
 			[
 				"end",
-				[
-					l(n, a, s),
-					l(n, o, s),
-					l(n, o, c),
-					l(n, a, c)
-				],
+				p(n),
 				[
 					-1,
 					0,
 					0
-				]
+				],
+				u(n)
 			],
 			[
 				"end",
-				[
-					l(i, a, s),
-					l(i, o, s),
-					l(i, o, c),
-					l(i, a, c)
-				],
+				p(i),
 				[
 					1,
 					0,
 					0
-				]
+				],
+				u(i)
 			]
-		].map(([n, i, [a, o, s]]) => {
-			let c = e === "back" ? [
+		].map(([n, i, [a, o, s], c]) => {
+			let l = e === "back" ? [
 				a,
 				s,
 				o
@@ -15939,7 +16011,7 @@ function Wp(e) {
 				-o,
 				s,
 				a
-			], l = i.reduce((e, t) => [
+			], u = i.reduce((e, t) => [
 				e[0] + t[0] / 4,
 				e[1] + t[1] / 4,
 				e[2] + t[2] / 4
@@ -15948,9 +16020,39 @@ function Wp(e) {
 				0,
 				0
 			]);
-			if (c[0] * (Dp[0] - l[0]) + c[1] * (Dp[1] - l[1]) + c[2] * (Dp[2] - l[2]) <= 0) return "";
-			let u = Pp(i.map(Mp), t.radius), d = n === "top" ? t.top : t.lit ? n === "front" ? Fp.front : Fp.end : Fp.wood, f = n === "front" && t.lit ? `<path d="M${Mp(i[3]).map((e) => e.toFixed(2)).join(" ")}L${Mp(i[2]).map((e) => e.toFixed(2)).join(" ")}" stroke="#7896a5" stroke-width=".45" stroke-linecap="round" opacity=".35" fill="none"/>` : "";
-			return `<path d="${u}" fill="${d}"/>${t.lit ? `<path d="${u}" ${r(Ip[n])}/>` : ""}${f}`;
+			if (l[0] * (Dp[0] - u[0]) + l[1] * (Dp[1] - u[1]) + l[2] * (Dp[2] - u[2]) <= 0 || t.pillow && n !== "front" || t.arm === "back" && c) return "";
+			let d = i.map(Mp), f = t.pillow ? Ip(d) : t.seat ? Fp(d, n === "front" ? [
+				.01,
+				.02,
+				.035,
+				.02
+			] : [
+				.015,
+				.015,
+				.015,
+				.015
+			], n === "front" ? [
+				.22,
+				.22,
+				.38,
+				.38
+			] : [
+				.3,
+				.3,
+				.3,
+				.3
+			]) : t.arm ? Pp(i, c ? [
+				.015,
+				.015,
+				Lp,
+				Lp
+			] : Rp[t.arm][n]) : Pp(i, [
+				t.radius,
+				t.radius,
+				t.radius,
+				t.radius
+			]), p = n === "top" ? t.top : t.lit ? t.arm && (n === "front" || c) ? "url(#couch-arm)" : n === "front" ? zp.front : zp.end : zp.wood, m = n === "front" && t.lit ? `<path d="M${Mp(i[3]).map((e) => e.toFixed(2)).join(" ")}L${Mp(i[2]).map((e) => e.toFixed(2)).join(" ")}" stroke="#7896a5" stroke-width=".45" stroke-linecap="round" opacity=".35" fill="none"/>` : "", h = t.pillow && n === "front" ? `<path d="${f}" fill="url(#couch-sheen)"/>` : "";
+			return `<path d="${f}" fill="${t.pillow && n === "front" ? "url(#couch-pillow)" : p}"/>${t.lit ? `<path d="${f}" ${r(Bp[n])}/>` : ""}${h}${t.pillow || t.seat || t.arm ? "" : m}`;
 		}).join("");
 	}).join(""), a = (e) => [
 		o(-e, -.01),
@@ -15967,8 +16069,8 @@ function Wp(e) {
     ${i}
   </g>`;
 }
-var Gp = "<defs>\n  <linearGradient id=\"couch-front\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop stop-color=\"#3f5a6b\"/><stop offset=\"1\" stop-color=\"#23374a\"/></linearGradient>\n  <filter id=\"couch-shadow\" x=\"-20%\" y=\"-60%\" width=\"140%\" height=\"220%\"><feGaussianBlur stdDeviation=\"1.6\"/></filter>\n</defs>" + bp.map(Wp).join("");
-function Kp(e) {
+var em = "<defs>\n  <linearGradient id=\"couch-front\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop stop-color=\"#3f5a6b\"/><stop offset=\"1\" stop-color=\"#23374a\"/></linearGradient>\n  <linearGradient id=\"couch-arm\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop stop-color=\"#4a6575\"/><stop offset=\".22\" stop-color=\"#3b5566\"/><stop offset=\"1\" stop-color=\"#25394b\"/></linearGradient>\n  <linearGradient id=\"couch-pillow\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop stop-color=\"#4b6676\"/><stop offset=\".55\" stop-color=\"#38515f\"/><stop offset=\"1\" stop-color=\"#22364a\"/></linearGradient>\n  <radialGradient id=\"couch-sheen\" cx=\".5\" cy=\".18\" r=\".62\"><stop stop-color=\"#a9c3cf\" stop-opacity=\".16\"/><stop offset=\"1\" stop-color=\"#a9c3cf\" stop-opacity=\"0\"/></radialGradient>\n  <filter id=\"couch-shadow\" x=\"-20%\" y=\"-60%\" width=\"140%\" height=\"220%\"><feGaussianBlur stdDeviation=\"1.6\"/></filter>\n</defs>" + bp.map($p).join("");
+function tm(e) {
 	let t = bp.map((t) => ({
 		node: e.querySelector(`.wall-couch[data-wall="${t}"]`),
 		samples: [
@@ -15993,7 +16095,7 @@ function Kp(e) {
 		}
 	};
 }
-function qp(e) {
+function nm(e) {
 	let t = bp.map((t) => ({
 		wall: t,
 		window: e.querySelector(`.wall-window[data-wall="${t}"]`),
@@ -16009,13 +16111,13 @@ function qp(e) {
 	};
 }
 // src/cards/light/scene.ts
-var Jp = "M86 124H258L320 153.6V174H0V150.2Z", Yp = "M0 14H20L86 44H258L300 14H320V153.6L258 124H86L0 150.2Z", Xp = "M107.5 124L-23.0 174 M129.0 124L32.1 174 M150.5 124L87.2 174 M172.0 124L142.3 174 M193.5 124L197.4 174 M215.0 124L252.5 174 M236.5 124L307.6 174", Zp = Array.from({ length: 12 }, (e, t) => `M${18 + t * 26} 6l-8 8`).join(" "), Qp = `<svg class="room" viewBox="0 0 320 174" aria-hidden="true">
+var rm = "M86 124H258L320 153.6V174H0V150.2Z", im = "M0 14H20L86 44H258L300 14H320V153.6L258 124H86L0 150.2Z", am = "M107.5 124L-23.0 174 M129.0 124L32.1 174 M150.5 124L87.2 174 M172.0 124L142.3 174 M193.5 124L197.4 174 M215.0 124L252.5 174 M236.5 124L307.6 174", om = Array.from({ length: 12 }, (e, t) => `M${18 + t * 26} 6l-8 8`).join(" "), sm = `<svg class="room" viewBox="0 0 320 174" aria-hidden="true">
   <defs>
     <linearGradient id="fade-h" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".11" stop-color="#fff"/><stop offset=".89" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <linearGradient id="fade-v" x1="0" y1="0" x2="0" y2="1"><stop offset=".8" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <mask id="mask-h" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="174"><rect width="320" height="174" fill="url(#fade-h)"/></mask>
     <mask id="mask-v" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="174"><rect width="320" height="174" fill="url(#fade-v)"/></mask>
-    <clipPath id="wall-clip"><path d="${Yp}"/></clipPath>
+    <clipPath id="wall-clip"><path d="${im}"/></clipPath>
     <linearGradient id="wall-ground"><stop stop-color="#0f1e31"/><stop offset=".27" stop-color="#0c192b"/><stop offset=".81" stop-color="#0c192b"/><stop offset="1" stop-color="#0f1e31"/></linearGradient>
     <filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.6"/></filter>
     <filter id="cone-blur" filterUnits="userSpaceOnUse" x="0" y="0" width="320" height="174"><feGaussianBlur stdDeviation="1.8"/></filter>
@@ -16035,13 +16137,13 @@ var Jp = "M86 124H258L320 153.6V174H0V150.2Z", Yp = "M0 14H20L86 44H258L300 14H3
   </defs>
   <g mask="url(#mask-h)"><g mask="url(#mask-v)">
     <path d="M20 14H300L258 44H86Z" fill="#0a1524"/>
-    <path d="${Yp}" fill="url(#wall-ground)"/>
-    <path d="${Jp}" fill="#0b1727"/>
+    <path d="${im}" fill="url(#wall-ground)"/>
+    <path d="${rm}" fill="#0b1727"/>
     ${[
 	0,
 	1,
 	2
-].map((e) => `<g class="wash"><path d="${Jp}" fill="url(#floortint-${e})"/></g>`).join("")}
+].map((e) => `<g class="wash"><path d="${rm}" fill="url(#floortint-${e})"/></g>`).join("")}
     <g fill="none" stroke="#02060d" stroke-width="2.4" filter="url(#soft)">
       <path class="crease-left" d="M86 44V124"/><path class="crease-right" d="M258 44V124"/>
       <path d="M86 44H258" opacity=".4"/>
@@ -16052,27 +16154,27 @@ var Jp = "M86 124H258L320 153.6V174H0V150.2Z", Yp = "M0 14H20L86 44H258L300 14H3
       <g class="glows"></g>
     </g>
     <g clip-path="url(#wall-clip)" pointer-events="none">${Cp}</g>
-    <path d="${Xp}" stroke="#2c4c68" stroke-width=".6" opacity=".45"/>
+    <path d="${am}" stroke="#2c4c68" stroke-width=".6" opacity=".45"/>
     <path d="M86 44H258" stroke="#2f5670" stroke-width=".6" opacity=".7"/>
     <g class="pools"></g>
     <g class="cones" filter="url(#cone-blur)"></g>
-    <g pointer-events="none">${Gp}</g>
+    <g pointer-events="none">${em}</g>
     <g class="fixtures"></g>
     <path d="M0 6H320V14H0Z" fill="#142c40"/>
     <path d="M0 6.5H320M0 14H320" stroke="#6dabbc" stroke-width=".9"/>
-    <path d="${Zp}" stroke="#3d6c84" stroke-width=".6" opacity=".6"/>
+    <path d="${om}" stroke="#3d6c84" stroke-width=".6" opacity=".6"/>
   </g></g>
-</svg>`, $p = "http://www.w3.org/2000/svg";
+</svg>`, cm = "http://www.w3.org/2000/svg";
 function $(e, t, n) {
 	let r = typeof n == "number" ? String(Math.round(n * 1e3) / 1e3) : n;
 	e.getAttribute(t) !== r && e.setAttribute(t, r);
 }
-function em(e, t, n) {
-	let r = document.createElementNS($p, t);
+function lm(e, t, n) {
+	let r = document.createElementNS(cm, t);
 	for (let [e, t] of Object.entries(n)) $(r, e, t);
 	return e.append(r), r;
 }
-function tm(e) {
+function um(e) {
 	let t = (t) => e.querySelector(`.${t}`), n = [...e.querySelectorAll(".wash")], r = n.map((e) => e.firstElementChild), i = [t("side-left"), t("side-right")], a = [t("crease-left"), t("crease-right")], o = [...e.querySelectorAll(".beam-mid")], s = [...e.querySelectorAll(".beam-end")], c = [], l = t("glows"), u = t("pools"), d = t("cones"), f = t("fixtures"), p = /* @__PURE__ */ new Map();
 	function m(e) {
 		for (; c.length > e;) {
@@ -16080,18 +16182,18 @@ function tm(e) {
 			e.remove(), t.remove(), n.remove(), r.remove();
 		}
 		for (; c.length < e;) {
-			let e = em(f, "g", {}), t = em(e, "ellipse", {}), n = em(e, "g", {});
+			let e = lm(f, "g", {}), t = lm(e, "ellipse", {}), n = lm(e, "g", {});
 			c.push({
-				glow: em(l, "ellipse", {
+				glow: lm(l, "ellipse", {
 					cy: 124,
 					ry: 60
 				}),
-				pool: em(u, "ellipse", {}),
-				cone: em(d, "polygon", {}),
+				pool: lm(u, "ellipse", {}),
+				cone: lm(d, "polygon", {}),
 				fixture: e,
 				halo: t,
-				trim: em(n, "ellipse", { fill: "#0a1422" }),
-				lens: em(n, "ellipse", {})
+				trim: lm(n, "ellipse", { fill: "#0a1422" }),
+				lens: lm(n, "ellipse", {})
 			});
 		}
 	}
@@ -16117,16 +16219,16 @@ function tm(e) {
 			n && ($(n.glow, "cx", e.glowX), $(n.glow, "rx", e.glowRx), $(n.glow, "fill", `url(#wash-${e.zone})`), $(n.glow, "opacity", e.glowOpacity), $(n.pool, "cx", e.x), $(n.pool, "cy", e.floorY), $(n.pool, "rx", e.poolRx), $(n.pool, "ry", e.poolRy), $(n.pool, "fill", `url(#pool-${e.zone})`), $(n.pool, "opacity", e.poolOpacity), $(n.cone, "points", e.cone), $(n.cone, "fill", `url(#beam-${e.zone})`), $(n.cone, "opacity", e.beamOpacity), $(n.halo, "cx", e.x), $(n.halo, "cy", e.haloY), $(n.halo, "rx", e.haloRx), $(n.halo, "ry", e.haloRy), $(n.halo, "fill", `url(#halo-${e.zone})`), $(n.halo, "opacity", e.beamOpacity), $(n.trim, "cx", e.x), $(n.trim, "cy", e.trimY), $(n.trim, "rx", e.trimRx), $(n.trim, "ry", e.trimRy), $(n.trim, "stroke", e.highlighted ? "#a6dbe8" : "#6dabbc"), $(n.trim, "stroke-width", e.highlighted ? 1 : .7), $(n.lens, "cx", e.x), $(n.lens, "cy", e.lensY), $(n.lens, "rx", e.lensRx), $(n.lens, "ry", e.lensRy), $(n.lens, "fill", e.lens), $(n.trim.parentElement, "opacity", e.dim));
 		});
 	}
-	let g = Kp(e);
+	let g = tm(e);
 	return {
 		draw: (e) => {
 			h(e), g(e);
 		},
-		room: qp(e)
+		room: nm(e)
 	};
 }
 // src/cards/light/light.ts
-var nm = 5e3, rm = `<style>${fu}
+var dm = 5e3, fm = `<style>${fu}
 :host{container-type:inline-size;min-width:0}
 ha-card{padding:12px 16px;display:grid;gap:4px;align-items:center}
 h2{margin:0;font-size:18px;font-weight:550;line-height:1.3;overflow-wrap:anywhere}
@@ -16175,17 +16277,17 @@ details[open] summary::before{transform:rotate(90deg)}
 :host([compact]) .action{height:32px}
 :host([compact]) :is(.brightness,details){display:none}
 </style>
-<ha-card><header><h2></h2></header>${Qp}
+<ha-card><header><h2></h2></header>${sm}
 <div class="detail"><div class="zones controls"></div>
 <details><summary>Colour temperature</summary><div class="zones temperatures"></div></details>
-<p class="hint" role="status"></p></div></ha-card>`, im = "<div class=\"row\"><div class=\"readout\"><span class=\"name\"></span><strong class=\"state\" role=\"status\"></strong><span class=\"age\"></span></div>\n<button type=\"button\" class=\"action\"></button></div>\n<label class=\"level brightness\"><span>Brightness</span><span class=\"value\"></span><input type=\"range\" min=\"1\" max=\"100\" step=\"1\"></label>", am = "<span class=\"label\"></span><span class=\"value\"></span><input type=\"range\" step=\"50\"><span class=\"scale\" aria-hidden=\"true\"></span>";
-function om(e, t) {
+<p class="hint" role="status"></p></div></ha-card>`, pm = "<div class=\"row\"><div class=\"readout\"><span class=\"name\"></span><strong class=\"state\" role=\"status\"></strong><span class=\"age\"></span></div>\n<button type=\"button\" class=\"action\"></button></div>\n<label class=\"level brightness\"><span>Brightness</span><span class=\"value\"></span><input type=\"range\" min=\"1\" max=\"100\" step=\"1\"></label>", mm = "<span class=\"label\"></span><span class=\"value\"></span><input type=\"range\" step=\"50\"><span class=\"scale\" aria-hidden=\"true\"></span>";
+function hm(e, t) {
 	e.textContent !== t && (e.textContent = t);
 }
-function sm(e, t, n) {
+function gm(e, t, n) {
 	e.getAttribute(t) !== n && e.setAttribute(t, n);
 }
-var cm = class extends HTMLElement {
+var _m = class extends HTMLElement {
 	root = this.attachShadow({ mode: "open" });
 	config;
 	client;
@@ -16223,7 +16325,7 @@ var cm = class extends HTMLElement {
 		};
 	}
 	constructor() {
-		super(), this.root.innerHTML = rm, this.svg = this.root.querySelector("svg.room"), this.renderer = tm(this.svg), this.svg.addEventListener("click", (e) => {
+		super(), this.root.innerHTML = fm, this.svg = this.root.querySelector("svg.room"), this.renderer = um(this.svg), this.svg.addEventListener("click", (e) => {
 			let t = this.zoneAt(e);
 			t >= 0 && this.toggle(this.zones[t]);
 		}), this.svg.addEventListener("pointermove", (e) => {
@@ -16242,7 +16344,7 @@ var cm = class extends HTMLElement {
 		this.config = {
 			...t,
 			zone_map: a ? [...t.zone_map] : n.zone_map
-		}, (!n || t.tv_wall !== n.tv_wall || t.couch_wall !== n.couch_wall || t.windows.length !== n.windows.length || t.windows.some((e, t) => e !== n.windows[t])) && this.renderer.room(t.windows, t.tv_wall, t.couch_wall), this.layoutDirty ||= a, om(this.root.querySelector("h2"), t.name ?? "Spots"), this.toggleAttribute("compact", t.variant === "compact"), i && this.reconcileZones(), this.zones.forEach((e, t) => this.updateName(e, t)), i ? this.sync(!0) : (a || t.beam_angle !== n?.beam_angle) && this.schedule();
+		}, (!n || t.tv_wall !== n.tv_wall || t.couch_wall !== n.couch_wall || t.windows.length !== n.windows.length || t.windows.some((e, t) => e !== n.windows[t])) && this.renderer.room(t.windows, t.tv_wall, t.couch_wall), this.layoutDirty ||= a, hm(this.root.querySelector("h2"), t.name ?? "Spots"), this.toggleAttribute("compact", t.variant === "compact"), i && this.reconcileZones(), this.zones.forEach((e, t) => this.updateName(e, t)), i ? this.sync(!0) : (a || t.beam_angle !== n?.beam_angle) && this.schedule();
 	}
 	set hass(e) {
 		this.client = e, this.sync(!1);
@@ -16258,13 +16360,13 @@ var cm = class extends HTMLElement {
 	updateName(e, t) {
 		let n = this.config.zones[t].name?.trim() || String(e.entity?.attributes.friendly_name ?? `Zone ${t + 1}`);
 		if (e.name === n) return;
-		e.name = n, om(e.el.querySelector(".name"), n), om(e.temperature.querySelector(".label"), n), sm(e.el.querySelector("input"), "aria-label", `${n} brightness`), sm(e.temperature.querySelector("input"), "aria-label", `${n} colour temperature`);
+		e.name = n, hm(e.el.querySelector(".name"), n), hm(e.temperature.querySelector(".label"), n), gm(e.el.querySelector("input"), "aria-label", `${n} brightness`), gm(e.temperature.querySelector("input"), "aria-label", `${n} colour temperature`);
 		let r = e.el.querySelector("button");
-		sm(r, "aria-label", `${r.textContent} ${n}`);
+		gm(r, "aria-label", `${r.textContent} ${n}`);
 	}
 	createZone(e) {
 		let t = document.createElement("div"), n = document.createElement("label");
-		t.className = "zone", t.innerHTML = im, n.className = "level kelvin", n.innerHTML = am;
+		t.className = "zone", t.innerHTML = pm, n.className = "level kelvin", n.innerHTML = mm;
 		let r = {
 			id: e,
 			name: "",
@@ -16291,7 +16393,7 @@ var cm = class extends HTMLElement {
 		let n = this.root.querySelector(".controls"), r = this.root.querySelector(".temperatures");
 		this.zones.forEach(({ el: e, temperature: t }, i) => {
 			for (let [a, o] of [[n, e], [r, t]]) {
-				sm(o, "data-zone", String(i));
+				gm(o, "data-zone", String(i));
 				let e = a.children.item(i);
 				o !== e && (o.parentElement === a && a.moveBefore ? a.moveBefore(o, e) : a.insertBefore(o, e));
 			}
@@ -16324,7 +16426,7 @@ var cm = class extends HTMLElement {
 		let i = {
 			...n ? e.request : void 0,
 			...t,
-			deadline: performance.now() + nm
+			deadline: performance.now() + dm
 		};
 		e.request = i, e.error = "", this.refresh();
 		try {
@@ -16363,20 +16465,20 @@ var cm = class extends HTMLElement {
 		this.zones.forEach((r) => {
 			r.request && e >= r.request.deadline && (r.request = void 0, r.error = `${r.name}: change not confirmed within five seconds.`);
 			let { light: i, on: a, brightness: o, kelvin: s } = this.view(r), c = r.el, l = i.available, u = r.name;
-			sm(c, "data-state", l ? a ? "on" : "off" : "unavailable"), om(c.querySelector(".state"), l ? a ? "On" : "Off" : "Unavailable");
+			gm(c, "data-state", l ? a ? "on" : "off" : "unavailable"), hm(c.querySelector(".state"), l ? a ? "On" : "Off" : "Unavailable");
 			let d = r.request, f = d ? d.on === !1 ? "Turning off…" : !i.on || d.brightness === void 0 && d.kelvin === void 0 ? "Turning on…" : "Adjusting…" : "", p = l ? f || Df(r.entity?.last_changed) : "";
-			om(c.querySelector(".age"), p ? `· ${p}` : "");
+			hm(c.querySelector(".age"), p ? `· ${p}` : "");
 			let m = c.querySelector("button"), h = a ? "Turn off" : "Turn on";
-			om(m, h), sm(m, "aria-label", `${h} ${u}`), m.disabled = !l;
+			hm(m, h), gm(m, "aria-label", `${h} ${u}`), m.disabled = !l;
 			let g = c.querySelector(".brightness"), _ = g.querySelector("input");
 			g.hidden = l && !i.dimmable, _.disabled = !l, r.draftBrightness === void 0 && _.valueAsNumber !== o && (_.value = String(o));
 			let v = l ? a ? `${o}%` : "Off" : "—";
-			om(g.querySelector(".value"), v), sm(_, "aria-valuetext", v);
+			hm(g.querySelector(".value"), v), gm(_, "aria-valuetext", v);
 			let y = r.temperature, b = y.querySelector("input");
 			y.hidden = l && !i.tunable, t ||= !y.hidden, b.min = String(i.minKelvin), b.max = String(i.maxKelvin), b.disabled = !l, r.draftKelvin === void 0 && b.valueAsNumber !== s && (b.value = String(s));
 			let x = l ? `${s} K` : "—";
-			om(y.querySelector(".value"), x), sm(b, "aria-valuetext", x), b.style.accentColor = l ? op(ap(s)) : "#6b7d90", r.request ? n = Math.min(n, r.request.deadline - e) : p && r.entity?.last_changed && (n = Math.min(n, 6e4 - (Date.now() - Date.parse(r.entity.last_changed)) % 6e4));
-		}), this.root.querySelector("details").hidden = !t, om(this.root.querySelector(".hint"), this.zones.map((e) => e.error).filter(Boolean).join(" ")), Number.isFinite(n) && this.isConnected && (this.timer = window.setTimeout(this.refresh, Math.max(1, n))), this.schedule();
+			hm(y.querySelector(".value"), x), gm(b, "aria-valuetext", x), b.style.accentColor = l ? op(ap(s)) : "#6b7d90", r.request ? n = Math.min(n, r.request.deadline - e) : p && r.entity?.last_changed && (n = Math.min(n, 6e4 - (Date.now() - Date.parse(r.entity.last_changed)) % 6e4));
+		}), this.root.querySelector("details").hidden = !t, hm(this.root.querySelector(".hint"), this.zones.map((e) => e.error).filter(Boolean).join(" ")), Number.isFinite(n) && this.isConnected && (this.timer = window.setTimeout(this.refresh, Math.max(1, n))), this.schedule();
 	};
 	schedule = () => {
 		if (!this.frame && this.config && this.isConnected && !document.hidden) {
@@ -16409,15 +16511,15 @@ var cm = class extends HTMLElement {
 			highlight: this.highlight
 		}), this.renderer.draw(this.scene);
 	};
-}, lm = [
+}, vm = [
 	"#4fc3f7",
 	"#ffb74d",
 	"#ce93d8"
-], um = {
+], ym = {
 	left: "Left wall",
 	back: "Back wall",
 	right: "Right wall"
-}, dm = `<option value="">None</option>${up.map((e) => `<option value="${e}">${um[e]}</option>`).join("")}`, fm = class extends HTMLElement {
+}, bm = `<option value="">None</option>${up.map((e) => `<option value="${e}">${ym[e]}</option>`).join("")}`, xm = class extends HTMLElement {
 	root = this.attachShadow({ mode: "open" });
 	config;
 	choices = "";
@@ -16458,10 +16560,10 @@ var cm = class extends HTMLElement {
       </div></fieldset>
       <fieldset><legend>Room walls</legend><div class="fields">
         <div id="window-label">Windows</div>
-        <div class="presets" role="group" aria-labelledby="window-label">${up.map((e) => `<label class="toggle"><input id="window-${e}" type="checkbox" data-window>${um[e]}</label>`).join("")}</div>
-        <label>TV wall<select id="tv-wall">${dm}</select></label>
+        <div class="presets" role="group" aria-labelledby="window-label">${up.map((e) => `<label class="toggle"><input id="window-${e}" type="checkbox" data-window>${ym[e]}</label>`).join("")}</div>
+        <label>TV wall<select id="tv-wall">${bm}</select></label>
         <small>Uncheck a window to place the TV on that wall. Move the TV or choose None to place a window there.</small>
-        <label>Couch wall<select id="couch-wall">${dm}</select></label>
+        <label>Couch wall<select id="couch-wall">${bm}</select></label>
         <small>The couch can sit below a window or the TV.</small>
       </div></fieldset>
       <fieldset><legend>Zones</legend><div class="fields">
@@ -16661,7 +16763,7 @@ var cm = class extends HTMLElement {
 		let c = t.zones ?? [], l = o("zones");
 		(e || l.childElementCount !== c.length || this.root.activeElement?.closest?.(".zone") == null) && l.replaceChildren(...c.map((e, t) => {
 			let n = document.createElement("div");
-			return n.className = "zone", n.innerHTML = `<span class="badge" aria-hidden="true" style="background:${lm[t]}">${t + 1}</span>
+			return n.className = "zone", n.innerHTML = `<span class="badge" aria-hidden="true" style="background:${vm[t]}">${t + 1}</span>
           <label>Zone ${t + 1} entity<input list="lights" data-field="entity" data-index="${t}" required pattern="light\\.[a-z0-9_]+" placeholder="light.example"></label>
           <label>Zone ${t + 1} name<input data-field="name" data-index="${t}" placeholder="Entity name"></label>
           <button type="button" class="remove" data-remove="${t}" aria-label="Remove zone ${t + 1}" ${c.length === 1 ? "disabled" : ""}>
@@ -16677,17 +16779,17 @@ var cm = class extends HTMLElement {
 			}
 			e && d[e - 1]++;
 			let l = document.createElement("button");
-			l.type = "button", l.dataset.cell = `${t},${a}`, l.className = e ? "" : "none", l.textContent = e ? String(e) : "", l.setAttribute("style", `${s};width:${f}px;height:${f}px${e ? `;background:${lm[e - 1]};border:2px solid var(--card-background-color,#1c1c1c);box-shadow:0 0 0 1px ${lm[e - 1]}` : ""}`);
+			l.type = "button", l.dataset.cell = `${t},${a}`, l.className = e ? "" : "none", l.textContent = e ? String(e) : "", l.setAttribute("style", `${s};width:${f}px;height:${f}px${e ? `;background:${vm[e - 1]};border:2px solid var(--card-background-color,#1c1c1c);box-shadow:0 0 0 1px ${vm[e - 1]}` : ""}`);
 			let u = e ? `${c[e - 1]?.name || `Zone ${e}`} (zone ${e})` : "no spot";
 			l.setAttribute("aria-label", `Row ${t + 1} from the back wall, column ${a + 1}: ${u}. Activate to change.`), m.push(l);
 		}));
 		let h = this.root.activeElement instanceof HTMLButtonElement ? this.root.activeElement.dataset.cell : void 0;
 		p.replaceChildren(...m), h && p.querySelector(`[data-cell="${h}"]`)?.focus({ preventScroll: !0 }), this.root.querySelector(".legend").replaceChildren(...c.map((e, t) => {
 			let n = document.createElement("span");
-			return n.innerHTML = `<i style="background:${lm[t]}"></i>`, n.append(`${t + 1} · ${e.name || e.entity || `Zone ${t + 1}`} (${d[t]})`), n;
+			return n.innerHTML = `<i style="background:${vm[t]}"></i>`, n.append(`${t + 1} · ${e.name || e.entity || `Zone ${t + 1}`} (${d[t]})`), n;
 		}), Object.assign(document.createElement("span"), { innerHTML: "<i style=\"border:1px dashed currentColor\"></i>No spot" }));
 	}
-}, pm = [
+}, Sm = [
 	{
 		type: "gleam-energy-graph",
 		name: "Gleam Energy Graph",
@@ -16709,13 +16811,13 @@ var cm = class extends HTMLElement {
 	{
 		type: "gleam-light",
 		name: "Gleam Light",
-		element: cm,
+		element: _m,
 		description: "In-roof spots in rows and columns, split into zones with brightness and colour temperature."
 	}
 ];
-for (let { type: e, element: t, ...n } of pm) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
+for (let { type: e, element: t, ...n } of Sm) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
 	type: e,
 	...n,
 	preview: !1
 });
-customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", Ad), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", $u), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", Bf), customElements.get("gleam-light-editor") || customElements.define("gleam-light-editor", fm);
+customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", Ad), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", $u), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", Bf), customElements.get("gleam-light-editor") || customElements.define("gleam-light-editor", xm);

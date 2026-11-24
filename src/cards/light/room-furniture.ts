@@ -51,37 +51,95 @@ function world(wall: RoomWall, u: number, v: number, y: number): V3 {
   if (wall === "back") return [ROOM_W / 2 - LENGTH / 2 + u, y, GAP + v];
   return [wall === "left" ? GAP + v : ROOM_W - GAP - v, y, SIDE_START + u];
 }
-/** Projected quad with softly rounded corners. */
-function rounded(points: (readonly [number, number])[], radius: number) {
-  const n = points.length, f = (v: number) => v.toFixed(2);
+/** Quad rounded in room space: each corner is cut the same distance along both of its edges, so
+ *  faces that share an edge meet at the same point from every viewing angle. Radii in metres. */
+function roll(corners: readonly V3[], radii: readonly number[]) {
+  const f = (v: number) => v.toFixed(2), n = corners.length;
+  const toward = (p: V3, q: V3, r: number): V3 => {
+    const t = Math.min(0.5, r / (Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) || 1));
+    return [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t];
+  };
   let d = "";
-  points.forEach((p, i) => {
-    const prev = points[(i + n - 1) % n], next = points[(i + 1) % n];
-    const toward = (q: readonly [number, number]) => {
-      const dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy) || 1, r = Math.min(radius, len * 0.45);
-      return [p[0] + dx / len * r, p[1] + dy / len * r];
-    };
-    const a = toward(prev), b = toward(next);
-    d += `${i ? "L" : "M"}${f(a[0])} ${f(a[1])}Q${f(p[0])} ${f(p[1])} ${f(b[0])} ${f(b[1])}`;
+  corners.forEach((p, i) => {
+    const a = project(toward(p, corners[(i + n - 1) % n], radii[i])), b = project(toward(p, corners[(i + 1) % n], radii[i])), c = project(p);
+    d += `${i ? "L" : "M"}${f(a[0])} ${f(a[1])}Q${f(c[0])} ${f(c[1])} ${f(b[0])} ${f(b[1])}`;
   });
   return d + "Z";
 }
 
+/** A stuffed cushion: generous rounded corners and edges that bulge outward, most at the crown. */
+function pillow(points: (readonly [number, number])[], bulge: readonly number[], corner: readonly number[]) {
+  const n = points.length, f = (v: number) => v.toFixed(2);
+  const cx = points.reduce((s, p) => s + p[0], 0) / n, cy = points.reduce((s, p) => s + p[1], 0) / n;
+  const shortest = Math.min(...points.map((p, i) => Math.hypot(points[(i + 1) % n][0] - p[0], points[(i + 1) % n][1] - p[1])));
+  // Corners run bottom-left, bottom-right, top-right, top-left: edge 2 is the crown.
+  const along = (p: readonly [number, number], q: readonly [number, number], r: number) => {
+    const len = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1;
+    return [p[0] + (q[0] - p[0]) / len * r, p[1] + (q[1] - p[1]) / len * r] as const;
+  };
+  let d = "";
+  points.forEach((p, i) => {
+    const q = points[(i + 1) % n], len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+    const a = along(p, q, shortest * corner[i]), b = along(q, p, shortest * corner[(i + 1) % n]);
+    // Push the edge's midpoint away from the centre.
+    const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+    let nx = -(q[1] - p[1]) / (len || 1), ny = (q[0] - p[0]) / (len || 1);
+    if (nx * (mx - cx) + ny * (my - cy) < 0) { nx = -nx; ny = -ny; }
+    const k = len * bulge[i];
+    if (!i) d += `M${f(a[0])} ${f(a[1])}`;
+    d += `Q${f(mx + nx * k * 2)} ${f(my + ny * k * 2)} ${f(b[0])} ${f(b[1])}`;
+    const next = points[(i + 2) % n], c2 = along(q, next, shortest * corner[(i + 1) % n]);
+    d += `Q${f(q[0])} ${f(q[1])} ${f(c2[0])} ${f(c2[1])}`;
+  });
+  return d + "Z";
+}
+
+/** Back pillow front: straight sides and one smooth crown from side to side, slightly domed. */
+function backPillow([bl, br, tr, tl]: (readonly [number, number])[]) {
+  const f = (v: number) => v.toFixed(2), at = (p: readonly [number, number], q: readonly [number, number], t: number) =>
+    [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t] as const;
+  const width = Math.hypot(br[0] - bl[0], br[1] - bl[1]), height = Math.hypot(tl[0] - bl[0], tl[1] - bl[1]);
+  const foot = Math.min(width, height) * 0.1;
+  // Upright cushion: the top rounds over from 24% down each side, with handles just past the corners
+  // for a soft-cornered, slightly crowned top. Narrow faces (seen at an angle) crown less.
+  const dome = 0.06 * Math.min(1, width / height / 1.2), start = 0.24;
+  const r = at(tr, br, start), l = at(tl, bl, start), h1 = at(tr, br, -dome), h2 = at(tl, bl, -dome);
+  const b1 = at(bl, br, foot / width), b2 = at(br, bl, foot / width), s1 = at(br, tr, foot / height), s2 = at(bl, tl, foot / height);
+  return `M${f(b1[0])} ${f(b1[1])}L${f(b2[0])} ${f(b2[1])}Q${f(br[0])} ${f(br[1])} ${f(s1[0])} ${f(s1[1])}L${f(r[0])} ${f(r[1])}` +
+    `C${f(h1[0])} ${f(h1[1])} ${f(h2[0])} ${f(h2[1])} ${f(l[0])} ${f(l[1])}L${f(s2[0])} ${f(s2[1])}Q${f(bl[0])} ${f(bl[1])} ${f(b1[0])} ${f(b1[1])}Z`;
+}
+
+// Track arms roll over with a 10 cm radius at the front and at the back; feet corners get 1.5 cm.
+// Only the hidden join between the two arm halves stays square.
+const ROLL = 0.1;
+const ARM_CORNERS = {
+  front: { front: [0.015, 0.015, ROLL, ROLL], top: [0, 0, ROLL, ROLL], end: [0.015, 0.015, ROLL, 0] },
+  back: { front: [0, 0, 0, 0], top: [ROLL, ROLL, 0, 0], end: [0.015, 0, 0, ROLL] },
+} as const;
+
 // Unlit upholstery reads as cool slate in the dark room; light adds the zone's warm mix on top.
-const FABRIC = { top: "#4f6c7c", seat: "#56737f", end: "#30475a", front: "url(#couch-front)", wood: "#0a121b" };
+const FABRIC = { armTop: "#4a6575", top: "#4f6c7c", seat: "#56737f", end: "#30475a", front: "url(#couch-front)", wood: "#0a121b" };
 const LIT = { top: 0.6, front: 0.34, end: 0.22 };
-type Part = { box: readonly [u0: number, u1: number, v0: number, v1: number, y0: number, y1: number]; top: string; radius: number; lit: boolean };
+/** radius: corner rounding in metres for plain blocks (plinth, feet). */
+type Part = { box: readonly [u0: number, u1: number, v0: number, v1: number, y0: number, y1: number]; top: string; radius: number; lit: boolean; pillow?: boolean; seat?: boolean; arm?: "back" | "front" };
 const cushion = (u0: number, u1: number, v0: number, v1: number, y0: number, y1: number, top = FABRIC.top): Part =>
-  ({ box: [u0, u1, v0, v1, y0, y1], top, radius: 1.1, lit: true });
-const ARM = 0.22, SEAT = 0.42, BASE = 0.24, BACK = 0.72, ARM_TOP = 0.56, SPLIT = LENGTH / 2;
+  ({ box: [u0, u1, v0, v1, y0, y1], top, radius: 0.03, lit: true });
+// A three-seater: low dark feet, an upholstered plinth, thick seat cushions, upright back
+// cushions taller than the wide track arms.
+const ARM = 0.24, FEET = 0.07, BASE = 0.26, SEAT = 0.45, BACK = 0.8, ARM_TOP = 0.62, BACK_DEPTH = 0.38;
+const SEATS = 3, BAY = (LENGTH - 2 * ARM) / SEATS;
+const bays = Array.from({ length: SEATS }, (_, i) => [ARM + i * BAY + 0.008, ARM + (i + 1) * BAY - 0.008] as const);
 const PARTS: Part[] = [
-  ...[[0.04, 0.09], [LENGTH - 0.09, LENGTH - 0.04]].flatMap(([u0, u1]) => [[0.06, 0.11], [DEPTH - 0.11, DEPTH - 0.06]]
-    .map(([v0, v1]) => ({ box: [u0, u1, v0, v1, 0, 0.1] as const, top: FABRIC.wood, radius: 0.3, lit: false }))),
-  cushion(ARM, LENGTH - ARM, 0.02, DEPTH - 0.02, 0.1, BASE, FABRIC.end),
-  cushion(ARM + 0.01, SPLIT - 0.01, 0.02, 0.4, BASE, BACK), cushion(SPLIT + 0.01, LENGTH - ARM - 0.01, 0.02, 0.4, BASE, BACK),
-  cushion(ARM + 0.01, SPLIT - 0.01, 0.4, DEPTH - 0.02, BASE, SEAT, FABRIC.seat), cushion(SPLIT + 0.01, LENGTH - ARM - 0.01, 0.4, DEPTH - 0.02, BASE, SEAT, FABRIC.seat),
+  ...[[0.05, 0.1], [LENGTH - 0.1, LENGTH - 0.05]].flatMap(([u0, u1]) => [[0.07, 0.12], [DEPTH - 0.12, DEPTH - 0.07]]
+    .map(([v0, v1]) => ({ box: [u0, u1, v0, v1, 0, FEET] as const, top: FABRIC.wood, radius: 0.01, lit: false }))),
+  cushion(ARM, LENGTH - ARM, 0.02, DEPTH - 0.03, FEET, BASE, FABRIC.end),
+  ...bays.map(([u0, u1]) => ({ ...cushion(u0, u1, 0.02, BACK_DEPTH, BASE, BACK), pillow: true })),
+  ...bays.map(([u0, u1]) => ({ ...cushion(u0, u1, BACK_DEPTH, DEPTH - 0.02, BASE, SEAT, FABRIC.seat), seat: true })),
   // Each arm in two parts, so the back half sorts behind the back cushions and the front half in front.
-  ...[[0, ARM], [LENGTH - ARM, LENGTH]].flatMap(([u0, u1]) => [cushion(u0, u1, 0, 0.4, 0.1, ARM_TOP), cushion(u0, u1, 0.4, DEPTH, 0.1, ARM_TOP)]),
+  ...[[0, ARM], [LENGTH - ARM, LENGTH]].flatMap(([u0, u1]) => [
+    // The back half reaches 3 cm under the front half so no seam shows where they meet.
+    { ...cushion(u0, u1, 0, BACK_DEPTH + 0.03, FEET, ARM_TOP, FABRIC.armTop), radius: 0, arm: "back" as const },
+    { ...cushion(u0, u1, BACK_DEPTH, DEPTH, FEET, ARM_TOP, FABRIC.armTop), arm: "front" as const }]),
 ];
 
 function sofa(wall: RoomWall) {
@@ -93,24 +151,44 @@ function sofa(wall: RoomWall) {
   const glow = (k: number) => `style="fill:var(--couch-glow,#000);opacity:calc(var(--couch-lit,0) * ${k})"`;
   const shapes = parts.map(({ part }) => {
     const [u0, u1, v0, v1, y0, y1] = part.box;
-    const c = (u: number, v: number, y: number) => world(wall, u, v, y);
+    // Back pillows lean against the frame: their crown sits 9 cm nearer the wall than their base.
+    const c = (u: number, v: number, y: number) => world(wall, u, part.pillow && y === y1 ? Math.min(v, v1 - 0.09) : v, y);
+    // An arm's outer face never meets a cushion, so the front half draws it whole (no join to show)
+    // and the back half skips it. Inner faces stay split so they layer correctly against the cushions.
+    const outer = (u: number) => part.arm !== undefined && (u === 0 || u === LENGTH);
+    const endFrom = (u: number) => (outer(u) && part.arm === "front" ? 0 : v0), endTo = (u: number) => (outer(u) && part.arm === "front" ? DEPTH : v1);
     // Faces with their outward direction in couch space and a point on the face.
-    const faces: [kind: "top" | "front" | "end", corners: V3[], normal: V3][] = [
+    const end = (u: number) => [c(u, endFrom(u), y0), c(u, endTo(u), y0), c(u, endTo(u), y1), c(u, endFrom(u), y1)];
+    const faces: [kind: "top" | "front" | "end", corners: V3[], normal: V3, outerEnd?: boolean][] = [
       ["top", [c(u0, v0, y1), c(u1, v0, y1), c(u1, v1, y1), c(u0, v1, y1)], [0, 0, 1]],
       ["front", [c(u0, v1, y0), c(u1, v1, y0), c(u1, v1, y1), c(u0, v1, y1)], [0, 1, 0]],
-      ["end", [c(u0, v0, y0), c(u0, v1, y0), c(u0, v1, y1), c(u0, v0, y1)], [-1, 0, 0]],
-      ["end", [c(u1, v0, y0), c(u1, v1, y0), c(u1, v1, y1), c(u1, v0, y1)], [1, 0, 0]],
+      ["end", end(u0), [-1, 0, 0], outer(u0)],
+      ["end", end(u1), [1, 0, 0], outer(u1)],
     ];
-    return faces.map(([kind, corners, [nu, nv, ny]]) => {
+    return faces.map(([kind, corners, [nu, nv, ny], outerEnd]) => {
       // Outward normal in room space, from the couch axes for this wall.
       const normal: V3 = wall === "back" ? [nu, ny, nv] : wall === "left" ? [nv, ny, nu] : [-nv, ny, nu];
       const centre = corners.reduce<V3>((s, p) => [s[0] + p[0] / 4, s[1] + p[1] / 4, s[2] + p[2] / 4], [0, 0, 0]);
       if (normal[0] * (CAMERA[0] - centre[0]) + normal[1] * (CAMERA[1] - centre[1]) + normal[2] * (CAMERA[2] - centre[2]) <= 0) return "";
-      const d = rounded(corners.map(project), part.radius);
-      const fill = kind === "top" ? part.top : part.lit ? (kind === "front" ? FABRIC.front : FABRIC.end) : FABRIC.wood;
+      // A leaning pillow reads as one soft silhouette: its front face carries the crown.
+      if (part.pillow && kind !== "front") return "";
+      if (part.arm === "back" && outerEnd) return "";
+      const screen = corners.map(project);
+      // Back pillows: straight sides, deeply rounded top corners flowing into one crown.
+      // Seat cushions: a gentle puff on the front edge and softened corners all round.
+      const d = part.pillow ? backPillow(screen)
+        : part.seat ? pillow(screen, kind === "front" ? [0.01, 0.02, 0.035, 0.02] : [0.015, 0.015, 0.015, 0.015], kind === "front" ? [0.22, 0.22, 0.38, 0.38] : [0.3, 0.3, 0.3, 0.3])
+        // Corner order: end faces run back-bottom, front-bottom, front-top, back-top;
+        // top faces back-left, back-right, front-right, front-left; front faces bottom-left, bottom-right, top-right, top-left.
+        : part.arm ? roll(corners, outerEnd ? [0.015, 0.015, ROLL, ROLL] : ARM_CORNERS[part.arm][kind])
+        : roll(corners, [part.radius, part.radius, part.radius, part.radius]);
+      // Arm faces that roll over at the top shade from the top colour down, so the roll reads as soft.
+      const fill = kind === "top" ? part.top : !part.lit ? FABRIC.wood
+        : part.arm && (kind === "front" || outerEnd) ? "url(#couch-arm)" : kind === "front" ? FABRIC.front : FABRIC.end;
       const seam = kind === "front" && part.lit
         ? `<path d="M${project(corners[3]).map(v => v.toFixed(2)).join(" ")}L${project(corners[2]).map(v => v.toFixed(2)).join(" ")}" stroke="#7896a5" stroke-width=".45" stroke-linecap="round" opacity=".35" fill="none"/>` : "";
-      return `<path d="${d}" fill="${fill}"/>${part.lit ? `<path d="${d}" ${glow(LIT[kind])}/>` : ""}${seam}`;
+      const sheen = part.pillow && kind === "front" ? `<path d="${d}" fill="url(#couch-sheen)"/>` : "";
+      return `<path d="${d}" fill="${part.pillow && kind === "front" ? "url(#couch-pillow)" : fill}"/>${part.lit ? `<path d="${d}" ${glow(LIT[kind])}/>` : ""}${sheen}${part.pillow || part.seat || part.arm ? "" : seam}`;
     }).join("");
   }).join("");
   // Soft contact shadow: downlights from above leave a dark, blurred footprint.
@@ -126,6 +204,9 @@ function sofa(wall: RoomWall) {
 
 export const couches = `<defs>
   <linearGradient id="couch-front" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3f5a6b"/><stop offset="1" stop-color="#23374a"/></linearGradient>
+  <linearGradient id="couch-arm" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4a6575"/><stop offset=".22" stop-color="#3b5566"/><stop offset="1" stop-color="#25394b"/></linearGradient>
+  <linearGradient id="couch-pillow" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4b6676"/><stop offset=".55" stop-color="#38515f"/><stop offset="1" stop-color="#22364a"/></linearGradient>
+  <radialGradient id="couch-sheen" cx=".5" cy=".18" r=".62"><stop stop-color="#a9c3cf" stop-opacity=".16"/><stop offset="1" stop-color="#a9c3cf" stop-opacity="0"/></radialGradient>
   <filter id="couch-shadow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="1.6"/></filter>
 </defs>` + walls.map(sofa).join("");
 
