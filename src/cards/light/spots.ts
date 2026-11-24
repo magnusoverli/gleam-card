@@ -6,6 +6,7 @@ const W = 4.8, D = 4, CEILING = 2.5, ZC = 6.362, SX = 280 / W, VX = 191, VY = 92
 const WALL_OFFSET = 0.45;
 const depthScale = (z: number) => 1 / (1 + z / ZC);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+const coverage = (corner: number, centre: number, width: number) => Math.max(0, 1 - Math.abs(corner - centre) / width);
 
 export interface Spot { row: number; column: number; zone: number; x: number; z: number }
 
@@ -71,9 +72,10 @@ export interface SpotDraw {
   hitX: number; hitY: number;
 }
 export interface ZoneDraw { lamp: string; mixA: string; mixB: string; mixC: string; washOpacity: number; tint: number }
+interface WallDraw { zone: number; opacity: number; creaseOpacity: number }
 export interface LightScene {
   spots: SpotDraw[]; zones: ZoneDraw[];
-  left: { zone: number; opacity: number }; right: { zone: number; opacity: number };
+  left: WallDraw; right: WallDraw;
   beamMid: number; beamEnd: number; sceneOpacity: number;
 }
 
@@ -85,6 +87,7 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
   const near = (d: number) => clamp((1.3 - d) / 0.9, 0, 1);
   const level = zones.map(z => (z.on ? 0.3 + 0.7 * z.brightness / 100 : 0));
   const tally = zones.map(() => ({ n: 0, left: 0, right: 0 }));
+  let leftLight = 0, rightLight = 0;
   // Dense grids: smaller trims, and per-spot light scaled so many beams don't wash the room out.
   const density = clamp(Math.sqrt(12 / Math.max(1, spots.length)), 0.42, 1);
   const trim = clamp(4.5 / Math.max(options.rows, options.columns), 0.5, 1);
@@ -95,6 +98,10 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
     const backX = VX + (X - VX) * depthScale(D);
     const half = Math.min(46, radius * SX * k * 0.46);
     const toBack = D - spot.z, toSide = W / 2 - Math.abs(spot.x), t = tally[spot.zone];
+    const glowRx = 24 + 12 * toBack + 10 * spread, glowOpacity = lvl * 0.6 / (1 + (toBack / 1.2) ** 2) * density;
+    const beamOpacity = lvl * coneGain * density, beamWidth = half * 0.7 + 2; // Lower wall, including the soft beam edge.
+    leftLight += glowOpacity * coverage(86, backX, glowRx) + beamOpacity * coverage(86, x, beamWidth);
+    rightLight += glowOpacity * coverage(258, backX, glowRx) + beamOpacity * coverage(258, x, beamWidth);
     t.n++;
     if (toSide < 1.3) t[spot.x < 0 ? "left" : "right"] += near(toSide);
     const round = (v: number) => Math.round(v * 10) / 10;
@@ -107,19 +114,19 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
       poolOpacity: zone.on ? Math.min(1, Math.min(1, (0.4 + 0.6 * lvl) * poolGain) * Math.sqrt(density)) : 0,
       cone: [[x - 2.6 * k, ceilingY + 1.2], [x + 2.6 * k, ceilingY + 1.2], [x + half, floorY], [x - half, floorY]]
         .map(([a, b]) => `${a.toFixed(1)},${b.toFixed(1)}`).join(" "),
-      beamOpacity: lvl * coneGain * density,
+      beamOpacity,
       // Bounce from the lit floor behind each pool: brightest low on the wall, fading upwards.
-      glowX: round(backX), glowRx: round(24 + 12 * toBack + 10 * spread),
-      glowOpacity: lvl * 0.6 / (1 + (toBack / 1.2) ** 2) * density,
+      glowX: round(backX), glowRx: round(glowRx), glowOpacity,
       lens: zone.on ? css(zone.color) : "#1b2c3d", dim: zone.unavailable ? 0.4 : 1,
       highlighted: options.highlight === spot.zone,
       hitX: x, hitY: (ceilingY + floorY) / 2,
     } satisfies SpotDraw;
   });
-  const sideZone = (key: "left" | "right") => {
+  const sideZone = (key: "left" | "right", cornerLight: number): WallDraw => {
     let best = 0;
     tally.forEach((t, i) => { if (t[key] * level[i] > tally[best][key] * level[best]) best = i; });
-    return { zone: best, opacity: level[best] * (0.5 + 0.25 * Math.min(1, tally[best][key])) };
+    const opacity = 0.75 * level[best] * Math.min(1, tally[best][key]);
+    return { zone: best, opacity, creaseOpacity: 0.4 / (1 + 8 * (cornerLight + 0.45 * opacity)) };
   };
   const steep = clamp((40 - beam) / 30, 0, 1);
   return {
@@ -128,7 +135,7 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
       lamp: css(z.color), mixA: mix(z.color, 0.74), mixB: mix(z.color, 0.44), mixC: mix(z.color, 0.12),
       washOpacity: 0.9 * level[i], tint: tally[i].n ? 0.3 * Math.min(1, tally[i].n / 4) : 0,
     })),
-    left: sideZone("left"), right: sideZone("right"),
+    left: sideZone("left", leftLight), right: sideZone("right", rightLight),
     beamMid: 0.095 + 0.06 * steep, beamEnd: 0.015 + 0.06 * steep,
     sceneOpacity: zones.every(z => z.unavailable) ? 0.35 : 1,
   };

@@ -52,6 +52,29 @@ test("settings fill defaults and reject what the card cannot draw or control", (
   ]) assert.throws(() => settings(bad), message);
 });
 
+test("room furnishings support every wall, with only the TV and window mutually exclusive", () => {
+  const zones = [{entity: "light.a"}], walls = ["left", "back", "right"];
+  assert.deepEqual(settings({zones}).windows, ["right"]);
+  assert.deepEqual(settings({zones, tv_wall:"right"}).windows, []);
+  for (let mask = 0; mask < 8; mask++) {
+    const windows = walls.filter((_, i) => mask & (1 << i));
+    for (const tv_wall of [undefined, ...walls]) for (const couch_wall of [undefined, ...walls]) {
+      const config = {zones, windows:[...windows].reverse(), tv_wall, couch_wall};
+      if (windows.includes(tv_wall)) assert.throws(() => settings(config), /both a TV and a window/);
+      else {
+        const room = settings(config);
+        assert.deepEqual(room.windows, windows);
+        assert.equal(room.tv_wall, tv_wall);
+        assert.equal(room.couch_wall, couch_wall);
+      }
+    }
+  }
+  for (const windows of ["left", null, ["floor"], ["left", "left"]])
+    assert.throws(() => settings({zones, windows}), /windows must be a list/);
+  for (const key of ["tv_wall", "couch_wall"])
+    assert.throws(() => settings({zones, [key]:"floor"}), new RegExp(key));
+});
+
 test("light readings normalise brightness, capabilities and colour", () => {
   const on = readLight({ state: "on", attributes: { brightness: 255, supported_color_modes: ["color_temp"], color_temp_kelvin: 3003, color_mode: "color_temp" } });
   assert.deepEqual([on.available, on.on, on.brightness, on.dimmable, on.tunable, on.kelvin, on.colour], [true, true, 100, true, true, 3003, undefined]);
@@ -95,6 +118,26 @@ test("scene light follows state, beam angle and spot density", () => {
   assert.equal(nearestZone(scene, 40, 80), 0);
   assert.equal(nearestZone(scene, 290, 80), 1);
   assert.equal(lightScene(grid, [{ ...zone(false), unavailable: true }, { ...zone(false), unavailable: true }], { rows: 3, columns: 4, beamAngle: 40 }).sceneOpacity, 0.35);
+});
+
+test("each rear crease responds only to light reaching its side", () => {
+  const zone = brightness => ({ on: brightness > 0, brightness, color: kelvinRgb(2700), unavailable: false });
+  const scene = (map, levels, beamAngle = 40) => lightScene(layoutSpots(3, 4, true, map, 2), levels.map(zone),
+    { rows: 3, columns: 4, beamAngle });
+  const map = ["1..2", "....", "...."];
+  const dark = scene(map, [0, 0]), left = scene(map, [100, 0]), right = scene(map, [0, 100]);
+  assert.ok(dark.left.creaseOpacity > 0 && dark.right.creaseOpacity > 0);
+  assert.deepEqual(left.right, dark.right);
+  assert.deepEqual(right.left, dark.left);
+  assert.ok(left.left.creaseOpacity < scene(map, [25, 0]).left.creaseOpacity);
+  assert.ok(right.right.creaseOpacity < dark.right.creaseOpacity);
+  assert.ok(scene(map, [100, 0], 90).left.creaseOpacity < scene(map, [100, 0], 10).left.creaseOpacity);
+
+  const empty = scene(["....", "....", "...."], [100, 100]);
+  assert.deepEqual([empty.left, empty.right], [dark.left, dark.right]);
+  const unassigned = scene(["...2", "....", "...."], [100, 0]);
+  assert.deepEqual([unassigned.left, unassigned.right], [dark.left, dark.right]);
+  assert.equal(unassigned.zones[0].washOpacity * unassigned.zones[0].tint, 0);
 });
 
 test("every projected lens and trim selects its configured zone", () => {

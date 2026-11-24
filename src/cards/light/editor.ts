@@ -1,10 +1,12 @@
-import type { HomeAssistant, LightConfig } from "../../types";
+import type { HomeAssistant, LightConfig, RoomWall } from "../../types";
 import { editorPanelStyles } from "../../shared/editor-styles";
 import { EditorPreview } from "../../shared/editor-preview";
-import { settings } from "./model";
+import { ROOM_WALLS, roomWindows, settings } from "./model";
 import { MAX_GRID, MAX_ZONES, defaultZone, onRing, planPosition } from "./spots";
 
 const ZONE_COLORS = ["#4fc3f7", "#ffb74d", "#ce93d8"];
+const WALL_LABEL: Record<RoomWall, string> = { left: "Left wall", back: "Back wall", right: "Right wall" };
+const WALL_OPTIONS = `<option value="">None</option>${ROOM_WALLS.map(wall => `<option value="${wall}">${WALL_LABEL[wall]}</option>`).join("")}`;
 
 export class GleamLightEditor extends HTMLElement {
   private root = this.attachShadow({ mode: "open" });
@@ -47,6 +49,14 @@ export class GleamLightEditor extends HTMLElement {
         <label>Layout<select id="layout"><option value="normal">Normal</option><option value="compact">Compact</option></select></label>
         <label>Display name<input id="name" placeholder="Spots"></label>
       </div></fieldset>
+      <fieldset><legend>Room walls</legend><div class="fields">
+        <div id="window-label">Windows</div>
+        <div class="presets" role="group" aria-labelledby="window-label">${ROOM_WALLS.map(wall => `<label class="toggle"><input id="window-${wall}" type="checkbox" data-window>${WALL_LABEL[wall]}</label>`).join("")}</div>
+        <label>TV wall<select id="tv-wall">${WALL_OPTIONS}</select></label>
+        <small>Uncheck a window to place the TV on that wall. Move the TV or choose None to place a window there.</small>
+        <label>Couch wall<select id="couch-wall">${WALL_OPTIONS}</select></label>
+        <small>The couch can sit below a window or the TV.</small>
+      </div></fieldset>
       <fieldset><legend>Zones</legend><div class="fields">
         <small>Each zone is one light entity, or a light group, that switches its spots together.</small>
         <datalist id="lights"></datalist><div id="zones" class="fields"></div>
@@ -83,6 +93,16 @@ export class GleamLightEditor extends HTMLElement {
         this.update({ zones });
       } else if (target.id === "layout") this.update({ variant: target.value === "compact" ? "compact" : undefined });
       else if (target.id === "walls") this.update({ walls_only: target.checked || undefined });
+      else if (target.hasAttribute("data-window")) {
+        const windows = ROOM_WALLS.filter(wall => this.windowInput(wall).checked);
+        this.update({ windows });
+      } else if (target.id === "tv-wall") {
+        const tv_wall = ROOM_WALLS.find(wall => wall === target.value);
+        // Moving a TV away from the right must not introduce the legacy default window.
+        const patch: Partial<LightConfig> = { tv_wall };
+        if (this.config.windows === undefined && this.config.tv_wall === "right" && tv_wall !== "right") patch.windows = [];
+        this.update(patch);
+      } else if (target.id === "couch-wall") this.update({ couch_wall: ROOM_WALLS.find(wall => wall === target.value) });
     });
     this.root.addEventListener("input", event => {
       if (this.config && event.target instanceof HTMLInputElement && !(event as InputEvent).isComposing)
@@ -170,7 +190,12 @@ export class GleamLightEditor extends HTMLElement {
     this.config = next;
     const valid = this.validate(next);
     // While typing or dragging, leave the active input and the spot-plan DOM alone.
-    if (!live) this.render();
+    if ("beam_angle" in patch) {
+      const {rows, columns, walls} = this.grid;
+      this.root.querySelector("#layout-summary")!.textContent =
+        `${rows} × ${columns}${walls ? " · along the walls" : ""} · ${next.beam_angle ?? 40}° beam`;
+    } else if ("windows" in patch || "tv_wall" in patch || "couch_wall" in patch) this.renderWalls(next);
+    else if (!live && !("name" in patch)) this.render();
     if (!valid) this.preview.cancel();
     else if (live) this.preview.queue(next);
     else this.preview.emit(next);
@@ -212,6 +237,21 @@ export class GleamLightEditor extends HTMLElement {
     this.root.querySelector("#beam-reading")!.textContent = `${beam.value}°`;
     beam.setAttribute("aria-valuetext", `${beam.value} degrees`);
   }
+  private windowInput(wall: RoomWall) { return this.root.querySelector<HTMLInputElement>(`#window-${wall}`)!; }
+  private renderWalls(config: LightConfig) {
+    const tv = this.root.querySelector<HTMLSelectElement>("#tv-wall")!;
+    tv.value = config.tv_wall ?? "";
+    this.root.querySelector<HTMLSelectElement>("#couch-wall")!.value = config.couch_wall ?? "";
+    const windows = roomWindows(config);
+    tv.disabled = Array.isArray(windows) && ROOM_WALLS.every(wall => windows.includes(wall));
+    for (const wall of ROOM_WALLS) {
+      const input = this.windowInput(wall);
+      input.checked = Array.isArray(windows) && windows.includes(wall);
+      // Keep a conflicting YAML window editable so either placement can be removed.
+      input.disabled = !input.checked && wall === config.tv_wall;
+      tv.querySelector<HTMLOptionElement>(`option[value="${wall}"]`)!.disabled = input.checked;
+    }
+  }
   private render(external = false) {
     const c = this.config!, { rows, columns, walls, zones: zoneCount } = this.grid;
     const field = <T extends HTMLElement>(id: string) => this.root.querySelector<T>(`#${id}`)!;
@@ -221,6 +261,7 @@ export class GleamLightEditor extends HTMLElement {
     field("rows").textContent = String(rows);
     field("columns").textContent = String(columns);
     field<HTMLInputElement>("walls").checked = walls;
+    this.renderWalls(c);
     field<HTMLInputElement>("beam").value = String(c.beam_angle ?? 40);
     this.showBeam();
     field("layout-summary").textContent = `${rows} × ${columns}${walls ? " · along the walls" : ""} · ${c.beam_angle ?? 40}° beam`;

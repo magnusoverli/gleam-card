@@ -140,6 +140,8 @@ export interface LightZoneConfig {
   name?: string;
 }
 
+export type RoomWall = "left" | "back" | "right";
+
 export interface LightConfig {
   type?: "custom:gleam-light";
   light_type?: "in_roof_spots";
@@ -150,6 +152,12 @@ export interface LightConfig {
   rows?: number;
   columns?: number;
   walls_only?: boolean;
+  /** Walls with a window. Defaults to the right wall unless the TV occupies it. */
+  windows?: RoomWall[];
+  /** Optional wall-mounted TV; cannot share a wall with a window. */
+  tv_wall?: RoomWall;
+  /** Optional floor-standing couch; may sit below a window or TV. */
+  couch_wall?: RoomWall;
   beam_angle?: number;
   /** One string per row, back wall first: a zone number per spot, or "." for no spot. */
   zone_map?: string[];

@@ -30,6 +30,23 @@ Buttons and sliders update the card straight away and send
 seconds, the card returns to the reported state and says so. Unavailable zones
 cannot be operated; if every zone is unavailable the room is dimmed.
 
+### Room furnishings
+
+In the visual editor, choose which walls have **windows**: left, back, right, any combination, or none. Place one optional **TV** and one optional **couch** by choosing a wall for each. The TV needs a wall without a window; clear that window first if needed. The couch can sit below either. These are decorations, not Home Assistant entities or controls.
+
+For example, this room has two windows and a couch under the TV:
+
+```yaml
+type: custom:gleam-light
+zones:
+  - entity: light.living_room
+windows: [left, right]
+tv_wall: back
+couch_wall: back
+```
+
+Use `windows: []` for solid walls. Without `windows`, the room keeps its original right-hand window unless a TV occupies that wall. Omit `tv_wall` or `couch_wall` to leave that item out.
+
 ### Spot layout
 
 | Setting | YAML | Default |

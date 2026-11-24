@@ -84,6 +84,9 @@ export class GleamLight extends HTMLElement {
   private renderer: ReturnType<typeof mountScene>;
   private svg: SVGSVGElement;
   private observer?: IntersectionObserver;
+  /** Set by Home Assistant before mounting the replacement editor preview. */
+  preview = false;
+  private firstPreviewPaint = false;
   private visible = false;
   private frame = 0;
   private timer = 0;
@@ -127,6 +130,9 @@ export class GleamLight extends HTMLElement {
       config.walls_only !== previous.walls_only || config.zone_map.length !== previous.zone_map.length ||
       config.zone_map.some((row, i) => row !== previous.zone_map[i]);
     this.config = { ...config, zone_map: layoutChanged ? [...config.zone_map] : previous.zone_map };
+    if (!previous || config.tv_wall !== previous.tv_wall || config.couch_wall !== previous.couch_wall ||
+        config.windows.length !== previous.windows.length || config.windows.some((wall, i) => wall !== previous.windows[i]))
+      this.renderer.room(config.windows, config.tv_wall, config.couch_wall);
     this.layoutDirty ||= layoutChanged;
     put(this.root.querySelector("h2")!, config.name ?? "Spots");
     this.toggleAttribute("compact", config.variant === "compact");
@@ -138,7 +144,12 @@ export class GleamLight extends HTMLElement {
   set hass(value: HomeAssistant) { this.client = value; this.sync(false); }
 
   connectedCallback() {
-    this.observer = new IntersectionObserver(([entry]) => { this.visible = entry.isIntersecting; this.schedule(); });
+    this.firstPreviewPaint = !this.scene;
+    this.observer = new IntersectionObserver(([entry]) => {
+      this.firstPreviewPaint = false;
+      if (this.visible === entry.isIntersecting) return;
+      this.visible = entry.isIntersecting; this.schedule();
+    });
     this.observer.observe(this);
     document.addEventListener("visibilitychange", this.schedule);
     this.refresh();
@@ -315,7 +326,19 @@ export class GleamLight extends HTMLElement {
     this.schedule();
   };
   private schedule = () => {
-    if (this.frame || !this.config || !this.isConnected || !this.visible || document.hidden) return;
+    if (this.frame || !this.config || !this.isConnected || document.hidden) return;
+    // On release HA mounts a new card. Waiting for intersection *then* rAF lets
+    // the empty room paint first. Seed just the visible preview once, with real state.
+    if (this.firstPreviewPaint && this.preview && this.client) {
+      this.firstPreviewPaint = false;
+      const r = this.getBoundingClientRect();
+      if (r.width && r.height && r.bottom > 0 && r.right > 0 && r.top < innerHeight && r.left < innerWidth) {
+        this.visible = true;
+        this.draw();
+        return;
+      }
+    }
+    if (!this.visible) return;
     this.frame = requestAnimationFrame(this.draw);
   };
   private draw = () => {

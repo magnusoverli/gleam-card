@@ -1,7 +1,10 @@
-import type { EntityState, HomeAssistant, LightConfig } from "../../types.ts";
+import type { EntityState, HomeAssistant, LightConfig, RoomWall } from "../../types.ts";
 import { MAX_GRID, MAX_ZONES, defaultZoneMap, type Rgb } from "./spots.ts";
 
 export const DEFAULT_KELVIN = 2700;
+export const ROOM_WALLS = ["left", "back", "right"] as const satisfies readonly RoomWall[];
+export const roomWindows = (config: Pick<LightConfig, "windows" | "tv_wall">): RoomWall[] =>
+  config.windows === undefined ? (config.tv_wall === "right" ? [] : ["right"]) : config.windows;
 const LIGHT = /^light\.[a-z0-9_]+$/;
 const wholeNumber = (value: unknown, min: number, max: number) =>
   typeof value === "number" && Number.isInteger(value) && value >= min && value <= max;
@@ -23,12 +26,23 @@ export function settings(config: LightConfig) {
   if (config.variant !== undefined && config.variant !== "normal" && config.variant !== "compact")
     throw Error("Layout must be normal or compact.");
   if (config.walls_only !== undefined && typeof config.walls_only !== "boolean") throw Error("walls_only must be true or false.");
+  for (const key of ["tv_wall", "couch_wall"] as const) {
+    const wall = config[key];
+    if (wall !== undefined && !ROOM_WALLS.includes(wall)) throw Error(`${key} must be left, back or right, or omitted.`);
+  }
+  const selection = roomWindows(config);
+  if (!Array.isArray(selection) || selection.some(wall => !ROOM_WALLS.includes(wall)) ||
+      new Set(selection).size !== selection.length)
+    throw Error('windows must be a list of unique walls: left, back or right. Use [] for no windows.');
+  const windows = ROOM_WALLS.filter(wall => selection.includes(wall));
+  if (config.tv_wall && windows.includes(config.tv_wall))
+    throw Error(`The ${config.tv_wall} wall cannot have both a TV and a window. Move the TV or clear that window.`);
   const map = config.zone_map ?? defaultZoneMap(rows, columns, zones.length);
   if (!Array.isArray(map) || map.some(row => typeof row !== "string" || !/^[1-9.]*$/.test(row)))
     throw Error("Zone map rows may contain only zone numbers and “.” for no spot.");
   const highest = Math.max(0, ...map.flatMap(row => [...row].map(Number).filter(Number.isFinite)));
   if (highest > zones.length) throw Error(`Zone map uses zone ${highest}, but only ${zones.length} zone${zones.length === 1 ? " is" : "s are"} configured.`);
-  return { ...config, zones, rows, columns, beam_angle: beam, walls_only: config.walls_only ?? false, variant: config.variant ?? "normal", zone_map: map };
+  return { ...config, zones, rows, columns, windows, beam_angle: beam, walls_only: config.walls_only ?? false, variant: config.variant ?? "normal", zone_map: map };
 }
 export type LightSettings = ReturnType<typeof settings>;
 

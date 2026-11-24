@@ -10,6 +10,8 @@
 
 - Choose **Gleam Light** in the card picker to show recessed ceiling spots in rows and columns (up to 8 × 8), or only along the walls.
 - Split the spots into up to three zones, each a light entity or group with its own switch, brightness and colour temperature. Tap the room to switch the nearest zone.
+- Reflected light now softens the rear corners where the beams cross them. Unlit corners remain visible, and the beams stay translucent.
+- Choose windows on any combination of the left, back and right walls. Place a TV on a window-free wall and a couch against any wall.
 - Assign spots in the visual editor’s plan view, or with the Left | right, Back | front and Walls | centre splits. Set the beam angle from the spot’s datasheet.
 
 [Light settings and YAML](https://github.com/magnusoverli/gleam-card/blob/main/docs/light.md)
