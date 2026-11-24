@@ -9,10 +9,11 @@
 | `src/cards/energy-graph/` | Energy card and pure data transforms |
 | `src/cards/thermostat/` | Thermostat and its visual editor |
 | `src/cards/cover/` | Layouts, per-door state and controls, SVG garage and visual editor |
+| `src/cards/light/` | In-roof spots: pure layout and lighting (`spots.ts`), retained SVG (`scene.ts`), light commands (`model.ts`), card and editor |
 | `src/cards/energy-graph/recorder.ts` | Recorder requests through a narrow client interface |
 | `src/cards/thermostat/commands.ts` | Pure command validation and climate-action transport |
 | `scripts/deploy.js` | Content-hashed filesystem deployment with a stable loader |
-| `index.html`, `energy-graph/`, `thermostat/`, `cover/` | Public demo gallery and standalone card pages |
+| `index.html`, `energy-graph/`, `thermostat/`, `cover/`, `light/` | Public demo gallery and standalone card pages |
 | `dev/preview.js`, `dev/demo.js` | Shared preview entry and synthetic states, history, and mock actions; `/dev/fixture.html` mounts all cards for regression tests |
 | `tests/data.test.js` | Data-contract regression tests |
 | `tests/browser/` | Built-bundle browser and interaction checks |
@@ -83,6 +84,10 @@ illustration or device class.
   draw call. HTML feedback is immediate; graphics are frame-coalesced.
 - Both suspend hidden rendering, avoid idle loops and release GPU resources
   on disconnect.
+- Light rebuilds its spot elements only when the layout changes. State updates
+  recompute the scene and write only changed attributes, in one animation frame,
+  and only while the card is visible. Gradient colours come from per-zone CSS
+  custom properties, so a colour change touches no gradient elements.
 - Cover animates retained SVG elements only during travel. Each bay in Double
   has its own command and confirmation state. In the demo, switch **Garage layout**
   to **Double** to try both bays without connecting hardware.

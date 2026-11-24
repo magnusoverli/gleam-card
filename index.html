@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Explore three interactive Home Assistant dashboard cards with sample data.">
+  <meta name="description" content="Explore four interactive Home Assistant dashboard cards with sample data.">
   <title>Gleam Cards · Demo gallery</title>
   <link rel="stylesheet" href="./dev/gallery.css">
   <script>
-    const legacy = {"#energy-graph":"energy-graph/", "#thermostat":"thermostat/", "#cover":"cover/", "#garage-layout":"cover/"};
+    const legacy = {"#energy-graph":"energy-graph/", "#thermostat":"thermostat/", "#cover":"cover/", "#garage-layout":"cover/", "#light":"light/"};
     function openBookmark() {
       if (legacy[location.hash]) location.replace(new URL(legacy[location.hash], location.href));
     }
@@ -26,6 +26,8 @@
       <div class="copy"><small>Experimental</small><h2>Thermostat</h2><p>Set a target temperature and try the controls of a simulated heat pump.</p><strong>Try the dial →</strong></div></a>
     <a class="tile" href="./cover/"><div class="photo"><img src="./docs/images/cover.png" alt="Two garage doors, one open and one closed"></div>
       <div class="copy"><small>Stable</small><h2>Cover</h2><p>Draw curtains, adjust blinds, shades and shutters, or operate two garage doors independently.</p><strong>Try the covers →</strong></div></a>
+    <a class="tile" href="./light/"><div class="photo"><img src="./docs/images/light.png" alt="Ceiling spots lighting a kitchen in two zones"></div>
+      <div class="copy"><small>New</small><h2>Light</h2><p>Switch, dim and tune zones of in-roof spots laid out in rows and columns.</p><strong>Try the spots →</strong></div></a>
   </div>
   <footer>No account or devices needed. <a href="https://github.com/magnusoverli/gleam-card#install">Install in Home Assistant ↗</a></footer>
 </main></body></html>

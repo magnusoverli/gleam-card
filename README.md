@@ -1,6 +1,6 @@
 # Gleam Cards
 
-**A collection of interactive cards for Home Assistant.** Start with the view you want, then make it yours in the visual editor. All three cards run locally and install as one bundle.
+**A collection of interactive cards for Home Assistant.** Start with the view you want, then make it yours in the visual editor. All four cards run locally and install as one bundle.
 
 [**Try the live demo →**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install)
 
@@ -36,6 +36,14 @@
 
 [**Try Gleam Cover →**](https://magnusoverli.github.io/gleam-card/cover/) · [Cover settings](docs/cover.md)
 
+## Gleam Light
+
+**New** · See which zones of your in-roof spots are on, dim them, or warm and cool their colour temperature. Lay the spots out in rows and columns, or only along the walls, and split them into up to three zones.
+
+<a href="https://magnusoverli.github.io/gleam-card/light/"><img src="docs/images/light.png" width="360" alt="Kitchen ceiling with twelve spots in two zones, both on, with brightness sliders."></a>
+
+[**Try Gleam Light →**](https://magnusoverli.github.io/gleam-card/light/) · [Light settings](docs/light.md)
+
 ## Install
 
 [![Open Gleam Cards in your Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&repository=gleam-card&category=plugin)
@@ -51,7 +59,7 @@ type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
 ```
 
-For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For garage doors or window coverings, choose **Gleam Cover**, select the cover type, and pick your `cover.*` entity.
+For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For garage doors or window coverings, choose **Gleam Cover**, select the cover type, and pick your `cover.*` entity. For in-roof spots, choose **Gleam Light** and add a `light.*` entity for each zone.
 
 <details>
 <summary>Manual installation</summary>
@@ -66,9 +74,9 @@ Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/
 
 [Release notes](https://github.com/magnusoverli/gleam-card/releases/latest) · [![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
 
-The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial. Cover draws its garage in SVG and does not require WebGL. No card needs a CDN or a separate backend integration.
+The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial. Cover and Light draw in SVG and do not require WebGL. No card needs a CDN or a separate backend integration.
 
-[Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md) · [Cover guide](docs/cover.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
+[Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md) · [Cover guide](docs/cover.md) · [Light guide](docs/light.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
 
 For local previews, builds, and tests, see [Development](docs/development.md). Release instructions are in [Publishing](docs/publishing.md).
 

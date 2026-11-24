@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### 💡 New: Gleam Light · In-roof spots
+
+- Choose **Gleam Light** in the card picker to show recessed ceiling spots in rows and columns (up to 8 × 8), or only along the walls.
+- Split the spots into up to three zones, each a light entity or group with its own switch, brightness and colour temperature. Tap the room to switch the nearest zone.
+- Assign spots in the visual editor’s plan view, or with the Left | right, Back | front and Walls | centre splits. Set the beam angle from the spot’s datasheet.
+
+[Light settings and YAML](https://github.com/magnusoverli/gleam-card/blob/main/docs/light.md)
+
 ## [0.0.11](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.11) · 2026-11-19
 
 ### 🪟 Gleam Cover is stable

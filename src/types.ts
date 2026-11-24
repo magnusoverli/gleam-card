@@ -134,3 +134,23 @@ export interface CoverConfig {
   left_label?: string;
   right_label?: string;
 }
+
+export interface LightZoneConfig {
+  entity: string;
+  name?: string;
+}
+
+export interface LightConfig {
+  type?: "custom:gleam-light";
+  light_type?: "in_roof_spots";
+  name?: string;
+  variant?: "normal" | "compact";
+  /** One to three light entities or groups; each switches its own spots. */
+  zones: LightZoneConfig[];
+  rows?: number;
+  columns?: number;
+  walls_only?: boolean;
+  beam_angle?: number;
+  /** One string per row, back wall first: a zone number per spot, or "." for no spot. */
+  zone_map?: string[];
+}

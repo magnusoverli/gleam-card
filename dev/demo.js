@@ -4,6 +4,11 @@ const hour = Math.floor(now / HOUR) * HOUR;
 const state = (value, attributes = {}) => ({
   state: String(value), attributes, last_updated: new Date(now).toISOString(),
 });
+const spot = (value, friendly_name, brightness, color_temp_kelvin, minutes) => ({
+  ...state(value, { friendly_name, supported_color_modes: ["color_temp"], color_mode: "color_temp",
+    min_color_temp_kelvin: 2200, max_color_temp_kelvin: 6500, ...(value === "on" ? { brightness, color_temp_kelvin } : {}) }),
+  last_changed: new Date(now - minutes * 60000).toISOString(), remembered: { brightness, color_temp_kelvin },
+});
 const states = {
   "cover.demo_shutter": state("open",{device_class:"shutter",friendly_name:"Patio shutter",supported_features:7,current_position:35}),
   "cover.demo_curtain": state("open",{device_class:"curtain",friendly_name:"Living room curtains",supported_features:15,current_position:30}),
@@ -13,6 +18,9 @@ const states = {
   "cover.offline_shade": state("unavailable",{device_class:"shade",friendly_name:"Guest room shade",supported_features:3}),
   "cover.right_garage": { ...state("open", { friendly_name:"Right garage", device_class:"garage", supported_features:3 }), last_changed:new Date(now-HOUR).toISOString() },
   "cover.garage_door": { ...state("closed", { friendly_name: "Garage", device_class: "garage", supported_features: 3 }), last_changed: new Date(now - 134 * 60000).toISOString() },
+  "light.kitchen_counter": spot("on", "Counter", 217, 3000, 65),
+  "light.kitchen_dining": spot("on", "Dining", 102, 2400, 65),
+  "light.bookcase_spots": spot("off", "Bookcase", 178, 2700, 200),
   "sensor.total_energy": state(1200, { unit_of_measurement: "kWh" }),
   "sensor.current_hour_energy": state(.84, { unit_of_measurement: "kWh" }),
   "sensor.electricity_price": state(1.25, {
@@ -64,6 +72,17 @@ const hass = {
     document.querySelector("#actions").textContent = `${label} · ${service.replaceAll("_"," ")}${value === undefined ? "" : `: ${value}`}`;
     const { entity_id: id, ...values } = data;
     const previous = states[id];
+    if (domain === "light") {
+      const remembered = { ...previous.remembered };
+      if (data.brightness_pct !== undefined) remembered.brightness = Math.round(data.brightness_pct * 2.55);
+      if (data.color_temp_kelvin !== undefined) remembered.color_temp_kelvin = data.color_temp_kelvin;
+      const on = service === "turn_on", { brightness, color_temp_kelvin, ...attributes } = previous.attributes;
+      states[id] = { ...previous, state: on ? "on" : "off", remembered,
+        last_changed: on === (previous.state === "on") ? previous.last_changed : new Date().toISOString(),
+        attributes: on ? { ...attributes, ...remembered } : attributes };
+      setTimeout(() => { light.hass = { ...hass, states: { ...states } }; }, 300);
+      return;
+    }
     if (domain === "cover") {
       if (service === "stop_cover") {
         const trip = moving.get(id);
@@ -109,7 +128,7 @@ const hass = {
 };
 const mount = document.querySelector("#cards");
 const selected = document.body.dataset.card;
-let energy, thermostat, cover;
+let energy, thermostat, cover, light;
 if (!selected || selected === "energy") {
 energy = document.createElement("gleam-energy-graph");
 energy.id = "energy-graph";
@@ -153,4 +172,29 @@ examples.onchange = applyCoverLayout;
 applyCoverLayout();
 mount.append(examples, layouts, cover);
 }
-window.demo = { energy, thermostat, cover, hass, calls, requests };
+if (!selected || selected === "light") {
+light = document.createElement("gleam-light");
+light.id = "light";
+light.hass = hass;
+const lightExamples = {
+  kitchen: { name: "Kitchen", zones: [{ entity: "light.kitchen_counter" }, { entity: "light.kitchen_dining" }] },
+  gallery: { name: "Gallery", rows: 4, columns: 5, walls_only: true, zone_map: ["11111", "2...2", "2...2", "22222"],
+    zones: [{ entity: "light.kitchen_counter", name: "Back wall" }, { entity: "light.kitchen_dining", name: "Sides" }] },
+  living: { name: "Living room", rows: 3, columns: 5, zone_map: ["33333", "11222", "11222"],
+    zones: [{ entity: "light.kitchen_dining", name: "Sofa" }, { entity: "light.kitchen_counter", name: "Reading" }, { entity: "light.bookcase_spots" }] },
+  dense: { name: "Open plan", rows: 8, columns: 8, beam_angle: 60, zones: [{ entity: "light.kitchen_counter" }, { entity: "light.kitchen_dining" }] },
+  hall: { name: "Hall", variant: "compact", rows: 2, columns: 4,
+    zones: [{ entity: "light.kitchen_counter", name: "Entrance" }, { entity: "light.kitchen_dining", name: "Stairs" }] },
+};
+const lightExample = document.createElement("label");
+lightExample.id = "light-example";
+lightExample.innerHTML = `Example <select><option value="kitchen">Kitchen · 3 × 4, two zones</option><option value="gallery">Gallery · along the walls</option><option value="living">Living room · three zones</option><option value="dense">Open plan · 8 × 8, 60° beams</option><option value="hall">Hall · compact</option></select>`;
+const applyLight = () => {
+  light.setConfig({ type: "custom:gleam-light", light_type: "in_roof_spots", ...lightExamples[lightExample.querySelector("select").value] });
+  light.style.gridColumn = `span ${light.getGridOptions().columns}`;
+};
+lightExample.onchange = applyLight;
+applyLight();
+mount.append(lightExample, light);
+}
+window.demo = { energy, thermostat, cover, light, hass, calls, requests };
