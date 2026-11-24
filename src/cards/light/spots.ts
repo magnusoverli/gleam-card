@@ -134,8 +134,13 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
   };
 }
 
-/** Zone of the spot nearest a point in viewBox units; horizontal distance counts most. */
+/** A fixture hit selects its zone; elsewhere use the nearest beam, favouring horizontal proximity. */
 export function nearestZone(scene: LightScene, x: number, y: number) {
+  // Test the visible trim in reverse paint order, so the top fixture wins any overlap.
+  for (let i = scene.spots.length - 1; i >= 0; i--) {
+    const s = scene.spots[i], dx = (x - s.x) / s.trimRx, dy = (y - s.trimY) / s.trimRy;
+    if (dx * dx + dy * dy <= 1) return s.zone;
+  }
   let best = -1, distance = Infinity;
   for (const s of scene.spots) {
     const dx = s.hitX - x, dy = (s.hitY - y) * 0.35, d = dx * dx + dy * dy;

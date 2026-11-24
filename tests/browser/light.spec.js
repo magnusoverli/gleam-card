@@ -45,6 +45,22 @@ test("a zone button sends one command, shows it at once and settles on the repor
   await expect(card.locator(".zone").nth(1).locator(".state")).toHaveText("On");
 });
 
+test("a second toggle waits for its own report, not cached state or the first toggle's report", async ({ page }) => {
+  const card = page.locator("gleam-light"), zone = card.locator(".zone").first();
+  await card.getByRole("button", { name: "Turn off Counter" }).click();
+  await card.getByRole("button", { name: "Turn on Counter" }).click();
+  await page.evaluate(id => window.reportLight(id, "off"), dining);
+  await expect(zone.locator(".age")).toHaveText("· Turning on…");
+  await page.evaluate(id => window.reportLight(id, "off"), counter);
+  await expect(zone.locator(".state")).toHaveText("On");
+  await expect(zone.locator(".age")).toHaveText("· Turning on…");
+  await page.evaluate(id => window.reportLight(id, "on"), counter);
+  await expect(zone.locator(".age")).toHaveText("· Under 1 min");
+  expect(await page.evaluate(() => window.lightCalls)).toEqual([
+    ["light", "turn_off", { entity_id: counter }], ["light", "turn_on", { entity_id: counter }],
+  ]);
+});
+
 test("tapping the room switches only the zone nearest the tap", async ({ page }) => {
   const room = page.locator("gleam-light svg.room"), box = await room.boundingBox();
   await room.click({ position: { x: box.width * 0.3, y: box.height * 0.5 } });

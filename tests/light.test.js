@@ -96,3 +96,25 @@ test("scene light follows state, beam angle and spot density", () => {
   assert.equal(nearestZone(scene, 290, 80), 1);
   assert.equal(lightScene(grid, [{ ...zone(false), unavailable: true }, { ...zone(false), unavailable: true }], { rows: 3, columns: 4, beamAngle: 40 }).sceneOpacity, 0.35);
 });
+
+test("every projected lens and trim selects its configured zone", () => {
+  const zones = [true, false, true].map(on => ({ on, brightness: 80, color: kelvinRgb(2700), unavailable: false }));
+  for (const [rows, columns, wallsOnly, map] of [
+    [2, 4, false, ["1111", "2222"]], // Back | front
+    [3, 4, false, ["1111", "1221", "1111"]], // Walls | centre
+    [4, 3, true, ["1.3", "2.1", "3.2", "123"]],
+    [8, 8, false, Array.from({ length: 8 }, (_, r) =>
+      Array.from({ length: 8 }, (_, c) => (r + c) % 3 + 1).join(""))],
+  ]) {
+    const grid = layoutSpots(rows, columns, wallsOnly, map, zones.length);
+    const scene = lightScene(grid, zones, { rows, columns, beamAngle: 40 });
+    for (const [i, { row, column }] of grid.entries()) {
+      const s = scene.spots[i], expected = Number(map[row][column]) - 1;
+      const where = `${rows} × ${columns}, row ${row}, column ${column}`;
+      assert.equal(nearestZone(scene, s.x, s.lensY), expected, where);
+      assert.equal(nearestZone(scene, s.x + 0.85 * s.trimRx, s.trimY), expected, where);
+      assert.equal(nearestZone(scene, s.hitX, s.hitY), expected, `${where} beam centre`);
+    }
+  }
+  assert.equal(nearestZone({ spots: [] }, 160, 87), -1);
+});

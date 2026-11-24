@@ -106,6 +106,7 @@ export class GleamLightEditor extends HTMLElement {
 
   setConfig(config: LightConfig) {
     this.config = config;
+    this.validate(config);
     this.render();
   }
   set hass(value: HomeAssistant) {
@@ -122,24 +123,40 @@ export class GleamLightEditor extends HTMLElement {
   /** Current map as numbers (0 = no spot), always rows × columns. */
   private cells(rows = this.grid.rows, columns = this.grid.columns, zones = this.grid.zones) {
     const map = this.config!.zone_map;
-    return Array.from({ length: rows }, (_, r) => Array.from({ length: columns }, (_, c) => {
-      const cell = map?.[r]?.charAt(c);
-      if (cell === ".") return 0;
-      const n = Number(cell);
-      return n >= 1 ? Math.min(zones, n) : defaultZone(c, columns, zones) + 1;
-    }));
+    return Array.from({ length: rows }, (_, r) => {
+      const raw: unknown = Array.isArray(map) ? map[r] : undefined;
+      // Recover unquoted YAML digits for the preview; only an edit writes string rows.
+      const row = typeof raw === "string" || (typeof raw === "number" && Number.isSafeInteger(raw) && raw > 0) ? String(raw) : "";
+      return Array.from({ length: columns }, (_, c) => {
+        if (row[c] === ".") return 0;
+        const n = Number(row[c]);
+        return n >= 1 ? Math.min(zones, n) : defaultZone(c, columns, zones) + 1;
+      });
+    });
   }
   private mapOf(cells: number[][]) { return cells.map(row => row.map(n => (n ? String(n) : ".")).join("")); }
 
+  private validate(config: LightConfig) {
+    const message = this.root.querySelector("#invalid")!;
+    try {
+      const map = config.zone_map;
+      if (map != null && (!Array.isArray(map) || map.some(row => typeof row !== "string")))
+        throw Error('Quote each zone_map row in YAML, for example ["1111", "2222"]. To repair it here, edit the spot plan or choose a quick split.');
+      settings(config);
+      message.textContent = "";
+      return true;
+    } catch (error) {
+      message.textContent = error instanceof Error ? error.message : "Invalid configuration.";
+      return false;
+    }
+  }
   private update(patch: Partial<LightConfig>) {
     const next: LightConfig = { ...this.config!, ...patch };
     for (const key of Object.keys(patch) as (keyof LightConfig)[]) if (patch[key] === undefined) delete next[key];
     this.config = next;
+    const valid = this.validate(next);
     this.render();
-    const message = this.root.querySelector("#invalid")!;
-    try { settings(next); message.textContent = ""; }
-    catch (error) { message.textContent = error instanceof Error ? error.message : "Invalid configuration."; return; }
-    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
+    if (valid) this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
   }
   private addZone() {
     const zones = this.config!.zones ?? [];
@@ -234,7 +251,9 @@ export class GleamLightEditor extends HTMLElement {
       button.setAttribute("aria-label", `Row ${r + 1} from the back wall, column ${col + 1}: ${label}. Activate to change.`);
       nodes.push(button);
     }));
+    const focusedCell = this.root.activeElement instanceof HTMLButtonElement ? this.root.activeElement.dataset.cell : undefined;
     plan.replaceChildren(...nodes);
+    if (focusedCell) plan.querySelector<HTMLButtonElement>(`[data-cell="${focusedCell}"]`)?.focus({ preventScroll: true });
     this.root.querySelector(".legend")!.replaceChildren(...zones.map((zone, i) => {
       const item = document.createElement("span");
       item.innerHTML = `<i style="background:${ZONE_COLORS[i]}"></i>`;
