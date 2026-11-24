@@ -12,9 +12,10 @@ a{color:#9feef3;text-underline-offset:.2em}a:focus-visible,select:focus-visible{
 nav,footer{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.25rem}nav a{padding:.35rem 0}nav a[aria-current]{color:#fff;text-decoration-thickness:3px}
 footer{border-top:1px solid #30445c;margin-top:2.5rem;padding-top:1rem}
 #cards{min-width:0}#thermostat{display:block;max-width:420px;margin:auto}
-body[data-card="cover"] #cards{max-width:500px;margin-inline:auto;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:8px;font:14px/normal system-ui,sans-serif}
+body[data-card="light"] #cards,body[data-card="cover"] #cards{max-width:500px;margin-inline:auto;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:8px;font:14px/normal system-ui,sans-serif}
 body[data-card="cover"] #garage-layout{grid-column:1/-1;font:1rem/1.55 system-ui,sans-serif}
 body[data-card="cover"] #cover-example{grid-column:1/-1;text-align:center}
+#light-example{grid-column:1/-1;text-align:center;margin-bottom:.5rem}
 #garage-layout{display:flex;gap:.75rem;align-items:center;justify-content:center;margin-bottom:1rem}select{font:inherit;padding:.35rem .6rem;border-radius:.5rem}
 #actions{font-size:.9rem;text-align:center;margin-top:.75rem;overflow-wrap:anywhere}
 @media(max-width:530px){main{padding:16px}header{margin:1.5rem 0}.photo{height:155px}}

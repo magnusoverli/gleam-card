@@ -23,7 +23,7 @@ test("one resource URL loads the latest deployed hash after a reload", async ({ 
       body: '<script type="module" src="/local/gleam-card/loader.js"></script>',
     }));
     await page.goto("/deployment-test");
-    await expect.poll(() => page.evaluate(() => window.customCards?.length)).toBe(3);
+    await expect.poll(() => page.evaluate(() => window.customCards?.length)).toBe(4);
     expect(loaded).toContain(first.file);
     await writeFile(bundle, source + "\nwindow.deploymentUpdated = true;\n");
     const second = await deploy(bundle, root);
