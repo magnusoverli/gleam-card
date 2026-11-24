@@ -1,5 +1,5 @@
 import type { LightScene } from "./spots";
-import { couches, mountFurniture, roomFurniture } from "./room-furniture";
+import { couches, mountCouchLight, mountFurniture, roomFurniture } from "./room-furniture";
 
 // Retained SVG for the room. Resize the spot layers and paint their geometry in the same frame.
 const ROOM_FLOOR = "M86 124H258L320 153.6V174H0V150.2Z";
@@ -48,8 +48,8 @@ export const sceneMarkup = `<svg class="room" viewBox="0 0 320 174" aria-hidden=
     <path d="${PLANKS}" stroke="#2c4c68" stroke-width=".6" opacity=".45"/>
     <path d="M86 44H258" stroke="#2f5670" stroke-width=".6" opacity=".7"/>
     <g class="pools"></g>
-    <g pointer-events="none">${couches}</g>
     <g class="cones" filter="url(#cone-blur)"></g>
+    <g pointer-events="none">${couches}</g>
     <g class="fixtures"></g>
     <path d="M0 6H320V14H0Z" fill="#142c40"/>
     <path d="M0 6.5H320M0 14H320" stroke="#6dabbc" stroke-width=".9"/>
@@ -135,5 +135,6 @@ export function mountScene(svg: SVGSVGElement) {
       set(n.trim.parentElement!, "opacity", s.dim);
     });
   }
-  return { draw, room: mountFurniture(svg) };
+  const couchLight = mountCouchLight(svg);
+  return { draw: (scene: LightScene) => { draw(scene); couchLight(scene); }, room: mountFurniture(svg) };
 }
