@@ -1,5 +1,39 @@
 import { test, expect } from "@playwright/test";
 
+test("Graph reuses its WebGL resources, idles off-screen and releases on disconnect",async({page})=>{
+  await page.goto("/graph/");
+  const card=page.locator("gleam-graph");
+  await expect.poll(()=>card.evaluate(g=>g.view?.targets.length ?? 0)).toBeGreaterThan(0);
+  const metrics=await card.evaluate(async g=>{
+    const frame=()=>new Promise(requestAnimationFrame); await frame();
+    const view=g.view, renderer=view.renderer, before={...renderer.info.memory}, mesh=view.targets[0];
+    const cfg={series:[{entity:"sensor.indoor_temperature",name:"Indoors"},{entity:"sensor.outdoor_temperature",name:"Outdoors"}]};
+    const count=window.demo.requests.length,start=performance.now();
+    for(let i=0;i<10;i++) g.setConfig({...cfg,dataset_spacing:i});
+    const cpuMs=performance.now()-start;
+    await frame();
+    return {reused:g.view.targets[0]===mesh,requests:window.demo.requests.length-count,before,after:{...renderer.info.memory},
+      cpuMs,toFrameMs:performance.now()-start,draws:renderer.info.render.calls};
+  });
+  expect(metrics.reused).toBe(true); expect(metrics.before).toEqual(metrics.after); expect(metrics.requests).toBe(0);
+  expect(metrics.draws).toBeGreaterThan(0);
+  console.log("Graph (two temperature series, ten spacing edits)",metrics);
+  await card.evaluate(g=>{g.style.marginTop="3000px";window.scrollTo(0,0);});
+  await expect.poll(()=>card.evaluate(g=>g.visible)).toBe(false);
+  expect(await card.evaluate(async g=>{
+    const n=g.view.renderer.info.render.frame,req=window.demo.requests.length;
+    g.resume(); await new Promise(requestAnimationFrame);
+    return n===g.view.renderer.info.render.frame && window.demo.requests.length===req;
+  })).toBe(true);
+  expect(await card.evaluate(g=>{
+    const renderer=g.view.renderer, canvas=renderer.domElement;
+    g.remove();document.querySelector("#cards").append(g);g.style.marginTop="";
+    return !canvas.isConnected && !g.view && renderer.info.memory.geometries===0 && renderer.info.memory.textures===0;
+  })).toBe(true);
+  await card.scrollIntoViewIfNeeded();
+  await expect(card.locator("canvas")).toBeVisible();
+});
+
 test("an 8×8 Light preview batches beam edits and retains its fixtures", async ({ page }) => {
   await page.goto("/light/");
   await page.getByLabel("Example").selectOption("dense");

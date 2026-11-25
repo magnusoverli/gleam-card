@@ -129,6 +129,19 @@ const hass = {
 const mount = document.querySelector("#cards");
 const selected = document.body.dataset.card;
 let energy, thermostat, cover, light;
+let graph;
+if (selected === "graph") {
+  const series = [{entity:"sensor.indoor_temperature",name:"Indoors"},{entity:"sensor.outdoor_temperature",name:"Outdoors"}];
+  const temp = (id,i) => (id === series[0].entity ? 21 + 1.8*Math.sin(i/7) : 12 + 6*Math.sin(i/7-1)).toFixed(1);
+  for (const {entity,name} of series) states[entity] = state(temp(entity,48),{friendly_name:name,unit_of_measurement:"°C"});
+  graph = document.createElement("gleam-graph"); graph.id = "graph";
+  graph.setConfig({title:"Indoor and outdoor temperature",series});
+  graph.hass = {...hass, async callWS(req) {
+    requests.push(req);
+    return Object.fromEntries(req.entity_ids.map(id=>[id,Array.from({length:49},(_,i)=>({lu:(now-(48-i)*HOUR/2)/1000,s:temp(id,i)}))]));
+  }};
+  mount.append(graph);
+}
 if (!selected || selected === "energy") {
 energy = document.createElement("gleam-energy-graph");
 energy.id = "energy-graph";
@@ -197,4 +210,4 @@ lightExample.onchange = applyLight;
 applyLight();
 mount.append(lightExample, light);
 }
-window.demo = { energy, thermostat, cover, light, hass, calls, requests };
+window.demo = { energy, thermostat, cover, light, graph, hass, calls, requests };

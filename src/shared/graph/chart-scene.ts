@@ -137,10 +137,11 @@ export class ChartScene {
     return mesh;
   }
 
-  joint(mesh: THREE.InstancedMesh, point: Point, radius: number) {
+  joint(mesh: THREE.InstancedMesh, point: Point, radius: number, tip?: string) {
     const matrix = this.#transform.matrix.makeScale(radius, radius, radius);
     matrix.setPosition(...point);
-    mesh.setMatrixAt(mesh.count++, matrix);
+    mesh.setMatrixAt(mesh.count, matrix);
+    mesh.userData.tips[mesh.count++] = tip;
   }
 
   stroke(mesh: THREE.InstancedMesh, a: Point, b: Point, radius: number, tip?: string) {
@@ -211,22 +212,23 @@ export class ChartScene {
     cap.renderOrder = z;
   }
 
-  bar(center: number, width: number, height: number, depth: number, color: number, opacity: number) {
-    const bar = this.#slot("bar", () => {
-      const mesh = new THREE.Mesh(this.#box, this.#material("bar", () =>
+  bar(center: number, width: number, height: number, depth: number, color: number, opacity: number,
+    z = BAR_CENTER_Z, base = 0, series = "bar") {
+    const bar = this.#slot(series, () => {
+      const mesh = new THREE.Mesh(this.#box, this.#material(series, () =>
         new THREE.MeshPhysicalMaterial({
           color: 0x22e4ef, emissive: 0x087d91, emissiveIntensity: .5,
           metalness: .18, roughness: .5, clearcoat: .45, clearcoatRoughness: .5, transparent: true,
           opacity: .65, depthWrite: false, side: THREE.DoubleSide,
         })));
-      mesh.add(new THREE.LineSegments(this.#edges, this.#material("outline", () =>
+      mesh.add(new THREE.LineSegments(this.#edges, this.#material(`${series}:outline`, () =>
         new THREE.LineBasicMaterial({ color: 0x8bffff, transparent: true, opacity: .9, depthWrite: false }))));
-      mesh.renderOrder = mesh.children[0].renderOrder = BAR_CENTER_Z;
       mesh.userData.blendOrder = 1;
       mesh.children[0].userData.blendOrder = 2;
       return mesh;
     });
-    bar.position.set(center, height / 2, BAR_CENTER_Z);
+    bar.renderOrder = bar.children[0].renderOrder = z;
+    bar.position.set(center, base + height / 2, z);
     bar.material.color.setHex(color);
     bar.material.emissive.copy(bar.material.color).multiplyScalar(.28);
     bar.material.opacity = opacity;

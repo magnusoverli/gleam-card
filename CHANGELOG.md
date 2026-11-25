@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Graph
+
+- Choose **Graph** to compare one to four numeric sensors, with independent lines, steps or interval bars, native units, current-value readouts and the Energy Graph camera controls. [Settings and examples](docs/graph.md).
+
 ## [0.0.12](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.12) · 2026-11-25
 
 ### 💡 New: Gleam Light · Room with ceiling spots

@@ -1,6 +1,6 @@
 # Gleam Cards
 
-**A collection of interactive cards for Home Assistant.** Start with the view you want, then make it yours in the visual editor. All four cards run locally and install as one bundle.
+**A collection of interactive cards for Home Assistant.** Start with the view you want, then make it yours in the visual editor. All five cards run locally and install as one bundle.
 
 [**Try the live demo →**](https://magnusoverli.github.io/gleam-card/) · [Install in Home Assistant](#install)
 
@@ -11,6 +11,14 @@
 <a href="https://magnusoverli.github.io/gleam-card/energy-graph/"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside a stepped electricity price forecast."></a>
 
 [**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/energy-graph/) · [Graph settings](docs/energy-graph.md)
+
+## Graph
+
+Compare up to four numeric sensors on a 3D timeline. Temperatures in the same unit share a scale; humidity or pressure gets its own. Choose lines, steps, or interval bars for each series.
+
+<a href="https://magnusoverli.github.io/gleam-card/graph/"><img src="docs/images/graph.png" width="640" alt="Indoor and outdoor temperatures on two depth lanes with the same Celsius scale."></a>
+
+[**Try Graph →**](https://magnusoverli.github.io/gleam-card/graph/) · [Graph settings and YAML](docs/graph.md)
 
 ## Gleam Thermostat
 
@@ -74,7 +82,7 @@ Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/
 
 [Release notes](https://github.com/magnusoverli/gleam-card/releases/latest) · [![Bundle downloads across GitHub releases](https://img.shields.io/github/downloads/magnusoverli/gleam-card/total?label=bundle%20downloads)](https://github.com/magnusoverli/gleam-card/releases)
 
-The graph requires **WebGL 2**; the thermostat’s HTML controls also work without the 3D dial. Cover and Light draw in SVG and do not require WebGL. No card needs a CDN or a separate backend integration.
+Both graphs require **WebGL 2** for the chart; the thermostat’s HTML controls also work without the 3D dial. Cover and Light draw in SVG and do not require WebGL. No card needs a CDN or a separate backend integration.
 
 [Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md) · [Cover guide](docs/cover.md) · [Light guide](docs/light.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
 

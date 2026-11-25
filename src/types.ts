@@ -64,6 +64,29 @@ export interface EnergyConfig {
   voltage_shift_minutes?: number;
 }
 
+export interface GraphSeries {
+  entity: string;
+  name?: string;
+  plot?: "line" | "step" | "bar";
+  color?: string;
+  opacity?: number;
+  line_width?: number;
+  shift_minutes?: number;
+  visible?: boolean;
+  show_readout?: boolean;
+  min?: number;
+  max?: number;
+  interval_minutes?: number;
+  aggregate?: "mean" | "min" | "max" | "last";
+}
+
+export interface GraphConfig extends Pick<EnergyConfig, "title" | "hours_to_show" | "refresh_interval" |
+  "dataset_spacing" | "use_server_time" | "show_camera_buttons" | "show_dataset_buttons" |
+  "starting_view" | "lock_navigation" | "now_marker_color" | "point_light_intensity" | "readout_value_size"> {
+  type?: "custom:gleam-graph";
+  series: GraphSeries[];
+}
+
 export interface ThermostatConfig {
   type?: "custom:gleam-thermostat";
   entity: string;

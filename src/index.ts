@@ -5,13 +5,16 @@ import { GleamCover } from "./cards/cover/cover";
 import { GleamCoverEditor } from "./cards/cover/editor";
 import { GleamLight } from "./cards/light/light";
 import { GleamLightEditor } from "./cards/light/editor";
-import type { Card, CoverConfig, EnergyConfig, LightConfig, ThermostatConfig } from "./types";
+import { GleamGraph } from "./cards/graph/graph";
+import { GraphEditor } from "./cards/graph/editor";
+import type { Card, CoverConfig, EnergyConfig, GraphConfig, LightConfig, ThermostatConfig } from "./types";
 
 // Check the public integration contract without adding a runtime base class.
 const Energy: new () => Card<EnergyConfig> = GleamEnergyGraph;
 const Thermostat: new () => Card<ThermostatConfig> = GleamThermostat;
 const Cover: new () => Card<CoverConfig> = GleamCover;
 const Light: new () => Card<LightConfig> = GleamLight;
+const Graph: new () => Card<GraphConfig> = GleamGraph;
 
 declare global {
   interface Window {
@@ -27,7 +30,9 @@ const cards = [
   { type: "gleam-cover", name: "Gleam Cover", element: Cover,
     description: "Garage doors, roller shades, slatted blinds, roller shutters and curtains with live status and controls." },
   { type: "gleam-light", name: "Gleam Light", element: Light,
-    description: "A room with ceiling spots, split into zones with brightness and colour temperature controls." },
+     description: "A room with ceiling spots, split into zones with brightness and colour temperature controls." },
+  { type: "gleam-graph", name: "Graph", element: Graph,
+    description: "Compare numeric sensor history with lines, steps or bars on an interactive timeline." },
 ];
 
 for (const { type, element, ...metadata } of cards) {
@@ -45,3 +50,4 @@ if (!customElements.get("gleam-energy-graph-editor")) {
 }
 if (!customElements.get("gleam-cover-editor")) customElements.define("gleam-cover-editor", GleamCoverEditor);
 if (!customElements.get("gleam-light-editor")) customElements.define("gleam-light-editor", GleamLightEditor);
+if (!customElements.get("gleam-graph-editor")) customElements.define("gleam-graph-editor", GraphEditor);

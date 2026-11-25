@@ -1,4 +1,6 @@
 // Pure data transforms, shared by the card and its tests. All times are UTC ms.
+import { timestamp } from "../../shared/graph/readings.ts";
+export { mergeHistory, timestamp } from "../../shared/graph/readings.ts";
 export const HOUR = 3600000;
 export const GRAPH_HEIGHT = 4.8;
 export const numeric = value => {
@@ -6,8 +8,6 @@ export const numeric = value => {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 };
-export const timestamp = value => typeof value === "number"
-  ? (value < 1e11 ? value * 1000 : value) : Date.parse(value);
 export const clockHour = now => Math.floor(now / HOUR) * HOUR;
 
 export function energyFromStatistics(rows, start, end) {
@@ -43,22 +43,6 @@ export function normalizeHistory(rows) {
       : timestamp(row.last_updated || row.last_changed),
     value: numeric(row.s ?? row.state),
   })).filter(p => Number.isFinite(p.time)).sort((a, b) => a.time - b.time);
-}
-
-// Replace the queried tail, retaining one predecessor for step values at the
-// rolling window boundary. Recorder can return the start state at its original
-// timestamp or at the requested boundary.
-export function mergeHistory(previous, incoming, from, keepFrom) {
-  const prefix = previous.filter(p => p.time < from);
-  const anchor = incoming.findLast(p => p.time <= from);
-  if (anchor && prefix.at(-1)?.value !== anchor.value) {
-    while (prefix.length && prefix.at(-1).time >= anchor.time) prefix.pop();
-    prefix.push(anchor);
-  } else if (!anchor && prefix.length && prefix.at(-1).value !== null) {
-    prefix.push({ time: from, value: null });
-  }
-  const first = Math.max(0, prefix.findLastIndex(p => p.time <= keepFrom));
-  return prefix.slice(first).concat(incoming.filter(p => p.time > from));
 }
 
 export function priceSegments(history, sensor, start, end, now) {

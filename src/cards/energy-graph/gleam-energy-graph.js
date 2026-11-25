@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { graphTemplate } from "./template";
-import { BAR_WORLD_DEPTH, BAR_CENTER_Z, ChartScene } from "./chart-scene";
-import { CAMERA_OFFSETS, fitCamera, setCameraSpan } from "./camera";
+import { BAR_WORLD_DEPTH, BAR_CENTER_Z, ChartScene } from "../../shared/graph/chart-scene";
+import { CAMERA_OFFSETS, fitCamera, setCameraSpan } from "../../shared/graph/camera";
 import { readStatistics, readHistory } from "./recorder";
 import { ENERGY_DEFAULTS, SERIES, hasEnergySource, resolveEnergyConfig } from "./config";
 import {
