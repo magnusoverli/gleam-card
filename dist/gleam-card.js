@@ -12274,7 +12274,7 @@ function du(e) {
 	}));
 }
 // src/shared/theme.ts
-var fu = "\n  :host {\n    color-scheme: dark;\n    display: block;\n    color: var(--gleam-text, #d8edff);\n    font-family: var(--ha-font-family-body, Inter, system-ui, sans-serif);\n  }\n  * { box-sizing: border-box; }\n  .experimental { position:absolute;top:8px;right:8px;z-index:2;pointer-events:none;\n    padding:2px 6px;border:1px solid #796340;border-radius:12px;background:#131c2c;\n    color:#ffd598;font:500 10px/1.2 var(--ha-font-family-body,system-ui,sans-serif) }\n  ha-card:has(>.experimental) {position:relative}\n  .badge-clearance {padding-right:78px}\n  [hidden] { display: none !important; }\n  ha-card {\n    display: block;\n    overflow: hidden;\n    color: inherit;\n    border: 1px solid var(--gleam-border, #1d3b60);\n    border-radius: var(--gleam-radius, 22px);\n    background: radial-gradient(ellipse at 16% 0%, #122c60 0%, var(--gleam-surface, #080e24) 50%, #050914 100%);\n    box-shadow: 0 12px 50px #02071680;\n  }\n  button, select {\n    font: inherit;\n    cursor: pointer;\n    border: 1px solid var(--gleam-control-border, #24405f);\n    border-radius: 30px;\n    background: var(--gleam-control-surface, #0b1830);\n    color: var(--gleam-control-text, #9fb4cb);\n  }\n  button { padding: 7px 10px; font-size: 11px; }\n  button[aria-pressed=true] { color: #f0faff; border-color: #406580; background: #102944; }\n  button, input, select, summary { -webkit-tap-highlight-color: transparent; }\n  :focus-visible {\n    outline: 2px solid var(--gleam-focus, #7eeaff);\n    outline-offset: 3px;\n  }\n", pu = (e, t, n) => `
+var fu = "\n  :host {\n    color-scheme: dark;\n    display: block;\n    color: var(--gleam-text, #d8edff);\n    font-family: var(--ha-font-family-body, Inter, system-ui, sans-serif);\n  }\n  * { box-sizing: border-box; }\n  .experimental { position:absolute;top:8px;right:8px;z-index:2;pointer-events:none;\n    padding:2px 6px;border:1px solid #796340;border-radius:12px;background:#131c2c;\n    color:#ffd598;font:500 10px/1.2 var(--ha-font-family-body,system-ui,sans-serif) }\n  ha-card:has(>.experimental) {position:relative}\n  .badge-clearance {padding-right:78px}\n  [hidden] { display: none !important; }\n  ha-card {\n    display: block;\n    overflow: hidden;\n    color: inherit;\n    border: 1px solid var(--gleam-border, #1d3b60);\n    border-radius: var(--gleam-radius, 22px);\n    background: radial-gradient(ellipse at 16% 0%, #122c60 0%, var(--gleam-surface, #080e24) 50%, #050914 100%);\n    box-shadow: 0 12px 50px #02071680;\n  }\n  button, select {\n    font: inherit;\n    cursor: pointer;\n    border: 1px solid var(--gleam-control-border, #24405f);\n    border-radius: 30px;\n    background: var(--gleam-control-surface, #0b1830);\n    color: var(--gleam-control-text, #9fb4cb);\n  }\n  button { padding: 7px 10px; font-size: 11px; }\n  button[aria-pressed=true] { color: #f0faff; border-color: #406580; background: #102944; }\n  button, input, select, summary { -webkit-tap-highlight-color: transparent; }\n  :focus-visible {\n    outline: 2px solid var(--gleam-focus, #7eeaff);\n    outline-offset: 3px;\n  }\n", pu = (e, t, n, r = !1) => `
   <style>
     ${fu}
     :host{container-type:inline-size}
@@ -12308,7 +12308,8 @@ var fu = "\n  :host {\n    color-scheme: dark;\n    display: block;\n    color: 
       .camera-controls button{font-size:9px;padding:5px 7px}}
   </style>
   <ha-card>
-    <header>
+     ${r ? "<span class=\"experimental\">Experimental</span>" : ""}
+     <header${r ? " class=\"badge-clearance\"" : ""}>
       <div class="readouts">
       <h2 class="card-title" hidden></h2>
       <div class="kpis">
@@ -17167,7 +17168,7 @@ var Vm = class {
 	dispose() {
 		this.events.abort(), this.resize.disconnect(), this.controls.dispose(), this.chart.dispose(), this.renderer.dispose(), this.renderer.forceContextLoss(), this.renderer.domElement.remove(), this.targets.length = 0;
 	}
-}, Wm = pu("", "", "Interactive 3D sensor history graph."), Gm = (e, t) => e.name || String(t?.attributes.friendly_name || e.entity), Km = class extends HTMLElement {
+}, Wm = pu("", "", "Interactive 3D sensor history graph.", !0), Gm = (e, t) => e.name || String(t?.attributes.friendly_name || e.entity), Km = class extends HTMLElement {
 	static getConfigElement() {
 		return document.createElement("gleam-graph-editor");
 	}
@@ -17673,7 +17674,7 @@ var Vm = class {
 	},
 	{
 		type: "gleam-graph",
-		name: "Graph",
+		name: "Graph (Experimental)",
 		element: Km,
 		description: "Compare numeric sensor history with lines, steps or bars on an interactive timeline."
 	}
@@ -17681,6 +17682,6 @@ var Vm = class {
 for (let { type: e, element: t, ...n } of Xm) customElements.get(e) || customElements.define(e, t), window.customCards ??= [], window.customCards.some((t) => t.type === e) || window.customCards.push({
 	type: e,
 	...n,
-	preview: !1
+	preview: !0
 });
 customElements.get("gleam-thermostat-editor") || customElements.define("gleam-thermostat-editor", jd), customElements.get("gleam-energy-graph-editor") || customElements.define("gleam-energy-graph-editor", ed), customElements.get("gleam-cover-editor") || customElements.define("gleam-cover-editor", Vf), customElements.get("gleam-light-editor") || customElements.define("gleam-light-editor", jm), customElements.get("gleam-graph-editor") || customElements.define("gleam-graph-editor", Ym);

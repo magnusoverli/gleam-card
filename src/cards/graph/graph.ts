@@ -6,7 +6,7 @@ import { HOUR, MINUTE, makePlot, numberState } from "./data";
 import { GraphHistory } from "./history";
 import { GraphViewport, type Lane } from "./viewport";
 
-const template = graphFrame("", "", "Interactive 3D sensor history graph.");
+const template = graphFrame("", "", "Interactive 3D sensor history graph.", true);
 const label = (s: Series, state?: EntityState) => s.name || String(state?.attributes.friendly_name || s.entity);
 export class GleamGraph extends HTMLElement {
   static getConfigElement() { return document.createElement("gleam-graph-editor"); }

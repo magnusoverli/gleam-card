@@ -14,7 +14,7 @@
 
 ## Graph
 
-Compare up to four numeric sensors on a 3D timeline. Temperatures in the same unit share a scale; humidity or pressure gets its own. Choose lines, steps, or interval bars for each series.
+**Experimental · New in v0.0.13.** Compare up to four numeric sensors on a 3D timeline. Temperatures in the same unit share a scale; humidity or pressure gets its own. Choose lines, steps, or interval bars for each series.
 
 <a href="https://magnusoverli.github.io/gleam-card/graph/"><img src="docs/images/graph.png" width="640" alt="Indoor and outdoor temperatures on two depth lanes with the same Celsius scale."></a>
 

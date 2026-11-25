@@ -1,6 +1,6 @@
 # Graph
 
-Choose **Graph** in the Home Assistant card picker, select a numeric `sensor.*` and add up to three more. Use **Move up** and **Move down** to change lane order. **Front** is useful for comparing curves; **Isometric** shows the lanes separately. Drag to orbit, right-drag to pan, pinch or scroll to zoom, and point at a measurement for its time and value.
+Choose **Graph (Experimental)** in the Home Assistant card picker, select a numeric `sensor.*` and add up to three more. Use **Move up** and **Move down** to change lane order. **Front** is useful for comparing curves; **Isometric** shows the lanes separately. Drag to orbit, right-drag to pan, pinch or scroll to zoom, and point at a measurement for its time and value.
 
 ```yaml
 type: custom:gleam-graph

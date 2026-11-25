@@ -2,9 +2,16 @@
 
 ## Unreleased
 
-### Graph
+## [0.0.13](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.13) · 2026-11-25
 
-- Choose **Graph** to compare one to four numeric sensors, with independent lines, steps or interval bars, native units, current-value readouts and the Energy Graph camera controls. [Settings and examples](docs/graph.md).
+### 📈 New: Graph (Experimental)
+
+- Compare one to four numeric sensors using lines, steps or interval bars. Sensors with matching units share a scale; unavailable readings leave gaps. Use the same camera controls as Energy Graph.
+- [Try the Graph demo](https://magnusoverli.github.io/gleam-card/graph/) · [Settings and YAML](https://github.com/magnusoverli/gleam-card/blob/v0.0.13/docs/graph.md)
+
+### 📦 General
+
+- All five cards now show live previews in Home Assistant’s card picker.
 
 ## [0.0.12](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.12) · 2026-11-25
 

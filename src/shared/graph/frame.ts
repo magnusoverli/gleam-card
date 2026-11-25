@@ -1,6 +1,6 @@
 import { foundationStyles } from "../theme";
 
-export const graphFrame = (readouts: string, buttons: string, description: string) => `
+export const graphFrame = (readouts: string, buttons: string, description: string, experimental = false) => `
   <style>
     ${foundationStyles}
     :host{container-type:inline-size}
@@ -34,7 +34,8 @@ export const graphFrame = (readouts: string, buttons: string, description: strin
       .camera-controls button{font-size:9px;padding:5px 7px}}
   </style>
   <ha-card>
-    <header>
+     ${experimental ? '<span class="experimental">Experimental</span>' : ""}
+     <header${experimental ? ' class="badge-clearance"' : ""}>
       <div class="readouts">
       <h2 class="card-title" hidden></h2>
       <div class="kpis">

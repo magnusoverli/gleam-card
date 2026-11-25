@@ -21,7 +21,7 @@ test("bundle renders both cards, camera and series controls work, reconnects cle
   await expect(page.locator("gleam-energy-graph canvas")).toHaveCount(1);
   await page.locator("gleam-thermostat").scrollIntoViewIfNeeded();
   await expect(page.locator("gleam-thermostat canvas")).toHaveCount(1);
-  expect(await page.evaluate(() => window.customCards.map(c => c.type))).toEqual(["gleam-energy-graph", "gleam-thermostat", "gleam-cover", "gleam-light", "gleam-graph"]);
+  expect(await page.evaluate(() => window.customCards.filter(c => c.preview).map(c => c.type))).toEqual(["gleam-energy-graph", "gleam-thermostat", "gleam-cover", "gleam-light", "gleam-graph"]);
   expect(errors).toEqual([]);
 });
 

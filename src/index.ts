@@ -31,7 +31,7 @@ const cards = [
     description: "Garage doors, roller shades, slatted blinds, roller shutters and curtains with live status and controls." },
   { type: "gleam-light", name: "Gleam Light", element: Light,
      description: "A room with ceiling spots, split into zones with brightness and colour temperature controls." },
-  { type: "gleam-graph", name: "Graph", element: Graph,
+  { type: "gleam-graph", name: "Graph (Experimental)", element: Graph,
     description: "Compare numeric sensor history with lines, steps or bars on an interactive timeline." },
 ];
 
@@ -39,7 +39,7 @@ for (const { type, element, ...metadata } of cards) {
   if (!customElements.get(type)) customElements.define(type, element);
   window.customCards ??= [];
   if (!window.customCards.some(card => card.type === type)) {
-    window.customCards.push({ type, ...metadata, preview: false });
+    window.customCards.push({ type, ...metadata, preview: true });
   }
 }
 if (!customElements.get("gleam-thermostat-editor")) {
