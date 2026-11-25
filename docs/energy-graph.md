@@ -1,5 +1,7 @@
 # Gleam Energy Graph
 
+For temperature, humidity, pressure or other numeric sensor history, use [Graph (Experimental)](graph.md). Gleam Energy Graph is for hourly energy use and electricity prices.
+
 Use `type: custom:gleam-energy-graph`, or choose **Gleam Energy Graph** in the
 dashboard's **Add card** dialog. The visual editor supports all options below.
 Sensor fields offer searchable entity-ID suggestions with friendly names from

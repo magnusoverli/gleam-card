@@ -10,7 +10,7 @@
 
 <a href="https://magnusoverli.github.io/gleam-card/energy-graph/"><img src="docs/images/energy-graph.png" width="640" alt="Hourly energy bars alongside a stepped electricity price forecast."></a>
 
-[**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/energy-graph/) · [Graph settings](docs/energy-graph.md)
+[**Try Gleam Energy Graph →**](https://magnusoverli.github.io/gleam-card/energy-graph/) · [Energy Graph settings](docs/energy-graph.md)
 
 ## Graph
 
@@ -57,8 +57,8 @@
 [![Open Gleam Cards in your Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=magnusoverli&repository=gleam-card&category=plugin)
 
 1. Open the link above. If Gleam Cards isn’t in your catalog, confirm **Add custom repository** when prompted, then install the Dashboard package.
-2. Reload the dashboard. Choose **Edit dashboard → Add card → Gleam Energy Graph**.
-3. Under **Main energy → Sensor**, select a cumulative meter that reports kWh and has hourly Recorder statistics. Save the card. Price and current-hour readings are optional.
+2. Reload the dashboard and choose **Edit dashboard → Add card**. All five cards support live picker previews; what you see depends on your entities and their recorded history.
+3. For ordinary sensor history, choose **Graph (Experimental)** and select one to four numeric sensors. For hourly energy use, choose **Gleam Energy Graph** and select a cumulative kWh meter under **Main energy → Sensor**. Save the card.
 
 Prefer YAML? Replace the example entity with your meter:
 
@@ -84,7 +84,7 @@ Copy [`dist/gleam-card.js`](dist/gleam-card.js) to `<Home Assistant config>/www/
 
 Both graphs require **WebGL 2** for the chart; the thermostat’s HTML controls also work without the 3D dial. Cover and Light draw in SVG and do not require WebGL. No card needs a CDN or a separate backend integration.
 
-[Energy Graph guide](docs/energy-graph.md) · [Thermostat guide](docs/thermostat.md) · [Cover guide](docs/cover.md) · [Light guide](docs/light.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
+[Energy Graph guide](docs/energy-graph.md) · [Graph guide](docs/graph.md) · [Thermostat guide](docs/thermostat.md) · [Cover guide](docs/cover.md) · [Light guide](docs/light.md) · [Report an issue](https://github.com/magnusoverli/gleam-card/issues)
 
 For local previews, builds, and tests, see [Development](docs/development.md). Release instructions are in [Publishing](docs/publishing.md).
 

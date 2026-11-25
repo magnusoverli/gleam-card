@@ -7,14 +7,16 @@
 | `src/index.ts` | Typed entry point; idempotent custom-element and card-picker registration |
 | `src/shared/theme.ts` | Shared shadow-DOM style foundation |
 | `src/cards/energy-graph/` | Energy card and pure data transforms |
+| `src/cards/graph/` | Generic numeric sensor graph, series configuration, history cache and editor |
+| `src/shared/graph/` | Shared graph frame, camera, scene rendering and history requests |
 | `src/cards/thermostat/` | Thermostat and its visual editor |
 | `src/cards/cover/` | Layouts, per-door state and controls, SVG garage and visual editor |
 | `src/cards/light/` | In-roof spots: pure layout and lighting (`spots.ts`), retained SVG (`scene.ts`), light commands (`model.ts`), card and editor |
 | `src/cards/energy-graph/recorder.ts` | Recorder requests through a narrow client interface |
 | `src/cards/thermostat/commands.ts` | Pure command validation and climate-action transport |
 | `scripts/deploy.js` | Content-hashed filesystem deployment with a stable loader |
-| `index.html`, `energy-graph/`, `thermostat/`, `cover/`, `light/` | Public demo gallery and standalone card pages |
-| `dev/preview.js`, `dev/demo.js` | Shared preview entry and synthetic states, history, and mock actions; `/dev/fixture.html` mounts all cards for regression tests |
+| `index.html`, `energy-graph/`, `graph/`, `thermostat/`, `cover/`, `light/` | Public demo gallery and standalone card pages |
+| `dev/preview.js`, `dev/demo.js` | Shared preview entry and synthetic states, history, and mock actions for the demos and browser fixtures |
 | `tests/data.test.js` | Data-contract regression tests |
 | `tests/browser/` | Built-bundle browser and interaction checks |
 | `vite.config.ts` | Single-resource library build and license distribution |
