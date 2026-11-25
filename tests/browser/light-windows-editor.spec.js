@@ -36,7 +36,7 @@ async function setup(page, extra = {}) {
   const editor = page.locator("gleam-light-editor");
   return {
     editor, checkbox: wall => editor.getByRole("checkbox", { name: `${wall} wall`, exact: true }),
-    tv: editor.getByLabel("TV wall"), couch: editor.getByLabel("Couch wall"),
+    tv: editor.getByLabel("TV wall"), couch: editor.getByLabel("Couch position"),
     replace: extra => editor.evaluate((e, c) => e.setConfig(c), { ...base, ...extra }),
     last: () => page.evaluate(() => window.roomTest.edits.at(-1)),
   };
@@ -124,8 +124,21 @@ test("conflicting YAML can be repaired by removing either placement and undo res
   expect(await last()).toEqual({ ...base, windows: ["right"], couch_wall: "right" });
 });
 
+test("the front couch previews from behind and preserves the TV and windows", async ({ page }) => {
+  const furnishings = { tv_wall: "back", windows: ["left", "right"] };
+  const { tv, couch, last } = await setup(page, furnishings);
+  await expect(tv.locator('option[value="front"]')).toHaveCount(0);
+  await couch.selectOption({ label: "Front" });
+  await expect(couch).toHaveValue("front");
+  expect(await last()).toEqual({ ...base, ...furnishings, couch_wall: "front" });
+  const preview = page.locator("aside gleam-light");
+  await expect(preview.locator('.wall-couch[data-wall="front"] .couch-back')).toBeVisible();
+  await expect(preview.locator('.wall-tv[data-wall="back"]')).toBeVisible();
+  await expect(preview.locator('.wall-window[display="inline"]')).toHaveCount(2);
+});
+
 test("malformed external window and couch values stay editable until both repairs are valid", async ({ page }) => {
-  const { editor, checkbox, couch, last } = await setup(page, { windows: "left", couch_wall: "front", tv_wall: "back" });
+  const { editor, checkbox, couch, last } = await setup(page, { windows: "left", couch_wall: "floor", tv_wall: "back" });
   await expect(editor.locator("#invalid")).not.toBeEmpty();
   await checkbox("Left").check();
   expect(await last()).toBeUndefined();

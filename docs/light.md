@@ -1,13 +1,13 @@
 # Gleam Light
 
 **New:** choose **Gleam Light** in the card picker. The first light type is
-**In-roof spots**: recessed downlights in a ceiling, laid out in rows and
+**Room with ceiling spots**: recessed downlights laid out in rows and
 columns and split into up to three zones. Each zone is one `light.*` entity,
 or a light group, that switches its spots together.
 
 [Try the demo](https://magnusoverli.github.io/gleam-card/light/)
 
-## In-roof spots
+## Room with ceiling spots
 
 The illustration is a room seen from the front. Each spot throws a soft beam
 onto the floor; the walls pick up light bounced from the lit floor, brightest
@@ -32,9 +32,9 @@ cannot be operated; if every zone is unavailable the room is dimmed.
 
 ### Room furnishings
 
-In the visual editor, choose which walls have **windows**: left, back, right, any combination, or none. Place one optional **TV** and one optional **couch** by choosing a wall for each. The TV needs a wall without a window; clear that window first if needed. The couch can sit below either. These are decorations, not Home Assistant entities or controls.
+In the visual editor, choose which walls have **windows**: left, back, right, any combination, or none. The optional **TV** needs a wall without a window; clear that window first if needed. The optional **couch** can sit against any wall, even below a window or TV, or at the front, closest to the viewer and facing the back wall. These are decorations, not Home Assistant entities or controls.
 
-For example, this room has two windows and a couch under the TV:
+For example, this room has two windows and a front couch facing the TV:
 
 ```yaml
 type: custom:gleam-light
@@ -42,7 +42,7 @@ zones:
   - entity: light.living_room
 windows: [left, right]
 tv_wall: back
-couch_wall: back
+couch_wall: front
 ```
 
 Use `windows: []` for solid walls. Without `windows`, the room keeps its original right-hand window unless a TV occupies that wall. Omit `tv_wall` or `couch_wall` to leave that item out.

@@ -38,7 +38,7 @@
 
 ## Gleam Light
 
-**New** · See which zones of your in-roof spots are on, dim them, or warm and cool their colour temperature. Lay the spots out in rows and columns, or only along the walls, and split them into up to three zones.
+**New in v0.0.12** · **Room with ceiling spots** is the first Gleam Light type. Arrange spots in a grid or along the walls, then switch, dim and tune up to three zones. Add windows, a TV and a couch to match your room.
 
 <a href="https://magnusoverli.github.io/gleam-card/light/"><img src="docs/images/light.png" width="360" alt="Kitchen ceiling with twelve spots in two zones, both on, with brightness sliders."></a>
 
@@ -59,7 +59,7 @@ type: custom:gleam-energy-graph
 energy_entity: sensor.total_energy
 ```
 
-For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For garage doors or window coverings, choose **Gleam Cover**, select the cover type, and pick your `cover.*` entity. For in-roof spots, choose **Gleam Light** and add a `light.*` entity for each zone.
+For climate controls, choose **Gleam Thermostat (Experimental)** and select a `climate.*` entity. For garage doors or window coverings, choose **Gleam Cover**, select the cover type, and pick your `cover.*` entity. For a room with ceiling spots, choose **Gleam Light** and add a `light.*` entity for each zone.
 
 <details>
 <summary>Manual installation</summary>

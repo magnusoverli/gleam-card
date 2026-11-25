@@ -27,7 +27,7 @@ const cards = [
   { type: "gleam-cover", name: "Gleam Cover", element: Cover,
     description: "Garage doors, roller shades, slatted blinds, roller shutters and curtains with live status and controls." },
   { type: "gleam-light", name: "Gleam Light", element: Light,
-    description: "In-roof spots in rows and columns, split into zones with brightness and colour temperature." },
+    description: "A room with ceiling spots, split into zones with brightness and colour temperature controls." },
 ];
 
 for (const { type, element, ...metadata } of cards) {

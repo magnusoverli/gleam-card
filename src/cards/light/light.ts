@@ -130,7 +130,8 @@ export class GleamLight extends HTMLElement {
       config.walls_only !== previous.walls_only || config.zone_map.length !== previous.zone_map.length ||
       config.zone_map.some((row, i) => row !== previous.zone_map[i]);
     this.config = { ...config, zone_map: layoutChanged ? [...config.zone_map] : previous.zone_map };
-    if (!previous || config.tv_wall !== previous.tv_wall || config.couch_wall !== previous.couch_wall ||
+    const couchChanged = config.couch_wall !== previous?.couch_wall;
+    if (!previous || config.tv_wall !== previous.tv_wall || couchChanged ||
         config.windows.length !== previous.windows.length || config.windows.some((wall, i) => wall !== previous.windows[i]))
       this.renderer.room(config.windows, config.tv_wall, config.couch_wall);
     this.layoutDirty ||= layoutChanged;
@@ -139,7 +140,7 @@ export class GleamLight extends HTMLElement {
     if (zonesChanged) this.reconcileZones();
     this.zones.forEach((zone, i) => this.updateName(zone, i));
     if (zonesChanged) this.sync(true);
-    else if (layoutChanged || config.beam_angle !== previous?.beam_angle) this.schedule();
+    else if (layoutChanged || couchChanged || config.beam_angle !== previous?.beam_angle) this.schedule();
   }
   set hass(value: HomeAssistant) { this.client = value; this.sync(false); }
 

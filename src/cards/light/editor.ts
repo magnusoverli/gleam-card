@@ -1,7 +1,7 @@
 import type { HomeAssistant, LightConfig, RoomWall } from "../../types";
 import { editorPanelStyles } from "../../shared/editor-styles";
 import { EditorPreview } from "../../shared/editor-preview";
-import { ROOM_WALLS, roomWindows, settings } from "./model";
+import { COUCH_PLACEMENTS, ROOM_WALLS, roomWindows, settings } from "./model";
 import { MAX_GRID, MAX_ZONES, defaultZone, onRing, planPosition } from "./spots";
 
 const ZONE_COLORS = ["#4fc3f7", "#ffb74d", "#ce93d8"];
@@ -45,17 +45,17 @@ export class GleamLightEditor extends HTMLElement {
       .legend i{width:12px;height:12px;border-radius:50%;box-sizing:border-box}
       p{margin:0;color:var(--error-color,#c62828)}p:empty{display:none}</style>
       <form><fieldset><legend>Light setup</legend><div class="fields">
-        <label>Light type<select id="light-type"><option value="in_roof_spots">In-roof spots</option></select></label>
+         <label>Light type<select id="light-type"><option value="in_roof_spots">Room with ceiling spots</option></select></label>
         <label>Layout<select id="layout"><option value="normal">Normal</option><option value="compact">Compact</option></select></label>
         <label>Display name<input id="name" placeholder="Spots"></label>
       </div></fieldset>
-      <fieldset><legend>Room walls</legend><div class="fields">
+       <fieldset><legend>Room furnishings</legend><div class="fields">
         <div id="window-label">Windows</div>
         <div class="presets" role="group" aria-labelledby="window-label">${ROOM_WALLS.map(wall => `<label class="toggle"><input id="window-${wall}" type="checkbox" data-window>${WALL_LABEL[wall]}</label>`).join("")}</div>
         <label>TV wall<select id="tv-wall">${WALL_OPTIONS}</select></label>
         <small>Uncheck a window to place the TV on that wall. Move the TV or choose None to place a window there.</small>
-        <label>Couch wall<select id="couch-wall">${WALL_OPTIONS}</select></label>
-        <small>The couch can sit below a window or the TV.</small>
+         <label>Couch position<select id="couch-wall">${WALL_OPTIONS}<option value="front">Front</option></select></label>
+         <small>The couch can sit below a window or the TV, or in front of the camera.</small>
       </div></fieldset>
       <fieldset><legend>Zones</legend><div class="fields">
         <small>Each zone is one light entity, or a light group, that switches its spots together.</small>
@@ -102,7 +102,7 @@ export class GleamLightEditor extends HTMLElement {
         const patch: Partial<LightConfig> = { tv_wall };
         if (this.config.windows === undefined && this.config.tv_wall === "right" && tv_wall !== "right") patch.windows = [];
         this.update(patch);
-      } else if (target.id === "couch-wall") this.update({ couch_wall: ROOM_WALLS.find(wall => wall === target.value) });
+      } else if (target.id === "couch-wall") this.update({ couch_wall: COUCH_PLACEMENTS.find(position => position === target.value) });
     });
     this.root.addEventListener("input", event => {
       if (this.config && event.target instanceof HTMLInputElement && !(event as InputEvent).isComposing)

@@ -52,13 +52,13 @@ test("settings fill defaults and reject what the card cannot draw or control", (
   ]) assert.throws(() => settings(bad), message);
 });
 
-test("room furnishings support every wall, with only the TV and window mutually exclusive", () => {
+test("room furnishings support every wall and a front couch, with only the TV and window mutually exclusive", () => {
   const zones = [{entity: "light.a"}], walls = ["left", "back", "right"];
   assert.deepEqual(settings({zones}).windows, ["right"]);
   assert.deepEqual(settings({zones, tv_wall:"right"}).windows, []);
   for (let mask = 0; mask < 8; mask++) {
     const windows = walls.filter((_, i) => mask & (1 << i));
-    for (const tv_wall of [undefined, ...walls]) for (const couch_wall of [undefined, ...walls]) {
+    for (const tv_wall of [undefined, ...walls]) for (const couch_wall of [undefined, ...walls, "front"]) {
       const config = {zones, windows:[...windows].reverse(), tv_wall, couch_wall};
       if (windows.includes(tv_wall)) assert.throws(() => settings(config), /both a TV and a window/);
       else {
@@ -69,10 +69,10 @@ test("room furnishings support every wall, with only the TV and window mutually 
       }
     }
   }
-  for (const windows of ["left", null, ["floor"], ["left", "left"]])
+  for (const windows of ["left", null, ["front"], ["left", "left"]])
     assert.throws(() => settings({zones, windows}), /windows must be a list/);
-  for (const key of ["tv_wall", "couch_wall"])
-    assert.throws(() => settings({zones, [key]:"floor"}), new RegExp(key));
+  assert.throws(() => settings({zones, tv_wall:"front"}), /TV wall/);
+  assert.throws(() => settings({zones, couch_wall:"floor"}), /Couch position/);
 });
 
 test("light readings normalise brightness, capabilities and colour", () => {

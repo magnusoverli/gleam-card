@@ -1,10 +1,11 @@
 // Pure geometry and lighting for the in-roof spots scene. No DOM access.
-// Room in metres: x across (centred), z depth from the cut-away front (0) to the back wall (D).
-// Screen: viewBox 320 × 174, one-point perspective with the vanishing point at (191, 92).
+import {
+  BACK_LEFT, BACK_RIGHT, BACK_SCALE, CAMERA_DISTANCE, CAMERA_HEIGHT, depthScale,
+  ROOM_W as W, ROOM_D as D, ROOM_H as CEILING, SCALE_X, SCALE_Y, screenX, screenY,
+} from "./room-projection.ts";
+
 export const MAX_GRID = 8, MAX_ZONES = 3;
-const W = 4.8, D = 4, CEILING = 2.5, ZC = 6.362, SX = 280 / W, VX = 191, VY = 92;
 const WALL_OFFSET = 0.45;
-const depthScale = (z: number) => 1 / (1 + z / ZC);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const coverage = (corner: number, centre: number, width: number) => Math.max(0, 1 - Math.abs(corner - centre) / width);
 
@@ -93,15 +94,15 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
   const trim = clamp(4.5 / Math.max(options.rows, options.columns), 0.5, 1);
   const draws = spots.map(spot => {
     const zone = zones[spot.zone], lvl = level[spot.zone];
-    const k = depthScale(spot.z), X = 20 + (spot.x + W / 2) * SX;
-    const x = VX + (X - VX) * k, ceilingY = VY + (14 - VY) * k, floorY = VY + (144 - VY) * k;
-    const backX = VX + (X - VX) * depthScale(D);
-    const half = Math.min(46, radius * SX * k * 0.46);
+    const k = depthScale(spot.z);
+    const x = screenX(spot.x, k), ceilingY = screenY(CEILING, k), floorY = screenY(0, k);
+    const backX = screenX(spot.x, BACK_SCALE);
+    const half = Math.min(46, radius * SCALE_X * k * 0.46);
     const toBack = D - spot.z, toSide = W / 2 - Math.abs(spot.x), t = tally[spot.zone];
     const glowRx = 24 + 12 * toBack + 10 * spread, glowOpacity = lvl * 0.6 / (1 + (toBack / 1.2) ** 2) * density;
     const beamOpacity = lvl * coneGain * density, beamWidth = half * 0.7 + 2; // Lower wall, including the soft beam edge.
-    leftLight += glowOpacity * coverage(86, backX, glowRx) + beamOpacity * coverage(86, x, beamWidth);
-    rightLight += glowOpacity * coverage(258, backX, glowRx) + beamOpacity * coverage(258, x, beamWidth);
+    leftLight += glowOpacity * coverage(BACK_LEFT, backX, glowRx) + beamOpacity * coverage(BACK_LEFT, x, beamWidth);
+    rightLight += glowOpacity * coverage(BACK_RIGHT, backX, glowRx) + beamOpacity * coverage(BACK_RIGHT, x, beamWidth);
     t.n++;
     if (toSide < 1.3) t[spot.x < 0 ? "left" : "right"] += near(toSide);
     const round = (v: number) => Math.round(v * 10) / 10;
@@ -110,7 +111,8 @@ export function lightScene(spots: readonly Spot[], zones: readonly ZoneLight[], 
       trimY: round(ceilingY + 0.6), trimRx: 6.4 * k * trim, trimRy: 2 * k * trim,
       lensY: round(ceilingY + 0.8), lensRx: 4 * k * trim, lensRy: 1.15 * k * trim,
       haloY: round(ceilingY + 1), haloRx: 13 * k * trim, haloRy: 4 * k * trim,
-      poolRx: round(Math.min(64, 1.15 * radius * SX * k)), poolRy: 1.15 * radius * (52 / ZC) * k * k,
+      poolRx: round(Math.min(64, 1.15 * radius * SCALE_X * k)),
+      poolRy: 1.15 * radius * (CAMERA_HEIGHT * SCALE_Y / CAMERA_DISTANCE) * k * k,
       poolOpacity: zone.on ? Math.min(1, Math.min(1, (0.4 + 0.6 * lvl) * poolGain) * Math.sqrt(density)) : 0,
       cone: [[x - 2.6 * k, ceilingY + 1.2], [x + 2.6 * k, ceilingY + 1.2], [x + half, floorY], [x - half, floorY]]
         .map(([a, b]) => `${a.toFixed(1)},${b.toFixed(1)}`).join(" "),

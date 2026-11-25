@@ -1,54 +1,53 @@
-import type { RoomWall } from "../../types";
+import type { CouchPlacement, RoomWall } from "../../types";
+import { COUCH_PLACEMENTS, ROOM_WALLS } from "./model";
+import { CAMERA_DISTANCE, CAMERA_HEIGHT, projectRoom, ROOM_D, ROOM_H, ROOM_W } from "./room-projection";
 import type { LightScene } from "./spots";
 
-// Each jamb runs from ceiling to floor. Interpolate between jambs so a frame's
-// top, glazing bars and sill follow the wall even as it recedes into the room.
-type Jamb = readonly [x: number, ceiling: number, floor: number];
-const planes = {
-  left: [[20, 14, 144.1], [86, 44, 124]],
-  back: [[86, 44, 124], [258, 44, 124]],
-  right: [[258, 44, 124], [300, 14, 144.1]],
-} as const satisfies Record<RoomWall, readonly [Jamb, Jamb]>;
-const walls = Object.keys(planes) as RoomWall[];
-const mix = (a: number, b: number, t: number) => a + (b - a) * t;
-
 function furnishings(wall: RoomWall) {
-  const [left, right] = planes[wall];
+  // Wall-local axes run left to right and ceiling to floor as seen on screen.
   function point(u: number, v: number) {
-    const x = mix(left[0], right[0], u);
-    const y = mix(mix(left[1], left[2], v), mix(right[1], right[2], v), u);
+    const [x, y] = projectRoom(
+      (wall === "back" ? u - .5 : wall === "left" ? -.5 : .5) * ROOM_W,
+      (1 - v) * ROOM_H,
+      (wall === "back" ? 1 : wall === "left" ? u : 1 - u) * ROOM_D,
+    );
     return `${x.toFixed(2)} ${y.toFixed(2)}`;
   }
   const quad = (l: number, t: number, r: number, b: number) =>
     `M${point(l,t)}L${point(r,t)}L${point(r,b)}L${point(l,b)}Z`;
-  const inset = wall === "back" ? .3 : .2, end = 1 - inset;
+  const inset = wall === "back" ? .33 : .24, end = 1 - inset;
+  const wallWidth = wall === "back" ? ROOM_W : ROOM_D;
+  // Size the 16:9 screen and its bezel before projecting them onto the wall.
+  const screenWidth = 1.65, screenHeight = screenWidth * 9 / 16, bezel = .025;
+  const tv = (border: number) => {
+    const x = (screenWidth / 2 + border) / wallWidth, y = (screenHeight / 2 + border) / ROOM_H;
+    return quad(.5 - x, .505 - y, .5 + x, .505 + y);
+  };
   return `<g class="wall-window" data-wall="${wall}" display="${wall === "right" ? "inline" : "none"}">
-    <path d="${quad(inset,.23,end,.76)}" fill="#14293a" stroke="#79afbb" stroke-width=".8" stroke-linejoin="round"/>
-    <path d="${quad(inset+.018,.253,end-.018,.737)}" fill="url(#night)"/>
-    <path d="M${point(.5,.253)}L${point(.5,.737)}M${point(inset+.018,.495)}L${point(end-.018,.495)}" fill="none" stroke="#406577" stroke-width="1"/>
-    <path d="${quad(inset-.018,.76,end+.018,.785)}" fill="#253e50" stroke="#628697" stroke-width=".7" stroke-linejoin="round"/>
+    <path d="${quad(inset,.265,end,.725)}" fill="#14293a" stroke="#79afbb" stroke-width=".8" stroke-linejoin="round"/>
+    <path d="${quad(inset+.018,.288,end-.018,.702)}" fill="url(#night)"/>
+    <path d="M${point(.5,.288)}L${point(.5,.702)}M${point(inset+.018,.495)}L${point(end-.018,.495)}" fill="none" stroke="#406577" stroke-width="1"/>
+    <path d="${quad(inset-.018,.725,end+.018,.75)}" fill="#253e50" stroke="#628697" stroke-width=".7" stroke-linejoin="round"/>
   </g>
   <g class="wall-tv" data-wall="${wall}" display="none">
-    <path d="${quad(inset-.025,.30,end+.025,.71)}" fill="#0a1119" stroke="#485967" stroke-width=".9" stroke-linejoin="round"/>
-    <path d="${quad(inset-.012,.315,end+.012,.685)}" fill="url(#tv-glass)"/>
+    <path d="${tv(bezel)}" fill="#0a1119" stroke="#485967" stroke-width=".9" stroke-linejoin="round"/>
+    <path d="${tv(0)}" fill="url(#tv-glass)"/>
   </g>`;
 }
 
-export const roomFurniture = walls.map(furnishings).join("");
+export const roomFurniture = ROOM_WALLS.map(furnishings).join("");
 
 // The couch is modelled in metres and seen from the scene's camera, so it reads correctly
 // on every wall: faces turned away from the camera are culled and parts are painted back
 // to front. Room: X 0–4.8 m (left to right), Y 0–2.5 m (up), Z 0–4 m (back wall to front).
 type V3 = readonly [number, number, number];
-const ROOM_W = 4.8, ROOM_H = 2.5, ROOM_D = 4, CAMERA: V3 = [2.93, 1, 10.36];
+const CAMERA: V3 = [ROOM_W / 2, CAMERA_HEIGHT, ROOM_D + CAMERA_DISTANCE];
 const LENGTH = 2.3, DEPTH = 0.95, GAP = 0.06, SIDE_START = 0.3;
-function project([x, y, z]: V3): readonly [number, number] {
-  const d = z / ROOM_D, across = x / ROOM_W, up = y / ROOM_H;
-  return [mix(mix(86, 20, d), mix(258, 300, d), across), mix(mix(124, 144.1, d), mix(44, 14, d), up)];
-}
+const project = ([x, y, z]: V3) => projectRoom(x - ROOM_W / 2, y, ROOM_D - z);
 /** Couch space: u along its length, v from the wall into the room, y up. */
-function world(wall: RoomWall, u: number, v: number, y: number): V3 {
+function world(wall: CouchPlacement, u: number, v: number, y: number): V3 {
   if (wall === "back") return [ROOM_W / 2 - LENGTH / 2 + u, y, GAP + v];
+  if (wall === "front") return [ROOM_W / 2 - LENGTH / 2 + u, y, ROOM_D - GAP - v];
   return [wall === "left" ? GAP + v : ROOM_W - GAP - v, y, SIDE_START + u];
 }
 /** Quad rounded in room space: each corner is cut the same distance along both of its edges, so
@@ -141,10 +140,13 @@ const PARTS: Part[] = [
     { ...cushion(u0, u1, 0, BACK_DEPTH + 0.03, FEET, ARM_TOP, FABRIC.armTop), radius: 0, arm: "back" as const },
     { ...cushion(u0, u1, BACK_DEPTH, DEPTH, FEET, ARM_TOP, FABRIC.armTop), arm: "front" as const }]),
 ];
+// A low upholstered panel spans the rear, letting the three pillow crowns show above it.
+const BACK_PANEL = cushion(ARM, LENGTH - ARM, 0.01, 0.14, BASE - 0.03, BACK - 0.08);
 
-function sofa(wall: RoomWall) {
+function sofa(wall: CouchPlacement) {
+  const fromRear = wall === "front";
   const distance = (p: V3) => Math.hypot(p[0] - CAMERA[0], p[1] - CAMERA[1], p[2] - CAMERA[2]);
-  const parts = PARTS.map(part => {
+  const parts = (fromRear ? [...PARTS, BACK_PANEL] : PARTS).map(part => {
     const [u0, u1, v0, v1, y0, y1] = part.box;
     return { part, far: distance(world(wall, (u0 + u1) / 2, (v0 + v1) / 2, (y0 + y1) / 2)) };
   }).sort((a, b) => b.far - a.far);
@@ -159,19 +161,22 @@ function sofa(wall: RoomWall) {
     const endFrom = (u: number) => (outer(u) && part.arm === "front" ? 0 : v0), endTo = (u: number) => (outer(u) && part.arm === "front" ? DEPTH : v1);
     // Faces with their outward direction in couch space and a point on the face.
     const end = (u: number) => [c(u, endFrom(u), y0), c(u, endTo(u), y0), c(u, endTo(u), y1), c(u, endFrom(u), y1)];
-    const faces: [kind: "top" | "front" | "end", corners: V3[], normal: V3, outerEnd?: boolean][] = [
+    const faces: [kind: "top" | "front" | "end" | "rear", corners: V3[], normal: V3, outerEnd?: boolean][] = [
       ["top", [c(u0, v0, y1), c(u1, v0, y1), c(u1, v1, y1), c(u0, v1, y1)], [0, 0, 1]],
       ["front", [c(u0, v1, y0), c(u1, v1, y0), c(u1, v1, y1), c(u0, v1, y1)], [0, 1, 0]],
       ["end", end(u0), [-1, 0, 0], outer(u0)],
       ["end", end(u1), [1, 0, 0], outer(u1)],
     ];
+    if (fromRear && part.arm !== "front")
+      faces.push(["rear", [c(u0, v0, y0), c(u1, v0, y0), c(u1, v0, y1), c(u0, v0, y1)], [0, -1, 0]]);
     return faces.map(([kind, corners, [nu, nv, ny], outerEnd]) => {
       // Outward normal in room space, from the couch axes for this wall.
-      const normal: V3 = wall === "back" ? [nu, ny, nv] : wall === "left" ? [nv, ny, nu] : [-nv, ny, nu];
+      const normal: V3 = fromRear ? [nu, ny, -nv] : wall === "back" ? [nu, ny, nv]
+        : wall === "left" ? [nv, ny, nu] : [-nv, ny, nu];
       const centre = corners.reduce<V3>((s, p) => [s[0] + p[0] / 4, s[1] + p[1] / 4, s[2] + p[2] / 4], [0, 0, 0]);
       if (normal[0] * (CAMERA[0] - centre[0]) + normal[1] * (CAMERA[1] - centre[1]) + normal[2] * (CAMERA[2] - centre[2]) <= 0) return "";
-      // A leaning pillow reads as one soft silhouette: its front face carries the crown.
-      if (part.pillow && kind !== "front") return "";
+      const visibleUpholstery = kind === "front" || kind === "rear";
+      if (part.pillow && !visibleUpholstery) return "";
       if (part.arm === "back" && outerEnd) return "";
       const screen = corners.map(project);
       // Back pillows: straight sides, deeply rounded top corners flowing into one crown.
@@ -180,15 +185,16 @@ function sofa(wall: RoomWall) {
         : part.seat ? pillow(screen, kind === "front" ? [0.01, 0.02, 0.035, 0.02] : [0.015, 0.015, 0.015, 0.015], kind === "front" ? [0.22, 0.22, 0.38, 0.38] : [0.3, 0.3, 0.3, 0.3])
         // Corner order: end faces run back-bottom, front-bottom, front-top, back-top;
         // top faces back-left, back-right, front-right, front-left; front faces bottom-left, bottom-right, top-right, top-left.
-        : part.arm ? roll(corners, outerEnd ? [0.015, 0.015, ROLL, ROLL] : ARM_CORNERS[part.arm][kind])
+        : part.arm ? roll(corners, outerEnd ? [0.015, 0.015, ROLL, ROLL] : ARM_CORNERS[part.arm][kind === "rear" ? "front" : kind])
         : roll(corners, [part.radius, part.radius, part.radius, part.radius]);
       // Arm faces that roll over at the top shade from the top colour down, so the roll reads as soft.
       const fill = kind === "top" ? part.top : !part.lit ? FABRIC.wood
-        : part.arm && (kind === "front" || outerEnd) ? "url(#couch-arm)" : kind === "front" ? FABRIC.front : FABRIC.end;
-      const seam = kind === "front" && part.lit
+        : part.arm && (visibleUpholstery || outerEnd) ? "url(#couch-arm)" : visibleUpholstery ? FABRIC.front : FABRIC.end;
+      const seam = visibleUpholstery && part.lit
         ? `<path d="M${project(corners[3]).map(v => v.toFixed(2)).join(" ")}L${project(corners[2]).map(v => v.toFixed(2)).join(" ")}" stroke="#7896a5" stroke-width=".45" stroke-linecap="round" opacity=".35" fill="none"/>` : "";
-      const sheen = part.pillow && kind === "front" ? `<path d="${d}" fill="url(#couch-sheen)"/>` : "";
-      return `<path d="${d}" fill="${part.pillow && kind === "front" ? "url(#couch-pillow)" : fill}"/>${part.lit ? `<path d="${d}" ${glow(LIT[kind])}/>` : ""}${sheen}${part.pillow || part.seat || part.arm ? "" : seam}`;
+      const sheen = part.pillow ? `<path d="${d}" fill="url(#couch-sheen)"/>` : "";
+      const panel = part === BACK_PANEL && kind === "rear" ? ` class="couch-back"` : "";
+      return `<path${panel} d="${d}" fill="${part.pillow ? "url(#couch-pillow)" : fill}"/>${part.lit ? `<path d="${d}" ${glow(LIT[kind === "rear" ? "front" : kind])}/>` : ""}${sheen}${part.pillow || part.seat || part.arm ? "" : seam}`;
     }).join("");
   }).join("");
   // Soft contact shadow: downlights from above leave a dark, blurred footprint.
@@ -208,51 +214,54 @@ export const couches = `<defs>
   <linearGradient id="couch-pillow" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4b6676"/><stop offset=".55" stop-color="#38515f"/><stop offset="1" stop-color="#22364a"/></linearGradient>
   <radialGradient id="couch-sheen" cx=".5" cy=".18" r=".62"><stop stop-color="#a9c3cf" stop-opacity=".16"/><stop offset="1" stop-color="#a9c3cf" stop-opacity="0"/></radialGradient>
   <filter id="couch-shadow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="1.6"/></filter>
-</defs>` + walls.map(sofa).join("");
+</defs>` + COUCH_PLACEMENTS.map(sofa).join("");
 
 /** Warm the couch with the light that reaches it: floor pools near its footprint, plus room bounce. */
 export function mountCouchLight(svg: SVGSVGElement) {
-  const couchesByWall = walls.map(wall => ({
+  const couchesByWall = new Map(COUCH_PLACEMENTS.map(wall => [wall, {
     node: svg.querySelector<SVGGElement>(`.wall-couch[data-wall="${wall}"]`)!,
     samples: [0.2, 0.5, 0.8].map(t => project(world(wall, LENGTH * t, DEPTH + 0.15, 0))),
     lit: "", glow: "",
-  }));
-  return (scene: LightScene) => {
+  }]));
+  return (scene: LightScene, placement?: CouchPlacement) => {
+    if (!placement) return;
+    const couch = couchesByWall.get(placement)!;
     const ambient = Math.max(0, ...scene.zones.map(z => (z.tint > 0 ? z.washOpacity * 0.22 : 0)));
-    for (const couch of couchesByWall) {
-      const weight = scene.zones.map(() => 0);
-      for (const s of scene.spots) {
-        if (!s.poolOpacity) continue;
-        const sx = s.poolRx * 0.9 + 4, sy = s.poolRy * 2.2 + 3;
-        for (const [x, y] of couch.samples)
-          weight[s.zone] += s.poolOpacity * Math.exp(-(((x - s.x) / sx) ** 2 + ((y - s.floorY) / sy) ** 2) / 2) / couch.samples.length;
-      }
-      const total = weight.reduce((a, b) => a + b, 0), zone = weight.indexOf(Math.max(...weight));
-      const ambientZone = scene.zones.reduce((best, z, i) => (z.washOpacity > scene.zones[best].washOpacity ? i : best), 0);
-      const lit = Math.min(0.6, total * 0.6 + ambient).toFixed(3);
-      const glow = `var(--mix-b-${total > 0.02 ? zone : ambientZone})`;
-      if (lit !== couch.lit) { couch.lit = lit; couch.node.style.setProperty("--couch-lit", lit); }
-      if (glow !== couch.glow) { couch.glow = glow; couch.node.style.setProperty("--couch-glow", glow); }
+    const weight = scene.zones.map(() => 0);
+    for (const s of scene.spots) {
+      if (!s.poolOpacity) continue;
+      const sx = s.poolRx * 0.9 + 4, sy = s.poolRy * 2.2 + 3;
+      for (const [x, y] of couch.samples)
+        weight[s.zone] += s.poolOpacity * Math.exp(-(((x - s.x) / sx) ** 2 + ((y - s.floorY) / sy) ** 2) / 2) / couch.samples.length;
     }
+    const total = weight.reduce((a, b) => a + b, 0), zone = weight.indexOf(Math.max(...weight));
+    const ambientZone = scene.zones.reduce((best, z, i) => (z.washOpacity > scene.zones[best].washOpacity ? i : best), 0);
+    const lit = Math.min(0.6, total * 0.6 + ambient).toFixed(3);
+    const glow = `var(--mix-b-${total > 0.02 ? zone : ambientZone})`;
+    if (lit !== couch.lit) { couch.lit = lit; couch.node.style.setProperty("--couch-lit", lit); }
+    if (glow !== couch.glow) { couch.glow = glow; couch.node.style.setProperty("--couch-glow", glow); }
   };
 }
 
 export function mountFurniture(svg: SVGSVGElement) {
-  const frames = walls.map(wall => ({
+  const frames = ROOM_WALLS.map(wall => ({
     wall,
     window: svg.querySelector(`.wall-window[data-wall="${wall}"]`)!,
     tv: svg.querySelector(`.wall-tv[data-wall="${wall}"]`)!,
-    couch: svg.querySelector(`.wall-couch[data-wall="${wall}"]`)!,
+  }));
+  const couches = COUCH_PLACEMENTS.map(placement => ({
+    placement,
+    node: svg.querySelector(`.wall-couch[data-wall="${placement}"]`)!,
   }));
   function show(node: Element, visible: boolean) {
     const display = visible ? "inline" : "none";
     if (node.getAttribute("display") !== display) node.setAttribute("display", display);
   }
-  return (walls: readonly RoomWall[], tv?: RoomWall, couch?: RoomWall) => {
+  return (walls: readonly RoomWall[], tv?: RoomWall, couch?: CouchPlacement) => {
     for (const frame of frames) {
       show(frame.window, walls.includes(frame.wall));
       show(frame.tv, tv === frame.wall);
-      show(frame.couch, couch === frame.wall);
     }
+    for (const { placement, node } of couches) show(node, couch === placement);
   };
 }

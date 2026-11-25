@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 // order all contribute to whether the room corner reads as a dark stripe.
 async function corners(room) {
   const png = (await room.screenshot()).toString("base64");
-  return room.evaluate(async (_, png) => {
+  return room.evaluate(async (svg, png) => {
     const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${png}`)).blob());
     const ctx = new OffscreenCanvas(image.width, image.height).getContext("2d");
     ctx.drawImage(image, 0, 0); image.close();
@@ -14,7 +14,8 @@ async function corners(room) {
       const i = 4 * (Math.floor(y * height / 174) * width + Math.floor(x * width / 320));
       return .213 * data[i] + .715 * data[i + 1] + .072 * data[i + 2];
     };
-    return [86, 258].map(x => {
+    return [".crease-left", ".crease-right"].map(selector => {
+      const x = svg.querySelector(selector).getPointAtLength(0).x;
       let trough = 0, step = 0;
       for (let y = 64; y < 116; y++) {
         const left = luma(x - 4, y), right = luma(x + 4, y);

@@ -1,8 +1,9 @@
-import type { EntityState, HomeAssistant, LightConfig, RoomWall } from "../../types.ts";
+import type { CouchPlacement, EntityState, HomeAssistant, LightConfig, RoomWall } from "../../types.ts";
 import { MAX_GRID, MAX_ZONES, defaultZoneMap, type Rgb } from "./spots.ts";
 
 export const DEFAULT_KELVIN = 2700;
 export const ROOM_WALLS = ["left", "back", "right"] as const satisfies readonly RoomWall[];
+export const COUCH_PLACEMENTS = [...ROOM_WALLS, "front"] as const satisfies readonly CouchPlacement[];
 export const roomWindows = (config: Pick<LightConfig, "windows" | "tv_wall">): RoomWall[] =>
   config.windows === undefined ? (config.tv_wall === "right" ? [] : ["right"]) : config.windows;
 const LIGHT = /^light\.[a-z0-9_]+$/;
@@ -26,10 +27,10 @@ export function settings(config: LightConfig) {
   if (config.variant !== undefined && config.variant !== "normal" && config.variant !== "compact")
     throw Error("Layout must be normal or compact.");
   if (config.walls_only !== undefined && typeof config.walls_only !== "boolean") throw Error("walls_only must be true or false.");
-  for (const key of ["tv_wall", "couch_wall"] as const) {
-    const wall = config[key];
-    if (wall !== undefined && !ROOM_WALLS.includes(wall)) throw Error(`${key} must be left, back or right, or omitted.`);
-  }
+  if (config.tv_wall !== undefined && !ROOM_WALLS.includes(config.tv_wall))
+    throw Error("TV wall must be left, back or right, or omitted.");
+  if (config.couch_wall !== undefined && !COUCH_PLACEMENTS.includes(config.couch_wall))
+    throw Error("Couch position must be left, back, right or front, or omitted.");
   const selection = roomWindows(config);
   if (!Array.isArray(selection) || selection.some(wall => !ROOM_WALLS.includes(wall)) ||
       new Set(selection).size !== selection.length)

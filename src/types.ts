@@ -141,6 +141,7 @@ export interface LightZoneConfig {
 }
 
 export type RoomWall = "left" | "back" | "right";
+export type CouchPlacement = RoomWall | "front";
 
 export interface LightConfig {
   type?: "custom:gleam-light";
@@ -156,8 +157,8 @@ export interface LightConfig {
   windows?: RoomWall[];
   /** Optional wall-mounted TV; cannot share a wall with a window. */
   tv_wall?: RoomWall;
-  /** Optional floor-standing couch; may sit below a window or TV. */
-  couch_wall?: RoomWall;
+  /** Optional floor-standing couch. Front faces the back wall. */
+  couch_wall?: CouchPlacement;
   beam_angle?: number;
   /** One string per row, back wall first: a zone number per spot, or "." for no spot. */
   zone_map?: string[];

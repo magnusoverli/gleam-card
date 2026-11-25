@@ -2,19 +2,19 @@
 
 ## Unreleased
 
-### Live visual editor previews
+## [0.0.12](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.12) · 2026-11-25
 
-- Preview names, colours, and appearance values while typing or dragging in all four cards. Entity IDs, image URLs, and history settings still wait until you finish editing. Previewing does not operate devices or save the dashboard.
+### 💡 New: Gleam Light · Room with ceiling spots
 
-### 💡 New: Gleam Light · In-roof spots
+- Choose **Gleam Light** in the card picker. Arrange recessed ceiling spots in a grid up to 8 × 8 or only along the walls, and assign them to zones in the visual plan.
+- Switch, dim or tune the colour temperature of up to three zones. Each zone can be a light entity or group. Tap a spot or its beam to switch its zone.
+- Furnish the room with windows, a wall-mounted TV and a three-seat couch. Put the couch against a wall or in front, facing the back wall. The room, furniture and spotlights share a centered perspective.
 
-- Choose **Gleam Light** in the card picker to show recessed ceiling spots in rows and columns (up to 8 × 8), or only along the walls.
-- Split the spots into up to three zones, each a light entity or group with its own switch, brightness and colour temperature. Tap the room to switch the nearest zone.
-- Reflected light now softens the rear corners where the beams cross them. Unlit corners remain visible, and the beams stay translucent.
-- Choose windows on any combination of the left, back and right walls. Place a TV on a window-free wall and a couch against any wall.
-- Assign spots in the visual editor’s plan view, or with the Left | right, Back | front and Walls | centre splits. Set the beam angle from the spot’s datasheet.
+[Try the Light demo](https://magnusoverli.github.io/gleam-card/light/) · [Light settings and YAML](https://github.com/magnusoverli/gleam-card/blob/v0.0.12/docs/light.md)
 
-[Light settings and YAML](https://github.com/magnusoverli/gleam-card/blob/main/docs/light.md)
+### 📦 General
+
+- Preview names, colours and appearance as you type or drag in all four cards. Entity IDs, image URLs and history settings still wait until you finish editing. Previewing does not operate devices or save the dashboard.
 
 ## [0.0.11](https://github.com/magnusoverli/gleam-card/releases/tag/v0.0.11) · 2026-11-19
 
